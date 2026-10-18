@@ -1,0 +1,13 @@
+; Looks for billiard tables with 180-degree rotational symmetry.
+c18
+h9
+w9
+v127 1
+rot180symm
+r39 39
+444
+444
+444!
+skipstable
+skipfizzle
+

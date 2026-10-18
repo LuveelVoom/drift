@@ -1,0 +1,18 @@
+.DS_Store
+__pycache__/
+# build output
+drift/drift
+drift/build/
+drift/tests/ruletest
+ref/dr2
+ref/dr2fixed
+# copies extracted from dr2.zip, and scratch runs
+ref/knownrotors
+ref/dr.documentation.txt
+ref/t1.*
+# run output
+*.ckpt
+*.ckpt.tmp
+*.jsonl
+# saved forum pages (contain a login session id)
+*.html

@@ -1,0 +1,22 @@
+c50
+h15
+w15
+rot90symm
+v127 1
+d2 36 36 44 44
+r36 36
+444344o.4
+....o.o.4
+oooo.oo.4
+4.o...o.3
+4o.....o4
+3.o...o.4
+4.oo.oooo
+4.o.o....
+4.o443444!
+d0 37 36 37 39
+d0 38 36 38 38
+d0 p39 37
+skipstable
+skipfizzle
+
