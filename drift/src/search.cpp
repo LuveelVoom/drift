@@ -140,7 +140,7 @@ void Search::initarrays() {
       bool inside = r >= 0 && r < HT && c >= 0 && c < WD;
       if (!inside || r <= 1 || r >= HT - 2 || c <= 1 || c >= WD - 2) {
         bkgd[i] = curr[i] = OFF;
-        flag[i] = 0xFF;
+        flag[i] = inside && P.checkBorder ? 0xFF & ~DONTCHECK : 0xFF;
       } else {
         bkgd[i] = curr[i] = UNK;
         flag[i] = 0;

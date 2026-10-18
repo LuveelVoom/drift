@@ -95,6 +95,18 @@ original arguments, plus a fingerprint of the search settings.
   explode. Counting everything with `max-changed 10`, `size 5x5` works and
   finds `g-eater` fizzles.
 
+- **Fixed dead border.** dr2 doesn't check the 2-cell dead border for stability.
+  In B3/S23-a5 spark searches, 70% of results were signals that ran into the
+  border and relied on it, so they couldn't be completed. Modern mode now
+  checks the border (`P.checkBorder`); `--classic` and `--unchecked-border`
+  keep dr2's behaviour.
+- **Partial results.** Completion is `tests/complete.py` (pysat).
+  `tests/minimize.py` shrinks stators with the rotor fixed phase by phase:
+  about 70% smaller, at most a few seconds each. Earlier bug: SAT variable
+  numbers overlapped the constants 0/1; they now start at 2.
+- **First attempt:** `attempts/a5/`, 180 real B3/S23-a5 oscillators (p4–p15)
+  from a 22 s spark search.
+
 ## 5. Open ideas
 
 - Further per-cell speedups in `trycell` and `listneighbors`.

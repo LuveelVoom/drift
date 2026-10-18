@@ -263,6 +263,7 @@ void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
       title = fmt("still going at gen %d: possible moving signal", gen);
       break;
   }
+  if (o.perRotor && oc != MAXGEN && ++seenRotor[main.desc] > o.perRotor) return;
   printed++;
   if (semifzl && (oc == PERIODIC || oc == STABLE)) title += " (semifizzle)";
 

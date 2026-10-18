@@ -20,6 +20,7 @@ struct Options {
   bool skipStable = false, skipFizzle = false, skipMaxgen = false, skipPeriodic = false;
   bool skipKnown = false;          // only print oscillators/fizzles not in known rotors
   int minPeriod = 0;
+  int perRotor = 0;                // print at most this many results per rotor (0 = all)
   bool noPics = false, noRle = false, showFin = false, showAll = false;
 
   std::string knownRotorsFile;     // empty = default lookup

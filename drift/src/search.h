@@ -49,6 +49,10 @@ struct Params {
   int maxchng = 9, maxwidth = 3, maxheight = 3, prob = 50;
   unsigned long seed = 1;
   int symm = NOSYMM;
+  // dr2.c doesn't check the fixed dead border for stability, so results can
+  // depend on cells that would really be born there. Checking it means
+  // "everything outside the space is dead".
+  bool checkBorder = false;
   long var[NUMVARS] = {};
   std::vector<int> reqchgcount;     // dr's "cc" command
   std::vector<PatternOp> ops;

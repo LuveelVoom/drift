@@ -195,6 +195,33 @@ At the end comes a summary of how many outcomes of each kind were found.
 `--jsonl FILE` also writes each result as one JSON line, including a plain
 on/off RLE of generation 0 in your rule.
 
+## Turning results into real patterns
+
+Pasting a result's RLE into Golly won't show a working oscillator. Its unknown
+cells count as dead there, and the LifeHistory rule runs plain Life rather
+than your rule. `tests/complete.py` finishes the job for you. It fills in the
+unknown cells with a SAT solver so that the whole background is a real still
+life, then simulates the finished pattern in your rule to confirm the
+oscillator. It needs `pip install python-sat`.
+
+    ./drift my.cfg --jsonl results.jsonl --per-rotor 8
+    python3 tests/complete.py results.jsonl --rule "$(./drift --rule B3/S23-a5 --show-rule | sed -n 's/^MAP: *//p')" --best real.txt
+
+`real.txt` then holds one working, complete pattern per distinct rotor,
+highest period first, as plain RLE in your rule. Add `--minimize` to shrink
+each stator. The rotor's behaviour stays fixed phase by phase, and a SAT
+solver finds the fewest live stator cells within 4 cells of the rotor
+(`--min-margin`, `--min-seconds`). Every minimised pattern is re-simulated
+before it's kept; in tests stators came out about 70% smaller.
+
+Some results can't be completed. drift only checks that each 3×3 window of
+the background is possible, so a large partial background (typically from a
+long transient) may have no still life that fits all of it. `--best` simply
+tries other results with the same rotor. dr2 has the same limitation.
+
+`--per-rotor N` prints at most N results per rotor. Without it a search can
+print thousands of copies of the same few oscillators.
+
 ## Setting up your own search
 
 ### The pattern
@@ -402,6 +429,11 @@ each unknown neighbour can be forced on its own.
 - **A stray (0,0) cell** appended to every neighbour list once a pattern is
   read. It only makes dr2 do a few extra no-op steps.
 - **The DONTCHECK cell list**, which dr2 restarts on each read command.
+- **The dead border is not checked for stability.** In dr2, results that reach
+  the edge of the space can rely on border cells that would really be born,
+  which makes them impossible to complete. drift checks the border (everything
+  outside the space is dead). `--unchecked-border` and `--classic` keep dr2's
+  behaviour.
 
 ## Tests
 
@@ -410,6 +442,7 @@ each unknown neighbour can be forced on its own.
     python3 tests/regress.py       # --classic output vs dr2.c, block by block
     python3 tests/bench.py         # speed vs dr2.c on identical work
     python3 tests/validate.py results.jsonl [--rule MAP…]   # re-simulate results independently
+    python3 tests/complete.py results.jsonl --rule MAP… --best real.txt --minimize   # real, small patterns
 
 The comparison with dr2 needs the original program built with the `v` fix,
 in `../ref`:

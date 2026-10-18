@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 
 #include "options.h"
@@ -37,6 +38,7 @@ class Reporter {
   const Options &o;
   size_t nknown;
   FILE *json = nullptr;
+  std::unordered_map<std::string, int> seenRotor;
 
   void classic(Search &s, Outcome o, int per, bool semifzl, uint64_t h);
   void modern(Search &s, Outcome o, int per, bool semifzl);

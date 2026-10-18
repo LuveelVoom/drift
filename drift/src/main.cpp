@@ -68,7 +68,7 @@ uint64_t fingerprint(const Options &o) {
   uint64_t h = 1469598103934665603ULL;
   h = fnvStr(h, o.rule.canonical());
   long nums[] = {P.HT, P.WD, P.maxgen, P.maxchng, P.maxwidth, P.maxheight, P.prob,
-                 (long)P.seed, P.symm};
+                 (long)P.seed, P.symm, P.checkBorder};
   h = fnv(h, nums, sizeof nums);
   h = fnv(h, P.var, sizeof P.var);
   for (int v : P.reqchgcount) h = fnv(h, &v, sizeof v);

@@ -29,6 +29,7 @@ struct Ctx {
   Region persistRegion;
   bool pushRight = false, pushDown = false, pushDownC2 = false;
   bool help = false;
+  bool uncheckedBorder = false;
   std::string baseDir;   // directory of the config file, for relative paths
 };
 
@@ -156,6 +157,10 @@ const std::vector<Opt> &opts() {
      [](Ctx &c, const std::string &v) {
        if (sscanf(v.c_str(), "%dx%d", &c.gridH, &c.gridW) != 2) fail("--grid expects HxW, e.g. 81x81");
      }},
+    {"unchecked-border", nullptr, "Search",
+     "Don't require the space's dead border to be stable (dr2.c's behaviour; results that\n"
+     "reach the edge may then be impossible to complete).",
+     [](Ctx &c, const std::string &v) { c.uncheckedBorder = toBool("unchecked-border", v); }},
     {"seed", "N", "Search", "Random seed for the order in which choices are tried. Default 1.",
      [](Ctx &c, const std::string &v) { c.o.params.seed = (unsigned)toLong("seed", v); }},
     {"prob", "PERCENT", "Search", "Chance of trying ON first at each free choice. Default 50.",
@@ -299,6 +304,9 @@ const std::vector<Opt> &opts() {
      [](Ctx &c, const std::string &v) { c.o.skipStable = toBool("skip-stable", v); }},
     {"skip-fizzle", nullptr, "Output", "Same as --skip fizzle (dr2: skipfizzle).",
      [](Ctx &c, const std::string &v) { c.o.skipFizzle = toBool("skip-fizzle", v); }},
+    {"per-rotor", "N", "Output",
+     "Print at most N results with the same rotor (or history, for fizzles).",
+     [](Ctx &c, const std::string &v) { c.o.perRotor = (int)toLong("per-rotor", v); }},
     {"min-period", "P", "Output", "Don't print oscillators with period below P.",
      [](Ctx &c, const std::string &v) { c.o.minPeriod = (int)toLong("min-period", v); }},
     {"no-pics", nullptr, "Output", "Don't print the character pictures.",
@@ -626,6 +634,7 @@ bool readModern(const std::vector<std::string> &args, Options &o) {
     P.var[134] = P.HT;
     P.var[135] = P.WD;
   }
+  P.checkBorder = !c.uncheckedBorder;
   if (P.maxgen < 1) fail("--max-gen must be at least 1");
   return true;
 }
