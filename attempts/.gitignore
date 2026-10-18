@@ -1,2 +1,3 @@
 *.txt
 !oscillators.txt
+!converters.txt

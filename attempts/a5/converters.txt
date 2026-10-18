@@ -1,0 +1,7 @@
+18-cell still life, spark in at gen 0, output spark, recovers at gen 7; independent check OK
+x = 8, y = 8, rule = B3/S23-a5
+6b2o$4bo2bo$3bob2o$obo2bo$2b2o2bo$3bob2o$3bo$2b2o!
+
+18-cell still life, spark in at gen 0, output spark, recovers at gen 7; independent check OK
+x = 8, y = 8, rule = B3/S23-a5
+6b2o$4bo2bo$3bob2o$2bo2bo$ob2o2bo$3bob2o$3bo$2b2o!
