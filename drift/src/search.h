@@ -21,7 +21,7 @@
 
 namespace drift {
 
-enum { DONTCHANGE = 1, DONTCOUNT = 2, DONTCHECK = 4 };
+enum { DONTCHANGE = 1, DONTCOUNT = 2, DONTCHECK = 4, MUSTREACH = 8 };
 constexpr int NUMVARS = 200;
 
 struct Region {

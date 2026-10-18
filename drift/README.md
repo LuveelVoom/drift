@@ -208,7 +208,12 @@ oscillator. It needs `pip install python-sat`.
     python3 tests/complete.py results.jsonl --rule "$(./drift --rule B3/S23-a5 --show-rule | sed -n 's/^MAP: *//p')" --best real.txt
 
 `real.txt` then holds one working, complete pattern per distinct rotor,
-highest period first, as plain RLE in your rule. Add `--minimize` to shrink
+highest period first, as plain RLE in your rule. Each oscillator is labelled
+**billiard table** (the rotor is walled in by the stator: you can't reach it
+from outside without crossing a live stator cell, and diagonal chains count as
+walls) or **exposed rotor**. `--no-billiards` keeps only exposed ones, trying
+other stators for a rotor before dropping it; the label depends on the stator.
+Add `--minimize` to shrink
 each stator. The rotor's behaviour stays fixed phase by phase, and a SAT
 solver finds the fewest live stator cells within 4 cells of the rotor
 (`--min-margin`, `--min-seconds`). Every minimised pattern is re-simulated
@@ -353,6 +358,18 @@ pattern:
 ..1
 111!
 ```
+
+**Spark converters** (`../attempts/a5/make_converter.py`, B3/S23-a5).
+
+- A spark arrives from empty space.
+- The still life is confined to a box, by clearing everything around it.
+- `--must-reach` regions just outside the box, away from the input, require the
+  reaction to put a live cell there.
+- `skip = oscillator, stable` keeps only reactions after which the still life
+  recovers.
+
+A 9×9 box with 10 changed cells in 6×6 finished in 0.3 s and found an 18-cell
+converter (`attempts/a5/converters.txt`).
 
 ## Long runs
 

@@ -187,6 +187,10 @@ const std::vector<Opt> &opts() {
      [](Ctx &c, const std::string &v) { region(c, PatternOp::SETFLAG, 2, v); }},
     {"check", "REGION", "Regions", "Undo --no-check in the region (dr2: D2).",
      [](Ctx &c, const std::string &v) { region(c, PatternOp::CLEARFLAG, 2, v); }},
+    {"must-reach", "REGION", "Regions",
+     "Only report results in which some cell in one of these regions changes (e.g. an\n"
+     "output spark appearing in empty space). May be given several times.",
+     [](Ctx &c, const std::string &v) { region(c, PatternOp::SETFLAG, 3, v); c.o.mustReach = true; }},
 
     // --- Extra constraints (dr2.c's v100..v139)
     {"change-counts", "N,N,...", "Constraints",

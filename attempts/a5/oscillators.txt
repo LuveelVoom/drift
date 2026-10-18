@@ -1,720 +1,720 @@
-p15  52 cells  rotor p15 r13 5x5 ...1. .1A0B 20@0. .A.1. ..AA.
+p15  52 cells  exposed rotor  rotor p15 r13 5x5 ...1. .1A0B 20@0. .A.1. ..AA.
 x = 11, y = 12, rule = B3/S23-a5
 b2o$bo2b2o$2b3o3bo$b3ob4o$2bo$bobob4o$bobobo3bo$2obob5o$bobo2bo$bo2b3ob2o$2o5b2obo$6b2obo!
 
-p13  44 cells  rotor p13 r12 4x5 .1.2. .0@@. B@0@3 .B.A.
+p13  44 cells  exposed rotor  rotor p13 r12 4x5 .1.2. .0@@. B@0@3 .B.A.
 x = 12, y = 13, rule = B3/S23-a5
 6b2o$6bobo$9bo$2o2b5o$o2bo$bob8o$2bo6bobo$b3o3b2obo$6bobo$3b4obo$3bo3bo$6bo$6b2o!
 
-p11  36 cells  rotor p11 r10 4x4 ..1. .1@A B@@0 .1.1
+p11  36 cells  exposed rotor  rotor p11 r10 4x4 ..1. .1@A B@@0 .1.1
 x = 10, y = 10, rule = B3/S23-a5
 4b2obo$5b3o$2b3obo$bo2bob2o$obo2bo2bo$bo3b3obo$3o2bo2bo$6b2o$2b4o$2bo2bo!
 
-p11  46 cells  rotor p11 r16 5x6 ...1.. .A.@A. .@@00B A00.B. 01A...
+p11  46 cells  exposed rotor  rotor p11 r16 5x6 ...1.. .A.@A. .@@00B A00.B. 01A...
 x = 12, y = 12, rule = B3/S23-a5
 5b2o$5bo$4b3o$3bo3bo2b2o$3b3o5bo$b2o4b4o$o2b3o$3o3b5o$3b2o3bo2bo$2bo2b2o3bo$2b2o3b3o$7bo!
 
-p11  48 cells  rotor p11 r11 4x5 ..2.. .10A. ..00A C00A.
+p11  48 cells  billiard table  rotor p11 r11 4x5 ..2.. .10A. ..00A C00A.
 x = 12, y = 11, rule = B3/S23-a5
 3b2ob2obo$3bo3b3o$4b3obo$b3o2bob2o$o3bo2bo2bo$bobo3b3obo$2ob2o2bo2bo$bobo4b2o$bo2b4o$2bobo2bo$3bo!
 
-p10  36 cells  rotor p10 r6 3x4 ..2. 30@A ..3.
+p10  36 cells  exposed rotor  rotor p10 r6 3x4 ..2. 30@A ..3.
 x = 10, y = 11, rule = B3/S23-a5
 8bo$4b2obobo$3bobob2o$3bobo2b2o$2obo3bobo$bobo3bo$o2bobobo$2o2b3o2$4b2obo$4bob2o!
 
-p10  41 cells  rotor p10 r8 4x4 ..2. 30@A ..1. ..BB
+p10  41 cells  exposed rotor  rotor p10 r8 4x4 ..2. 30@A ..1. ..BB
 x = 11, y = 11, rule = B3/S23-a5
 bo$obob2o3bo$b2obobobobo$2o2bob3obo$obobobo2bo$2bobobobo$2bo3bob2o$3b3o2$3b2obo$3bob2o!
 
-p10  41 cells  rotor p10 r12 4x4 ..1B A0@. 1@@B 121.  (Life rotor: new 10.0.0)
+p10  41 cells  exposed rotor  rotor p10 r12 4x4 ..1B A0@. 1@@B 121.  (Life rotor: new 10.0.0)
 x = 12, y = 10, rule = B3/S23-a5
 9b2o$9bo$4b2o2b3o$2b3obo$bo4b5o$o2b2o4bobo$b2o3b3obo$2bobobobo$2bobobobo$3b2ob2o!
 
-p10  45 cells  rotor p10 r12 4x5 ....3 .A0@. A@001 .2A.2
+p10  45 cells  exposed rotor  rotor p10 r12 4x5 ....3 .A0@. A@001 .2A.2
 x = 12, y = 12, rule = B3/S23-a5
 2bo$bobo$bobo$2ob2o3b2obo$4bo4b3o$5o3b2o$bo2bo4b3o$b3o3bob2o$4b5obo$3bo$4bobo$5b2o!
 
-p10  53 cells  rotor p10 r14 4x6 ....2. ..A.@2 .20@0A 2210A.
+p10  53 cells  exposed rotor  rotor p10 r14 4x6 ....2. ..A.@2 .20@0A 2210A.
 x = 13, y = 12, rule = B3/S23-a5
 2b2o$2bobobobo$4b5o2b2o$4bo3bobobo$5b3o2bo$3bobob4o$b3obobo$o4bobob2o$b5ob2o2bo$6bo3b2o$3b2obo$3bobo!
 
-p9  41 cells  rotor p9 r11 4x5 ...1. ..A0. 21@0B .BA2.
+p9  41 cells  exposed rotor  rotor p9 r11 4x5 ...1. ..A0. 21@0B .BA2.
 x = 12, y = 11, rule = B3/S23-a5
 3b2o$3bo2b2o$4bobobo$b4o3bo$o4b2obob2o$b3obob2o2bo$3bobo3bo$3bo2b3o$4b2o$6b2obo$6bob2o!
 
-p8  28 cells  rotor p8 r9 4x5 ....2 A@1A1 1.0.. .B...
+p8  28 cells  exposed rotor  rotor p8 r9 4x5 ....2 A@1A1 1.0.. .B...
 x = 9, y = 11, rule = B3/S23-a5
 4b2o$3bobo$3bo$2obo$bobobo$bobobo$2bo3b2o$3b2obo$4bobobo$4bo2b2o$3b2o!
 
-p8  33 cells  rotor p8 r7 3x3 ..2 2@1 20A
+p8  33 cells  billiard table  rotor p8 r7 3x3 ..2 2@1 20A
 x = 10, y = 9, rule = B3/S23-a5
 4b2obo$3bob2obo$3bo4bo$2obobo2b2o$o2b4obo$2bo3bobo$3b3o2b2o$5bobo$6b2o!
 
-p8  34 cells  rotor p8 r8 3x4 .33. 100A .33.  (Life rotor: R2D2 (SC 8.1.2))
+p8  34 cells  billiard table  rotor p8 r8 3x4 .33. 100A .33.  (Life rotor: R2D2 (SC 8.1.2))
 x = 11, y = 10, rule = B3/S23-a5
 5bo$4bobo$2obobobob2o$bobo3bobo$o2bo3bobo$2obobobob2o$3bobobo$3bobobo$4bobo$5bo!
 
-p8  41 cells  rotor p8 r11 4x5 ..1A. .A.1. .@00A 3.B.A
+p8  41 cells  exposed rotor  rotor p8 r11 4x5 ..1A. .A.1. .@00A 3.B.A
 x = 11, y = 12, rule = B3/S23-a5
 3bo$3b3o3b2o$6bo2bo$b5obobo$obo3bo2b2o$bob2o2bobo$3bob3obo$2bo5bo$2bob4o$3bo$5bo$4b2o!
 
-p8  42 cells  rotor p8 r12 4x5 ..1.C .202. A.02. A1A2.
+p8  42 cells  exposed rotor  rotor p8 r12 4x5 ..1.C .202. A.02. A1A2.
 x = 10, y = 13, rule = B3/S23-a5
 5b2o$6bo$2o3bo3bo$o2bo2b4o$b5o$7bo$b2o2b2obo$bo6bo$2b6o2$4b6o$4bo3bo$7b2o!
 
-p8  42 cells  rotor p8 r11 4x5 ..1.. 2@@13 2@.0. ..1A.
+p8  42 cells  exposed rotor  rotor p8 r11 4x5 ..1.. 2@@13 2@.0. ..1A.
 x = 12, y = 11, rule = B3/S23-a5
 5b2o$2o3bobobo$obo4bob3o$2bo4bobobo$2b2obobobo$3bobobobo$2bo3bobo$2b3obobobo$5b2o2b2o$4bobo$5bo!
 
-p8  42 cells  rotor p8 r10 4x5 ...2. A10@B A.1.. .1A..
+p8  42 cells  exposed rotor  rotor p8 r10 4x5 ...2. A10@B A.1.. .1A..
 x = 12, y = 12, rule = B3/S23-a5
 6b2o$6bo$2o5bo$bo2b3obo$bobo4bo$2obo2b3ob2o$bobobo3bobo$bob6o$2bo$3b4o$5bo$5b2o!
 
-p8  42 cells  rotor p8 r8 3x5 ..2.. 1@@1A .B..2  (Life rotor: new 8.0.0)
+p8  42 cells  exposed rotor  rotor p8 r8 3x5 ..2.. 1@@1A .B..2  (Life rotor: new 8.0.0)
 x = 11, y = 10, rule = B3/S23-a5
 5bob2o$3b4obo$2bo$o2b2ob2o$2obobo2bo$bobobobo2bo$bobobobob2o$2bo2bobo$b3obobo$bobob2o!
 
-p8  44 cells  rotor p8 r11 4x5 ..2.. .0@1. 20@@B .A2..
+p8  44 cells  exposed rotor  rotor p8 r11 4x5 ..2.. .0@1. 20@@B .A2..
 x = 12, y = 10, rule = B3/S23-a5
 4b2o$4bo4b2o$2o4bo2bo$b5obobo$b2o2bobo2b2o$2o4bobobo$obo3b3obo$2bo2bo3bo$2bobob3o$3b2obo!
 
-p7  29 cells  rotor p7 r5 3x3 .1. 30B .3.  (Life rotor: burloaferimeter (SC 7.0.0))
+p7  29 cells  exposed rotor  rotor p7 r5 3x3 .1. 30B .3.  (Life rotor: burloaferimeter (SC 7.0.0))
 x = 11, y = 9, rule = B3/S23-a5
 4b2ob2o$2o3bobo2bo$o2bo3bob2o$2b3ob2o$7bo$2b5o$2bo$4bo$3b2o!
 
-p7  32 cells  rotor p7 r7 3x4 ..2. A00B 33..
+p7  32 cells  exposed rotor  rotor p7 r7 3x4 ..2. A00B 33..
 x = 10, y = 10, rule = B3/S23-a5
 2b2ob2o$3bobo2bo$3bobob2o$2obo3bo$o2bo3bo$2bo2bobobo$3b2obob2o$4bobo$4bobo$5bo!
 
-p7  33 cells  rotor p7 r7 3x4 ..3. 30@A ..33
+p7  33 cells  exposed rotor  rotor p7 r7 3x4 ..3. 30@A ..33
 x = 11, y = 10, rule = B3/S23-a5
 4b2ob2o$2bo2bobobo$2b2obobobo$3bobobob2o$3bo3bo$2obo3bo$bo2b3o$bo$2b3o$4bo!
 
-p7  34 cells  rotor p7 r7 3x4 ..3. 2@0B 2.A.
+p7  34 cells  exposed rotor  rotor p7 r7 3x4 ..3. 2@0B 2.A.
 x = 10, y = 11, rule = B3/S23-a5
 5b2o$3bo2bo$2bob2o$2bobo3b2o$3o3bo2bo$ob2ob3o$bo$2b6o$7bo$4b3o$4bo!
 
-p7  35 cells  rotor p7 r8 3x4 .0@1 2@.A .2A.  (Life rotor: new 7.0.0)
+p7  35 cells  exposed rotor  rotor p7 r8 3x4 .0@1 2@.A .2A.  (Life rotor: new 7.0.0)
 x = 10, y = 11, rule = B3/S23-a5
 4b2o$2obobo$bobo$bobo$2obobo2b2o$bob2obo2bo$bo2bobobo$2b3obob2o$5bo$4bo$4b2o!
 
-p7  35 cells  rotor p7 r8 4x4 ..2. A00B 32.. ..C.
+p7  35 cells  exposed rotor  rotor p7 r8 4x4 ..2. A00B 32.. ..C.
 x = 12, y = 10, rule = B3/S23-a5
 6b2o$6bo$3bo3bo$o2b4obo$3o3bob3o$3bo3bo3bo$2bo5b3o$2bob4o$3bobo2bo$7b2o!
 
-p7  36 cells  rotor p7 r8 3x4 .111 300. .1B.
+p7  36 cells  exposed rotor  rotor p7 r8 3x4 .111 300. .1B.
 x = 10, y = 10, rule = B3/S23-a5
 8bo$6b3o$b2o4b3o$bobo3bo$2bo3b4o$4bo2b2o$7o2bo$bo6bo$b2o2b3o$5bo!
 
-p7  38 cells  rotor p7 r10 3x5 ..1@. B2.@2 BAA2.
+p7  38 cells  exposed rotor  rotor p7 r10 3x5 ..1@. B2.@2 BAA2.
 x = 11, y = 12, rule = B3/S23-a5
 8b2o$3b2o4bo$3bo3bo$4bo2b2o$obobo3bo$3obobobobo$2bob2obob2o$2bo2bobo$3b3obo$6bo$5bo$5b2o!
 
-p7  39 cells  rotor p7 r10 3x5 .3.3. 100@A .3.33
+p7  39 cells  exposed rotor  rotor p7 r10 3x5 .3.3. 100@A .3.33
 x = 10, y = 11, rule = B3/S23-a5
 4b2o$bobobo$b2o$2b6o$o7bo$5o2bobo$8bo$8o$o$2b2obo$b2ob2o!
 
-p7  40 cells  rotor p7 r10 4x4 ..2. A10A A.0. .A@B  (Life rotor: SC 7.0.2)
+p7  40 cells  exposed rotor  rotor p7 r10 4x4 ..2. A10A A.0. .A@B  (Life rotor: SC 7.0.2)
 x = 11, y = 11, rule = B3/S23-a5
 6b2o$4b3obo$3bo4bo$3b5ob2o$b2o4bobo$o2b3obobo$obo4bob2o$b2ob2obo$4bo2bo$4bobo$5bo!
 
-p7  43 cells  rotor p7 r12 4x5 ..33. ..102 3.A0. 3A1A.
+p7  43 cells  exposed rotor  rotor p7 r12 4x5 ..33. ..102 3.A0. 3A1A.
 x = 10, y = 12, rule = B3/S23-a5
 5b2o$5bo$2bo3bo$2b4obo$5bobo$4obobobo$bo3bob3o$2obobo2bo$2bo2bobobo$2bobo2b2o$obob2o$2o!
 
-p7  44 cells  rotor p7 r9 4x4 ...3 1A11 0@.. B1..
+p7  44 cells  exposed rotor  rotor p7 r9 4x4 ...3 1A11 0@.. B1..
 x = 12, y = 11, rule = B3/S23-a5
 5b2o$6bo$b2obobob2o$o2b2ob2obo$b2obo2bobobo$2bo2b3ob3o$2bo4bobo$3b4o2bo$9b2o$b4o$bo2bo!
 
-p7  45 cells  rotor p7 r11 4x6 ...1A. .B..@1 1@@AA. ..2...  (Life rotor: new 7.2.2)
+p7  45 cells  exposed rotor  rotor p7 r11 4x6 ...1A. .B..@1 1@@AA. ..2...  (Life rotor: new 7.2.2)
 x = 11, y = 12, rule = B3/S23-a5
 6bo$5bobo$2ob3obo$b2o4b2o$2ob4o2bo$6bob2o$5obo$o5bob2o$b4obobobo$5bo3bo$3bo$3b2o!
 
-p7  46 cells  rotor p7 r13 5x5 ....3 ..32. ..1@B 3.A0. 3A1A.
+p7  46 cells  exposed rotor  rotor p7 r13 5x5 ....3 ..32. ..1@B 3.A0. 3A1A.
 x = 10, y = 12, rule = B3/S23-a5
 6b2o$5bo2bo$2bo3bo2bo$2b4ob2o$5bobo$4obobobo$bo3bob3o$2obobo2bo$2bo2bobobo$2bobo2b2o$obob2o$2o!
 
-p6  27 cells  rotor p6 r7 3x4 ..2. B0@2 .0@.
+p6  27 cells  exposed rotor  rotor p6 r7 3x4 ..2. B0@2 .0@.
 x = 11, y = 7, rule = B3/S23-a5
 5bobo$3b3ob3o$2bo3bo3bo$o2b4obobo$2obo2bob2o$3bo$3b2o!
 
-p6  28 cells  rotor p6 r6 3x4 ...2 .1@A A1..  (Life rotor: new 6.1.0)
+p6  28 cells  exposed rotor  rotor p6 r6 3x4 ...2 .1@A A1..  (Life rotor: new 6.1.0)
 x = 10, y = 10, rule = B3/S23-a5
 4bo$2b3o$bo3b2o$ob2o3bo$bo3b2obo$2b2o4bo$3bob2ob2o$3bo2bo$4bobo$5bo!
 
-p6  33 cells  rotor p6 r6 3x4 ..2. 30@B .2..  (Life rotor: $rats (SC 6.0.3))
+p6  33 cells  exposed rotor  rotor p6 r6 3x4 ..2. 30@B .2..  (Life rotor: $rats (SC 6.0.3))
 x = 10, y = 9, rule = B3/S23-a5
 6b2o$2b2obo2bo$o2bob2obo$2obo4b2o$3bob3o$3bo4b2o$4b3obo$7b3o$6b2obo!
 
-p6  34 cells  rotor p6 r7 3x4 ..2. A1@2 2.1.
+p6  34 cells  exposed rotor  rotor p6 r7 3x4 ..2. A1@2 2.1.
 x = 10, y = 10, rule = B3/S23-a5
 5b2obo$6b3o$3b3obo$2bo4b2o$2b2obo$5bob2o$4ob2o2bo$o2bo4bo$5b3o$4b2o!
 
-p6  34 cells  rotor p6 r7 3x4 ..3. A101 2.B.  (Life rotor: SC 6.0.5)
+p6  34 cells  exposed rotor  rotor p6 r7 3x4 ..3. A101 2.B.  (Life rotor: SC 6.0.5)
 x = 11, y = 9, rule = B3/S23-a5
 4b2ob2o$5bobo2bo$3bobobob2o$b5obo$o6bo$b6o$3bo$5b4o$4b2o2bo!
 
-p6  34 cells  rotor p6 r7 3x4 ..2. 30@A ..33
+p6  34 cells  exposed rotor  rotor p6 r7 3x4 ..2. 30@A ..33
 x = 10, y = 11, rule = B3/S23-a5
 bo$obob2o$b2obo2bo$2o2bob2o$obobobo$2bobobo$2bo3bob2o$3b3o2bo$8bo$5b3o$5bo!
 
-p6  35 cells  rotor p6 r9 3x4 .2.B A00@ .32B
+p6  35 cells  exposed rotor  rotor p6 r9 3x4 .2.B A00@ .32B
 x = 10, y = 10, rule = B3/S23-a5
 3bo$3b3o$b2o3bo$o2b4o$b2obo2b2o$2bo2b2o2bo$2bo3bob2o$obobobo$2o2b3o$4bo!
 
-p6  35 cells  rotor p6 r13 5x5 ...1. ..01. 3101C .11.C .AA..
+p6  35 cells  exposed rotor  rotor p6 r13 5x5 ...1. ..01. 3101C .11.C .AA..
 x = 9, y = 12, rule = B3/S23-a5
 2o$bo$bob2o$2bo2bo$3bobo$2b2obob2o$2b2obo2bo$2bo3b2o$3b2obo$bobob3o$b2o5bo$7b2o!
 
-p6  35 cells  rotor p6 r9 4x5 ....2 ..1@A A@0.. .A1..
+p6  35 cells  exposed rotor  rotor p6 r9 4x5 ....2 ..1@A A@0.. .A1..
 x = 11, y = 10, rule = B3/S23-a5
 4b2o3bo$4bobobobo$6bob2o$5bo$2o5b3o$o2b3o3bo$b2o3b3o$4b2o$b3o2bo$bo3b2o!
 
-p6  36 cells  rotor p6 r7 3x4 ..1. 1A0B B.B.
+p6  36 cells  exposed rotor  rotor p6 r7 3x4 ..1. 1A0B B.B.
 x = 12, y = 10, rule = B3/S23-a5
 6bo$5bobo$2bobobobo$3obobobo$obob2ob2ob2o$9bobo$3b2ob2obo$4bobo2bo$2bo4b2o$2b2o!
 
-p6  36 cells  rotor p6 r8 3x5 ....2 1A0AA B.A..
+p6  36 cells  exposed rotor  rotor p6 r8 3x5 ....2 1A0AA B.A..
 x = 9, y = 12, rule = B3/S23-a5
 4bobo$3bob2o$3bo$bobob4o$obo2bo2bo$b3obobo$7b2o$3b3o$2bo4b2o$3b3obo$5bobo$6bo!
 
-p6  36 cells  rotor p6 r9 4x5 ...33 ....2 AA@A. 2.A..
+p6  36 cells  exposed rotor  rotor p6 r9 4x5 ...33 ....2 AA@A. 2.A..
 x = 10, y = 10, rule = B3/S23-a5
 7b2o$8bo$bob2obo$b2obob2o$9bo$b4obob2o$obo3bobo$ob4o2bo$b3o4b2o$3bo!
 
-p6  36 cells  rotor p6 r8 3x4 .2.2 10@A .32.
+p6  36 cells  exposed rotor  rotor p6 r8 3x4 .2.2 10@A .32.
 x = 10, y = 10, rule = B3/S23-a5
 4bo$3bobo$2bobobo$2bo3bo$obo2b2ob2o$3o4b2o$bo2bob2obo$obobo4bo$b2obob3o$5b2o!
 
-p6  37 cells  rotor p6 r10 4x4 ...3 B22. @0@A B.B.
+p6  37 cells  billiard table  rotor p6 r10 4x4 ...3 B22. @0@A B.B.
 x = 11, y = 11, rule = B3/S23-a5
 4bo$4b3o$2b2o3bo$bo2b4o$ob2obo2b2o$o2bo2b2o2bo$bobo3bobo$2b2obo2bo$4bob2o$4bo$3b2o!
 
-p6  37 cells  rotor p6 r11 4x5 ...2. 10@.A .A@AA .32..
+p6  37 cells  exposed rotor  rotor p6 r11 4x5 ...2. 10@.A .A@AA .32..
 x = 11, y = 10, rule = B3/S23-a5
 5b2o$5bobo$2o5bo$bo5bob2o$3ob2obobo$4b4obo$2b2o3bob2o$bo2b2obo$2bobob2o$3bo!
 
-p6  37 cells  rotor p6 r8 4x4 ..1. 1A0B B.A. ..C.
+p6  37 cells  exposed rotor  rotor p6 r8 4x4 ..1. 1A0B B.A. ..C.
 x = 9, y = 11, rule = B3/S23-a5
 4bo$3bobo$3bobo$2b2ob2o$bo2bo2bo$ob2o2b2o$bo2bobo$2b3obobo$7b2o$2b2ob3o$2bob2ob2o!
 
-p6  37 cells  rotor p6 r8 3x5 ..1.. A1@AA 2...2
+p6  37 cells  exposed rotor  rotor p6 r8 3x5 ..1.. A1@AA 2...2
 x = 11, y = 9, rule = B3/S23-a5
 7b2o$3bo3bo$2bobo3bo$2bob4obo$2o7bo$bob3obob2o$bobo3bobo$2obobobobo$4b2ob2o!
 
-p6  37 cells  rotor p6 r9 4x5 ...33 2...2 AA@A. ..A..
+p6  37 cells  exposed rotor  rotor p6 r9 4x5 ...33 2...2 AA@A. ..A..
 x = 9, y = 10, rule = B3/S23-a5
 4b2o$2obo2bo$bob4o$o2bob3o$2obobo$5bo$4obob2o$o5bobo$b5o$3bo!
 
-p6  37 cells  rotor p6 r8 3x3 11A A.1 1AA
+p6  37 cells  exposed rotor  rotor p6 r8 3x3 11A A.1 1AA
 x = 10, y = 9, rule = B3/S23-a5
 2bo4bo$3o2b3o$obobo$2bo2bob3o$2bo3bobo$3b4ob2o$6bobo$b4obobo$bo2bob2o!
 
-p6  38 cells  rotor p6 r8 4x4 ..2. 30@A ..23 .C..
+p6  38 cells  exposed rotor  rotor p6 r8 4x4 ..2. 30@A ..23 .C..
 x = 10, y = 11, rule = B3/S23-a5
 bo$obob2o$b2obo2bo$2o2bob2o$obobobo$2bobobobo$2bo3b2obo$3b3o3bo$7b2o$5b3o$5bob2o!
 
-p6  38 cells  rotor p6 r10 4x6 .....2 ..1@AA 3A.1.. 31....
+p6  38 cells  exposed rotor  rotor p6 r10 4x6 .....2 ..1@AA 3A.1.. 31....
 x = 11, y = 9, rule = B3/S23-a5
 7bo$3bo2bobo$3b4obo$b2o4bob2o$o2b2obo2bo$bobobobo2bo$2o3bo2b2o$o2bob3o$2b2obobo!
 
-p6  38 cells  rotor p6 r8 2x5 1A0AA B.A.2
+p6  38 cells  exposed rotor  rotor p6 r8 2x5 1A0AA B.A.2
 x = 10, y = 12, rule = B3/S23-a5
 4b2o$5b3o$3bo4bo$b3ob2o2bo$o6b2o$b3obobo$2bo2bo2bo$bobob3o$bobo$2bo2b3o$6bo$5b2o!
 
-p6  39 cells  rotor p6 r10 3x6 ....13 2.1.A3 AA@1..
+p6  39 cells  exposed rotor  rotor p6 r10 3x6 ....13 2.1.A3 AA@1..
 x = 10, y = 11, rule = B3/S23-a5
 4b2o$3bob3o$3bo4bo$bob2obo2bo$obo2bob2o$b4o2bo$5bobo$b2ob2ob2o$bo4bo$3b2obo$2b2obo!
 
-p6  39 cells  rotor p6 r10 4x5 ...33 ....2 AA@A. 2.A.3
+p6  39 cells  exposed rotor  rotor p6 r10 4x5 ...33 ....2 AA@A. 2.A.3
 x = 10, y = 10, rule = B3/S23-a5
 5bo$2bobobo$3ob2o$obobob3o$9bo$b4obob2o$obo3bobo$ob4o2bo$b3o4b2o$3bo!
 
-p6  40 cells  rotor p6 r9 4x5 ...1. .3.AB A@1A. .B...  (Life rotor: new 6.8.0)
+p6  40 cells  exposed rotor  rotor p6 r9 4x5 ...1. .3.AB A@1A. .B...  (Life rotor: new 6.8.0)
 x = 12, y = 11, rule = B3/S23-a5
 5b2obo$6b2obo$3b3ob2o$2bo$2bob5o$3obobo2bobo$obobo2b2ob2o$4bo3bo$4bobobo$5bobo$6bo!
 
-p6  40 cells  rotor p6 r8 4x5 ...2. ..1@2 .B.1. CC...
+p6  40 cells  exposed rotor  rotor p6 r8 4x5 ...2. ..1@2 .B.1. CC...
 x = 11, y = 11, rule = B3/S23-a5
 6bo$5bobo$b2o2bo2bo$o2bob2obo$b3o4b2o$4bobo$3bo2bob2o$3b4obobo$2b3obo2bo$bo2bobo$b2o2bo!
 
-p6  40 cells  rotor p6 r11 4x5 ..2A. .1.1. 2A0@1 .B.2.
+p6  40 cells  exposed rotor  rotor p6 r11 4x5 ..2A. .1.1. 2A0@1 .B.2.
 x = 10, y = 12, rule = B3/S23-a5
 2b2o$3bo2bo$3bobobo$2b2obo2bo$o2bob2obo$4obo2b2o$3bo3bo$4obobo$o4b2o$b3o$2bo$b2o!
 
-p6  40 cells  rotor p6 r11 4x6 ....13 2.1.A3 AA@1.. ....3.
+p6  40 cells  exposed rotor  rotor p6 r11 4x6 ....13 2.1.A3 AA@1.. ....3.
 x = 11, y = 10, rule = B3/S23-a5
 6bo$2b2obobo$o2bob2o$2o3bob3o$bobobobo2bo$o2b2obo2bo$b2o4bob2o$4b2obo$b2obob2o$bobo!
 
-p6  40 cells  rotor p6 r9 4x4 ...3 .22. A0@A B.B.
+p6  40 cells  exposed rotor  rotor p6 r9 4x4 ...3 .22. A0@A B.B.
 x = 10, y = 12, rule = B3/S23-a5
 2o$o$2bob2o$b2obobo$2bo3bo$obo2b2obo$3o4bobo$bo2bob3o$obobo$b2obob3o$5bo2bo$6b2o!
 
-p6  41 cells  rotor p6 r7 4x4 ...3 .2.A 2@1. .1..
+p6  41 cells  exposed rotor  rotor p6 r7 4x4 ...3 .2.A 2@1. .1..
 x = 10, y = 12, rule = B3/S23-a5
 3b2o$3bo$4bo$b3obobobo$o2bobob3o$3o2bo2bo$3bo2bob2o$2ob2obo$b2o3bo$2ob3o$4bo$4b2o!
 
-p6  41 cells  rotor p6 r10 4x5 ...33 2...2 AA@A. ..A.3
+p6  41 cells  exposed rotor  rotor p6 r10 4x5 ...33 2...2 AA@A. ..A.3
 x = 10, y = 10, rule = B3/S23-a5
 b2o2b2o$bo2bo2bo$3ob4o$4bob3o$3obobo$bo4bo$ob3obob2o$bo5bobo$2b5o$4bo!
 
-p6  41 cells  rotor p6 r9 4x6 .....2 ..1@AA .B.1.. CC....
+p6  41 cells  exposed rotor  rotor p6 r9 4x6 .....2 ..1@AA .B.1.. CC....
 x = 12, y = 9, rule = B3/S23-a5
 3bo2bobo$3b4ob3o$11bo$b5obob2o$o2bo3bobo$b3obobobo$2b3obobo$obo3bo$2o4b2o!
 
-p6  42 cells  rotor p6 r10 4x4 ..2. 32.A 1@@0 B..B
+p6  42 cells  billiard table  rotor p6 r10 4x4 ..2. 32.A 1@@0 B..B
 x = 10, y = 11, rule = B3/S23-a5
 3bo$3b3o$b2o3bo$o2b4o$bobo3b2o$2ob4o2bo$bobo2bobo$bob4ob2o$2bo4bo$3b3obo$5b2o!
 
-p6  42 cells  rotor p6 r10 3x5 .1A0B .@.@. B01A.
+p6  42 cells  exposed rotor  rotor p6 r10 3x5 .1A0B .@.@. B01A.
 x = 9, y = 11, rule = B3/S23-a5
 b2o2bo$bo2bobo$5obo$5bob2o$2b3o2bo$bobo3bo$bob4o$2obo$2bob5o$2bobo2bo$3bo2b2o!
 
-p6  42 cells  rotor p6 r11 4x6 .....2 3..A0A .A@@.. 3.AA..
+p6  42 cells  exposed rotor  rotor p6 r11 4x6 .....2 3..A0A .A@@.. 3.AA..
 x = 12, y = 11, rule = B3/S23-a5
 4b2o3b2o$4bobobobo$6bobo$5bo3bo$2o5b2o$o2b3o3b3o$b2o3b2o3bo$4b2o2b2o$b3o2bobo$bo3bo2bo$6b2o!
 
-p6  42 cells  rotor p6 r11 4x6 ....13 ..1.A3 AA@1.. 2...3.
+p6  42 cells  exposed rotor  rotor p6 r11 4x6 ....13 ..1.A3 AA@1.. 2...3.
 x = 10, y = 11, rule = B3/S23-a5
 b2obo$2b2obob2o$o4bobo$2ob2o2bo$4bobo$4o2bobo$bo2bob2obo$b3obo3bo$6b3o$3b2obo$3bobo!
 
-p6  42 cells  rotor p6 r9 4x5 ...33 .A.2. B@A.. .2.3.
+p6  42 cells  exposed rotor  rotor p6 r9 4x5 ...33 .A.2. B@A.. .2.3.
 x = 10, y = 12, rule = B3/S23-a5
 2b2o$3bo2bo$2bo3b3o$o2b3o3bo$3o4bobo$3bobob2o$2bo2bo$2b4ob2o$b3obo2bo$3bobobo$3bo2bo$2b2o!
 
-p6  44 cells  rotor p6 r11 4x5 ...3. B11@. .A0@3 .2.A.
+p6  44 cells  exposed rotor  rotor p6 r11 4x5 ...3. B11@. .A0@3 .2.A.
 x = 11, y = 11, rule = B3/S23-a5
 b2o$bobob2o2b2o$3bobobo2bo$2bo2bobobo$o2b3obob2o$3o2bobo$3bo3bo$2o2b3o$o$b6o$3bo2bo!
 
-p6  44 cells  rotor p6 r10 4x5 ...2. ..1@. .221. B0A.3
+p6  44 cells  exposed rotor  rotor p6 r10 4x5 ...2. ..1@. .221. B0A.3
 x = 12, y = 11, rule = B3/S23-a5
 4bo$2b3o2bob2o$bo3b3obobo$bobo7bo$2bob7o$obobobobo$3o3bo$2bobob2o$3b2o3bo$5b3o$5bo!
 
-p6  44 cells  rotor p6 r8 4x5 ...1. ..1@2 .B.2. CC...
+p6  44 cells  exposed rotor  rotor p6 r8 4x5 ...1. ..1@2 .B.2. CC...
 x = 13, y = 9, rule = B3/S23-a5
 2bo2bob2o$2b4obobo$3b2o4b3o$2bo2b3o4bo$bobobo3b3o$b2ob4obo$3ob2obo$2b2obobo$6bo!
 
-p6  44 cells  rotor p6 r8 4x5 ....2 .1@AA A.1.. 3....
+p6  44 cells  exposed rotor  rotor p6 r8 4x5 ....2 .1@AA A.1.. 3....
 x = 12, y = 12, rule = B3/S23-a5
 8b2o$9bo$3bobobo$2bob2ob2o$2bo4bo$2ob2obo2bo$bobobobob3o$bo3bobobobo$2b3obo2bo$6bob2o$4b3o$4bobo!
 
-p6  45 cells  rotor p6 r8 4x5 ...1B .B..B 3@A.. ..3..
+p6  45 cells  exposed rotor  rotor p6 r8 4x5 ...1B .B..B 3@A.. ..3..
 x = 12, y = 12, rule = B3/S23-a5
 6b2o$6bo$7bo$4b3obob2o$3bo4b3o$3bob3o2b2o$2obobo2b3o$o2bob2obob2o$2bobo4bobo$3bo2b3o$7bo$6b2o!
 
-p6  45 cells  rotor p6 r9 4x5 ...1. ..1@2 .B.1. CC.C.
+p6  45 cells  exposed rotor  rotor p6 r9 4x5 ...1. ..1@2 .B.1. CC.C.
 x = 13, y = 10, rule = B3/S23-a5
 2bo2bob2o$2b4obobo$3b2o4b3o$3o2b3o4bo$o2bobo3b3o$2bob4obo$b2ob2ob2o$3bobo$3bobo$4bo!
 
-p6  47 cells  rotor p6 r11 4x5 ...3. .1.@2 A0@@2 3.1..
+p6  47 cells  exposed rotor  rotor p6 r11 4x5 ...3. .1.@2 A0@@2 3.1..
 x = 9, y = 12, rule = B3/S23-a5
 3bo3b2o$2bobobobo$2bob2o$b2obob2o$o3bo3bo$b2o2b4o$3o2bo$o2bobob2o$b4ob2o$6b2o$3bobob2o$3b2o!
 
-p6  47 cells  rotor p6 r11 3x5 .2.23 10@@A 32.2.
+p6  47 cells  exposed rotor  rotor p6 r11 3x5 .2.23 10@@A 32.2.
 x = 13, y = 9, rule = B3/S23-a5
 4bob2o2b2o$bobob2o3bo$b2ob2ob3o2bo$3ob2o4b3o$2b2o3b3o$5bo4bo$2b4ob2obo$2bo3b2obo$5b2obo!
 
-p6  48 cells  rotor p6 r9 4x5 ...1. .B.A2 10A1. .C...  (Life rotor: new 6.8.1)
+p6  48 cells  exposed rotor  rotor p6 r9 4x5 ...1. .B.A2 10A1. .C...  (Life rotor: new 6.8.1)
 x = 12, y = 12, rule = B3/S23-a5
 7b2o$7bobo$2bo6bo$3o2b4o$obobo$2bob2o2b3o$bo2bobo2bo$bob2ob2ob2o$2bo3bo2bo$3b3o2b3o$4bo6bo$3b2o5b2o!
 
-p5  25 cells  rotor p5 r5 2x3 1@B B.B
+p5  25 cells  exposed rotor  rotor p5 r5 2x3 1@B B.B
 x = 8, y = 8, rule = B3/S23-a5
 3bob2o$3b2o2bo$4b4o$obo$3obob2o$2bobo2bo$3bo2bo$4b2o!
 
-p5  27 cells  rotor p5 r5 3x3 ..2 2@A 2..
+p5  27 cells  exposed rotor  rotor p5 r5 3x3 ..2 2@A 2..
 x = 9, y = 11, rule = B3/S23-a5
 4b2o$3bobo$3bo$2ob2o$bo4b2o$o2bob2obo$b2o2bobo$3b2o$3bo$4bo$3b2o!
 
-p5  27 cells  rotor p5 r6 3x4 ..2. .1.A A1A.
+p5  27 cells  exposed rotor  rotor p5 r6 3x4 ..2. .1.A A1A.
 x = 9, y = 10, rule = B3/S23-a5
 6b2o$5bo2bo$5bob2o$4b2o$2bo4b2o$2b3o3bo$5bobo$4obo$o2bobo$4bo!
 
-p5  28 cells  rotor p5 r5 2x3 .1A B02
+p5  28 cells  exposed rotor  rotor p5 r5 2x3 .1A B02
 x = 9, y = 10, rule = B3/S23-a5
 5b2o$5bo2bo$2b2obob2o$2bo2bobo$obo4bo$3obobo$2bob2o$3bo$4bobo$5b2o!
 
-p5  30 cells  rotor p5 r6 3x3 .1A B02 .2.
+p5  30 cells  exposed rotor  rotor p5 r6 3x3 .1A B02 .2.
 x = 10, y = 10, rule = B3/S23-a5
 7b2o$6bobo$6bo$4b2obo$3bobobo$3bo2bob2o$b2o3bobo$obobobobo$bo2b2obo$4bobo!
 
-p5  30 cells  rotor p5 r9 4x4 ..01 ..@A A00B .2..  (Life rotor: new 5.0.1)
+p5  30 cells  exposed rotor  rotor p5 r9 4x4 ..01 ..@A A00B .2..  (Life rotor: new 5.0.1)
 x = 9, y = 10, rule = B3/S23-a5
 2obo$ob2o$2b3o$b2o2bo$bobobo$3bobobo$3bo3bo$4bobo$2bobobobo$2b2o3b2o!
 
-p5  30 cells  rotor p5 r10 4x5 ...2. 2.01A A@1.. .23..
+p5  30 cells  exposed rotor  rotor p5 r10 4x5 ...2. 2.01A A@1.. .23..
 x = 11, y = 10, rule = B3/S23-a5
 7bo$3b2obobo$b3ob2obo$o6bo$b4o2$b3o3b2o$2bo4bo$b2o5b3o$10bo!
 
-p5  31 cells  rotor p5 r7 3x3 .10 1@0 B.B  (Life rotor: new 5.0.0)
+p5  31 cells  exposed rotor  rotor p5 r7 3x3 .10 1@0 B.B  (Life rotor: new 5.0.0)
 x = 10, y = 10, rule = B3/S23-a5
 2b2o$2bo2b2o$3b2o2bobo$5bob3o$b3obobo$obo2b2o$bob3o$3bo$bobo$b2o!
 
-p5  32 cells  rotor p5 r6 3x4 ..2. 300B .3..
+p5  32 cells  exposed rotor  rotor p5 r6 3x4 ..2. 300B .3..
 x = 10, y = 11, rule = B3/S23-a5
 6bo$3bobobo$b3obo2bo$o5bobo$obobobob2o$b2obobo$6bo$b5o$bo$3bo$2b2o!
 
-p5  32 cells  rotor p5 r8 3x4 ..2. 20@1 .1A@
+p5  32 cells  exposed rotor  rotor p5 r8 3x4 ..2. 20@1 .1A@
 x = 10, y = 12, rule = B3/S23-a5
 5b2o$6bo$4bo$3bob4o$3bo5bo$2obob4o$o2b4o$b2o3bo$3b2o$3bo$4bo$3b2o!
 
-p5  33 cells  rotor p5 r5 3x3 ..2 311 .2.
+p5  33 cells  exposed rotor  rotor p5 r5 3x3 ..2 311 .2.
 x = 10, y = 9, rule = B3/S23-a5
 bo6bo$b3o3bobo$4bo3b2o$3bobob2o$3bobo2b2o$bobob3obo$obobo$obo2bo$bo2b2o!
 
-p5  33 cells  rotor p5 r10 4x4 ..0B ..0A 3100 31..
+p5  33 cells  exposed rotor  rotor p5 r10 4x4 ..0B ..0A 3100 31..
 x = 9, y = 10, rule = B3/S23-a5
 3bob2o$b5o$o4b2o$2o2b2o2bo$7b2o$4o$o3bo$2b2obo$b2o2bo$bob2o!
 
-p5  34 cells  rotor p5 r10 4x4 ..1B ..A. 20@1 .AA@
+p5  34 cells  exposed rotor  rotor p5 r10 4x4 ..1B ..A. 20@1 .AA@
 x = 10, y = 12, rule = B3/S23-a5
 5b2o$6bo$4bo$3bob4o$3bo5bo$2obob4o$bob4o$o5bo$2ob2o$bobo$bobo$2bo!
 
-p5  34 cells  rotor p5 r9 4x4 ..1B B.@. A@@A ..C.
+p5  34 cells  exposed rotor  rotor p5 r9 4x4 ..1B B.@. A@@A ..C.
 x = 9, y = 11, rule = B3/S23-a5
 4b2o$3bobo$2bo$2b6o$8bo$5o2b2o$o$bobob4o$2b2obo2bo$5bobo$5b2o!
 
-p5  34 cells  rotor p5 r5 3x3 ..2 A1@ .B.
+p5  34 cells  exposed rotor  rotor p5 r5 3x3 ..2 A1@ .B.
 x = 10, y = 10, rule = B3/S23-a5
 8bo$b2o4bobo$bobo4b2o$3bo3b2o$3bobo2b2o$b2o3b2obo$o2b3obo$bo5bo$2b5o$4bo!
 
-p5  34 cells  rotor p5 r8 4x4 ...2 31@1 .10. .A..
+p5  34 cells  exposed rotor  rotor p5 r8 4x4 ...2 31@1 .10. .A..
 x = 11, y = 12, rule = B3/S23-a5
 7bo$6bobobo$6bob3o$3b2obobo$3bo2bo$2obob2o$bobo$bob2o$2bo3bo$3b4o$5b3o$5bo!
 
-p5  35 cells  rotor p5 r7 3x4 ..2. A@13 .A1.
+p5  35 cells  exposed rotor  rotor p5 r7 3x4 ..2. A@13 .A1.
 x = 10, y = 10, rule = B3/S23-a5
 6b2o$2b2obobo$3b2o$2b2ob2o$bo5bo$b4o2bo$4bobo$ob2o3b3o$2obob2o2bo$4bobo!
 
-p5  35 cells  rotor p5 r5 3x3 ..2 31@ .2.  (Life rotor: tech. fin. prod. (SC 5.1.0))
+p5  35 cells  billiard table  rotor p5 r5 3x3 ..2 31@ .2.  (Life rotor: tech. fin. prod. (SC 5.1.0))
 x = 11, y = 11, rule = B3/S23-a5
 5b2o$5bo$6bo$3b3obob2o$2bo2bobobo$3o3b2obo$obobobo2b2o$3b2obobo$5bo2bo$5bobo$6bo!
 
-p5  35 cells  rotor p5 r10 4x5 ...2B 3A22. 311.. ..B..
+p5  35 cells  exposed rotor  rotor p5 r10 4x5 ...2B 3A22. 311.. ..B..
 x = 11, y = 10, rule = B3/S23-a5
 b2ob2o$2bobo$2bobobo$2o3bobo$bobo3bo$bo2bob2ob2o$2b3o3bobo$6b2o$2b4o$2bo2bo!
 
-p5  35 cells  rotor p5 r12 4x5 ..0AB 31000 .11.. .CC..
+p5  35 cells  exposed rotor  rotor p5 r12 4x5 ..0AB 31000 .11.. .CC..
 x = 11, y = 12, rule = B3/S23-a5
 4b2o$bo2bo$b3o2bo$4b2obo$3bo2bo$2bob2o$2b2o5b2o$3bo2b2o2bo$3o4b2o$o5b2o$6bobo$7bo!
 
-p5  36 cells  rotor p5 r9 3x4 ..1B 2.@0 A0A1
+p5  36 cells  exposed rotor  rotor p5 r9 3x4 ..1B 2.@0 A0A1
 x = 10, y = 9, rule = B3/S23-a5
 3b2o$2bobo$3obob2o$obob2obo$5bobobo$b5ob3o$o4bobo$b3obo$3bob2o!
 
-p5  37 cells  rotor p5 r6 3x4 ..2. .113 3.A.
+p5  37 cells  billiard table  rotor p5 r6 3x4 ..2. .113 3.A.
 x = 12, y = 10, rule = B3/S23-a5
 7b2o$4bo2bobo$3bobobo2bo$3bob2obobo$2obob2obob2o$bobo3b2o$bobobo2bo$2bobob2o$4bo$3b2o!
 
-p5  37 cells  rotor p5 r11 4x4 ...3 1A1. .0A2 2111
+p5  37 cells  exposed rotor  rotor p5 r11 4x4 ...3 1A1. .0A2 2111
 x = 12, y = 12, rule = B3/S23-a5
 7b2o$7bo$2bob2obo2bo$3obo2bobobo$obobobo2b2o$2bobobobo$2b2ob2obo$7bo$2b2o$2bo$3bo$2b2o!
 
-p5  37 cells  rotor p5 r12 4x5 ...1. B111. .A0@A .1@A.
+p5  37 cells  exposed rotor  rotor p5 r12 4x5 ...1. B111. .A0@A .1@A.
 x = 11, y = 10, rule = B3/S23-a5
 4bo$4b3o$2b2o3bo$o2bob3o2bo$2o2bo3b3o$6b2o$5o3bo$o5b2o$2b4o$b2o2bo!
 
-p5  38 cells  rotor p5 r7 4x4 ..2. .11. 3.@B .C..
+p5  38 cells  billiard table  rotor p5 r7 4x4 ..2. .11. 3.@B .C..
 x = 12, y = 11, rule = B3/S23-a5
 6b2o$6bo$8bo$4b5o$3bo5b2o$3bo3b2o2bo$2obob2obob2o$bobob2obo$bo2bobobo$2bobo2bo$3b2o!
 
-p5  38 cells  rotor p5 r10 5x5 ...1. 31AA. ..AA1 ..1.. ..3..
+p5  38 cells  exposed rotor  rotor p5 r10 5x5 ...1. 31AA. ..AA1 ..1.. ..3..
 x = 11, y = 12, rule = B3/S23-a5
 6b2o$4bo2bo$3bob2o$3bo$2obo2b3o$bo2b2o3bo$bo2b2o2bo$2b2o2bobobo$6bo2b2o$2b5o$3bo$3b2o!
 
-p5  38 cells  rotor p5 r9 3x5 ...1A 321.A .@@1.
+p5  38 cells  exposed rotor  rotor p5 r9 3x5 ...1A 321.A .@@1.
 x = 11, y = 9, rule = B3/S23-a5
 3bobob2o$3b3obobo$4bo2bobo$b4obo2b2o$o4bobobo$2o2b4o2bo$8b2o$4b4o$4bo2bo!
 
-p5  39 cells  rotor p5 r9 4x4 ...1 .11A 10@. 2.2.  (Life rotor: new 5.0.4)
+p5  39 cells  exposed rotor  rotor p5 r9 4x4 ...1 .11A 10@. 2.2.  (Life rotor: new 5.0.4)
 x = 12, y = 9, rule = B3/S23-a5
 4b2o2b2obo$5bo3b3o$3bo4bobo$3b2o3bob2o$b2o2b4o2bo$o2b3o3bo$b2o3b3o$3b2obo$3bobo!
 
-p5  40 cells  rotor p5 r10 4x4 ..3. 1A02 1A03 ..C.
+p5  40 cells  exposed rotor  rotor p5 r10 4x4 ..3. 1A02 1A03 ..C.
 x = 12, y = 11, rule = B3/S23-a5
 4bo2bo$2b8o$bo8bo$bo2b4o2bo$2obo4bob2o$3bo4bobo$3bo4bobo$4b3obob2o$7bo$6bo$6b2o!
 
-p5  41 cells  rotor p5 r12 4x5 ....1 .AA@A 300@1 .AB..
+p5  41 cells  exposed rotor  rotor p5 r12 4x5 ....1 .AA@A 300@1 .AB..
 x = 13, y = 9, rule = B3/S23-a5
 5b2ob2o$2b2o2bobobo$3bobo2bobo$3bob2o3b2o$2obo4b2o2bo$o2bob2o4bo$bobobob4o$2bo2bo2bo$5b2o!
 
-p5  42 cells  rotor p5 r10 4x5 ..11. .1AA2 C@A.. ..B..
+p5  42 cells  exposed rotor  rotor p5 r10 4x5 ..11. .1AA2 C@A.. ..B..
 x = 11, y = 12, rule = B3/S23-a5
 5b2o$5bo$2b2obobo$o2bo2bobobo$2obobo2b3o$bob3o2bo$3obobobo$4bo2bo$2b5o$bo$2b3o$4bo!
 
-p5  42 cells  rotor p5 r10 4x5 ....3 2.111 A01.. .23..
+p5  42 cells  exposed rotor  rotor p5 r10 4x5 ....3 2.111 A01.. .23..
 x = 12, y = 11, rule = B3/S23-a5
 7bo$3b2obobo$b3ob2obo$o4b3o$4o$4bo5b2o$2b2o3b2o2bo$2bo3bob3o$3bo2bo$4bob3o$3b2obobo!
 
-p5  46 cells  rotor p5 r11 5x5 ...1. 31AA. ..AA1 ..1.. .3.3.
+p5  46 cells  exposed rotor  rotor p5 r11 5x5 ...1. 31AA. ..AA1 ..1.. .3.3.
 x = 12, y = 13, rule = B3/S23-a5
 9b2o$5b2obobo$4bob3o$4bo3bo$obobo$3obo2b4o$2bo2b2o4bo$2bo2b2o2bobo$3b2o2bob2o$7bo$3b5o$4bo$4b2o!
 
-p4  24 cells  rotor p4 r5 2x3 .01 CBB
+p4  24 cells  exposed rotor  rotor p4 r5 2x3 .01 CBB
 x = 9, y = 7, rule = B3/S23-a5
 bo2b2o$obo2bo$b2obo$4b4o$b3o4bo$o2b2o2b2o$2o!
 
-p4  26 cells  rotor p4 r4 2x3 .1. 2@2  (Life rotor: SC 4.2.6)
+p4  26 cells  billiard table  rotor p4 r4 2x3 .1. 2@2  (Life rotor: SC 4.2.6)
 x = 11, y = 8, rule = B3/S23-a5
 5bo$4bobo$3bobobo$3bo3bo$2ob2ob2ob2o$obo5bobo$3b5o$5bo!
 
-p4  27 cells  rotor p4 r4 2x4 ...3 C1A.  (Life rotor: DJB #104 (SC 4.2.2))
+p4  27 cells  exposed rotor  rotor p4 r4 2x4 ...3 C1A.  (Life rotor: DJB #104 (SC 4.2.2))
 x = 9, y = 11, rule = B3/S23-a5
 4b2o$3bobo$3bo$2obo$bobo$bobob2o$2obobobo$4b2obo$6bo$6bobo$7b2o!
 
-p4  27 cells  rotor p4 r6 3x3 .2A 322 .3.
+p4  27 cells  billiard table  rotor p4 r6 3x3 .2A 322 .3.
 x = 10, y = 10, rule = B3/S23-a5
 8b2o$8bo$7b3o$4b2o$3bo2b2o$3bo2bobo$4b2o2bo$obobo2bo$3o2b2o$2bo!
 
-p4  27 cells  rotor p4 r5 2x3 .13 303
+p4  27 cells  exposed rotor  rotor p4 r5 2x3 .13 303
 x = 9, y = 8, rule = B3/S23-a5
 7b2o$4bobobo$3bob2o$3bo3bo$2obo3bo$bobobob2o$bobobo2bo$2b2ob2o!
 
-p4  27 cells  rotor p4 r6 2x4 .111 1BB.
+p4  27 cells  exposed rotor  rotor p4 r6 2x4 .111 1BB.
 x = 9, y = 10, rule = B3/S23-a5
 4b2o$4bo$2ob3o$b2o3bo$2ob2obo$6b2o$5bo$3b2obobo$6b3o$6bo!
 
-p4  28 cells  rotor p4 r6 3x3 .1. 212 .33
+p4  28 cells  exposed rotor  rotor p4 r6 3x3 .1. 212 .33
 x = 9, y = 10, rule = B3/S23-a5
 3bo$2bobo$bo2bo2b2o$bob2obobo$2o4bo$bo4bo$bobo2b2o$2bobo2bo$4bobo$4b2o!
 
-p4  28 cells  rotor p4 r7 3x4 ..01 1BAB .B..
+p4  28 cells  exposed rotor  rotor p4 r7 3x4 ..01 1BAB .B..
 x = 8, y = 11, rule = B3/S23-a5
 5b2o$b2obobo$2bobo$2bo2bo$2obobo$bobo$bobo$2bo3bo$3b4o$5b3o$5bo!
 
-p4  29 cells  rotor p4 r6 3x4 ..2. 31@A .2..  (Life rotor: DJB #25)
+p4  29 cells  exposed rotor  rotor p4 r6 3x4 ..2. 31@A .2..  (Life rotor: DJB #25)
 x = 10, y = 9, rule = B3/S23-a5
 4b2obo$5b3o$2b3obo$bo4b2o$ob3o$bo5b3o$2b3obo2bo$4bobo$5bo!
 
-p4  29 cells  rotor p4 r4 1x4 31AC  (Life rotor: SC 4.2.1)
+p4  29 cells  exposed rotor  rotor p4 r4 1x4 31AC  (Life rotor: SC 4.2.1)
 x = 7, y = 12, rule = B3/S23-a5
 3b2o$3bo$o3bo$4obo$3bobo$2b2ob2o$bo3bo$bo3bo$2b3o2$2b2obo$2bob2o!
 
-p4  29 cells  rotor p4 r8 3x4 ...2 1A11 2A2.
+p4  29 cells  exposed rotor  rotor p4 r8 3x4 ...2 1A11 2A2.
 x = 10, y = 8, rule = B3/S23-a5
 7b2o$2o6bo$o2b2o2b3o$2b2obo$5b5o$2b4o2bo$bo5b2o$b2o!
 
-p4  29 cells  rotor p4 r8 2x4 1BAB B12A
+p4  29 cells  exposed rotor  rotor p4 r8 2x4 1BAB B12A
 x = 6, y = 12, rule = B3/S23-a5
 2b2o$3bo$2b3o$bo3bo$ob4o$2o$4b2o$3o2bo$o3bo$b3o$2bo$b2o!
 
-p4  29 cells  rotor p4 r6 3x3 .1A A.1 AA.  (Life rotor: DJB #17,20 (SC 4.4.4))
+p4  29 cells  exposed rotor  rotor p4 r6 3x3 .1A A.1 AA.  (Life rotor: DJB #17,20 (SC 4.4.4))
 x = 9, y = 9, rule = B3/S23-a5
 3b2o$2bob3o$2bo4bo$2ob3obo$bo3b2o$bobo$2bo2b4o$3b2o2bo$6b2o!
 
-p4  29 cells  rotor p4 r8 4x4 ..01 1BAB .B.. ..3.
+p4  29 cells  exposed rotor  rotor p4 r8 4x4 ..01 1BAB .B.. ..3.
 x = 9, y = 11, rule = B3/S23-a5
 6b2o$2b2obobo$bobobo$bobo2bo$2o2bo$2bobo$2bobo$3bo3bo$4b4o$6b3o$6bo!
 
-p4  30 cells  rotor p4 r5 3x3 ..3 C12 .B.
+p4  30 cells  billiard table  rotor p4 r5 3x3 ..3 C12 .B.
 x = 9, y = 10, rule = B3/S23-a5
 3bo2bo$3b4o2$b4o$obo2bo$ob2obo$b3obob2o$3bobo2bo$3bo2bo$4b2o!
 
-p4  30 cells  rotor p4 r5 3x3 ..2 .1A B1.  (Life rotor: DJB #21 (SC 4.3.6))
+p4  30 cells  exposed rotor  rotor p4 r5 3x3 ..2 .1A B1.  (Life rotor: DJB #21 (SC 4.3.6))
 x = 10, y = 9, rule = B3/S23-a5
 4bo$3bobo2b2o$b3o2bo2bo$o4b2obo$ob3o2bo$bobob2o$3bobo$2b2o2bo$5b2o!
 
-p4  30 cells  rotor p4 r8 4x4 ...2 .B11 10@. .C..
+p4  30 cells  exposed rotor  rotor p4 r8 4x4 ...2 .B11 10@. .C..
 x = 8, y = 11, rule = B3/S23-a5
 2b2o$bobo$bo$2b4o$6bo$2b4obo$2b2o2bo$2bob2o$2bobo$obo2bo$2o2b2o!
 
-p4  30 cells  rotor p4 r7 4x4 ..2. .122 3.A. .C..
+p4  30 cells  exposed rotor  rotor p4 r7 4x4 ..2. .122 3.A. .C..
 x = 10, y = 10, rule = B3/S23-a5
 4bo2bo$4b4o$2o$bo2b4o$bobo4bo$2ob2o2bobo$3bobo2bo$3bobo$4bobo$5bo!
 
-p4  30 cells  rotor p4 r4 3x4 ...3 .1A. C...  (Life rotor: SC 4.2.3)
+p4  30 cells  exposed rotor  rotor p4 r4 3x4 ...3 .1A. C...  (Life rotor: SC 4.2.3)
 x = 10, y = 11, rule = B3/S23-a5
 3b2o$3bobo$6bo$b5o$o5b3o$2o3bo3bo$4bobobo$5b2ob2o$6bo$4bobo$4b2o!
 
-p4  30 cells  rotor p4 r6 3x4 ..1. B.1B 1B..
+p4  30 cells  exposed rotor  rotor p4 r6 3x4 ..1. B.1B 1B..
 x = 11, y = 9, rule = B3/S23-a5
 8bo$5bobobo$3b3obobo$obo4bob2o$2obo5bo$3bob3obo$3bo4bo$4b3o$6b2o!
 
-p4  30 cells  rotor p4 r6 4x4 ..2. .B.2 C.B. .C..
+p4  30 cells  exposed rotor  rotor p4 r6 4x4 ..2. .B.2 C.B. .C..
 x = 11, y = 11, rule = B3/S23-a5
 6bo$4b3o$3bo$2bob3o$bobo3bo$bobo3bo$2obo3bob2o$4b3o2bo$9bo$6b3o$6bo!
 
-p4  31 cells  rotor p4 r5 3x3 ..2 B1A .1.  (Life rotor: DJB #22)
+p4  31 cells  billiard table  rotor p4 r5 3x3 ..2 B1A .1.  (Life rotor: DJB #22)
 x = 10, y = 10, rule = B3/S23-a5
 3b2o$2bob3o$2bo4bo$2obob2o2bo$bob2obob2o$bo2bobo$2b3obo$5bo$4bo$4b2o!
 
-p4  31 cells  rotor p4 r7 3x4 .2.C 112. .23.
+p4  31 cells  exposed rotor  rotor p4 r7 3x4 .2.C 112. .23.
 x = 9, y = 10, rule = B3/S23-a5
 4b2o$3bo2bo$3bo2b3o$2ob2obobo$bo4bo$bo4b2o$2obo2bo$2bobo2bo$2bo2b2o$b2o!
 
-p4  31 cells  rotor p4 r7 3x4 ..3. 32.2 12A.
+p4  31 cells  exposed rotor  rotor p4 r7 3x4 ..3. 32.2 12A.
 x = 10, y = 9, rule = B3/S23-a5
 3bo3b2o$3b3o2bo$2obobobo$bo5b2o$bob2obo2bo$2b4ob2o$4bobo$6bo$6b2o!
 
-p4  32 cells  rotor p4 r7 3x4 .1A1 .@@. C.B.
+p4  32 cells  exposed rotor  rotor p4 r7 3x4 .1A1 .@@. C.B.
 x = 10, y = 10, rule = B3/S23-a5
 4bobo$3bob2o$3b2obob2o$6bobo$b6obo$o2bo2b2o$2ob2o$3bo$3bobo$4b2o!
 
-p4  33 cells  rotor p4 r7 3x4 ..1. BAA. .BBB
+p4  33 cells  exposed rotor  rotor p4 r7 3x4 ..1. BAA. .BBB
 x = 9, y = 9, rule = B3/S23-a5
 2b2ob2o$o2bobobo$2obobo2bo$bob2ob2o$bo2bobo$2b3o2bo$5b2o$bob2o$b2obo!
 
-p4  33 cells  rotor p4 r8 4x4 ..1. 2@A. 2@.C .3..
+p4  33 cells  exposed rotor  rotor p4 r8 4x4 ..1. 2@A. 2@.C .3..
 x = 11, y = 9, rule = B3/S23-a5
 9b2o$2o2b2o3bo$o2bo2bob3o$bob2o3bobo$2obo5bo$4b5o2$6b2obo$6bob2o!
 
-p4  33 cells  rotor p4 r7 3x4 ..1B B.A. 1A1.
+p4  33 cells  exposed rotor  rotor p4 r7 3x4 ..1B B.A. 1A1.
 x = 9, y = 9, rule = B3/S23-a5
 4b2o$5b3o$3bo4bo$b3ob4o$o4bo$ob4ob2o$bo3bobo$3bobobo$2b2ob2o!
 
-p4  33 cells  rotor p4 r10 4x4 ..01 3A0B .1@. .22.
+p4  33 cells  exposed rotor  rotor p4 r10 4x4 ..01 3A0B .1@. .22.
 x = 9, y = 11, rule = B3/S23-a5
 2bo$3o$obob2o$4bo2b2o$3b5o$3b3ob2o$3bo2bobo$3b3o2$2bob2o$2b2obo!
 
-p4  33 cells  rotor p4 r7 4x4 ...2 ..1A AA1. B...  (Life rotor: new 4.3.2)
+p4  33 cells  exposed rotor  rotor p4 r7 4x4 ...2 ..1A AA1. B...  (Life rotor: new 4.3.2)
 x = 10, y = 9, rule = B3/S23-a5
 3b2o2b2o$b3obo2bo$o5b4o$b5o$4bob2o$b2obobo$bo2bobo$2bo2bo$3b2o!
 
-p4  33 cells  rotor p4 r8 4x4 ...3 .2.1 CA@B ..B.
+p4  33 cells  billiard table  rotor p4 r8 4x4 ...3 .2.1 CA@B ..B.
 x = 11, y = 10, rule = B3/S23-a5
 4bo$3bobo$b3obo$o5b2o$ob3obobo$bo4b3o$2b2o3bo$4bobob3o$4bobo3bo$5b2o!
 
-p4  33 cells  rotor p4 r8 4x4 ..01 1BAB .B.. .3..
+p4  33 cells  exposed rotor  rotor p4 r8 4x4 ..01 1BAB .B.. .3..
 x = 10, y = 11, rule = B3/S23-a5
 2b2o2b2o$2bo2bobo$3bobo$2b2o2bo$bo2bo$obobo$bo2bo3b2o$2b2o3bobo$4b4o$4bo3bo$7b2o!
 
-p4  34 cells  rotor p4 r7 4x4 ...1 .1AB .A.. B1..
+p4  34 cells  exposed rotor  rotor p4 r7 4x4 ...1 .1AB .A.. B1..
 x = 10, y = 10, rule = B3/S23-a5
 8b2o$2bo2bobobo$2b4obo$6bobo$2b2obo2bo$bo2bobob2o$bo2bobo$2obob2o$o2bo$2b2o!
 
-p4  34 cells  rotor p4 r7 4x4 ...2 .A1A .1.. 2A..
+p4  34 cells  exposed rotor  rotor p4 r7 4x4 ...2 .A1A .1.. 2A..
 x = 10, y = 10, rule = B3/S23-a5
 3bobo$3b2obo$6b3o$b4o4bo$o3bob3o$b4obo$4bo$obobobo$3o2b2o$2bo!
 
-p4  34 cells  rotor p4 r6 3x4 ..1. CA0A .B..
+p4  34 cells  exposed rotor  rotor p4 r6 3x4 ..1. CA0A .B..
 x = 10, y = 7, rule = B3/S23-a5
 2bob2o2b2o$2b3obo2bo$4b3obo$5o2bo$bo2bob3o$obobobobo$b2ob2o!
 
-p4  34 cells  rotor p4 r10 3x5 .1AAA .A..A 1B.2A
+p4  34 cells  exposed rotor  rotor p4 r10 3x5 .1AAA .A..A 1B.2A
 x = 12, y = 9, rule = B3/S23-a5
 3b2o$2bo2bo2bo$2bobo2bobo$b2ob2obob3o$o3bo4bobo$b6obo$6bo$3b2obo$3bobo!
 
-p4  34 cells  rotor p4 r7 4x4 ...2 .A1A 11.. .B..  (Life rotor: new 4.3.1)
+p4  34 cells  exposed rotor  rotor p4 r7 4x4 ...2 .A1A 11.. .B..  (Life rotor: new 4.3.1)
 x = 10, y = 11, rule = B3/S23-a5
 4b2o$5bo$4bo$3bob3o$3bo4bo$2obo2bobo$bob2obob2o$bobo3bo$2bob2obo$obobobo$2o!
 
-p4  34 cells  rotor p4 r6 4x5 ...1. ..2@2 ..... CC...
+p4  34 cells  exposed rotor  rotor p4 r6 4x5 ...1. ..2@2 ..... CC...
 x = 12, y = 9, rule = B3/S23-a5
 5bo$3b3o2bo$2bo3b3o$3o6b2o$obob5o2bo$3bobobob2o$7bobo$6b2o2bo$9b2o!
 
-p4  35 cells  rotor p4 r7 4x4 ..2. .2.A 3.1A .3..
+p4  35 cells  exposed rotor  rotor p4 r7 4x4 ..2. .2.A 3.1A .3..
 x = 11, y = 12, rule = B3/S23-a5
 4bo$3bobo$2bo2bo$3obob2o$obobobobo$4bo4bo$3bo3bobo$3bobobob2o$4b3o2bo$9bo$6b3o$6bo!
 
-p4  35 cells  rotor p4 r9 4x4 ..1. .A@2 B001 .B..  (Life rotor: new 4.6.4)
+p4  35 cells  exposed rotor  rotor p4 r9 4x4 ..1. .A@2 B001 .B..  (Life rotor: new 4.6.4)
 x = 11, y = 9, rule = B3/S23-a5
 5b2obo$6b3o$3b3obo$2bo4b2o$o2bobo3bo$2obo3b3o$3bobo$3bobob2obo$4b2obob2o!
 
-p4  35 cells  rotor p4 r8 4x5 ...0B .1AA. .A... B1...
+p4  35 cells  exposed rotor  rotor p4 r8 4x5 ...0B .1AA. .A... B1...
 x = 11, y = 11, rule = B3/S23-a5
 7bo$3bo2bobo$3b4obo$9b2o$3b3obobo$2bo4bobo$2bo2bobob2o$b2obobo$o3b2o$b3o$3bo!
 
-p4  35 cells  rotor p4 r8 4x5 ...1A .A@1. .A... BA...
+p4  35 cells  exposed rotor  rotor p4 r8 4x5 ...1A .A@1. .A... BA...
 x = 10, y = 11, rule = B3/S23-a5
 6b2o$6bo$7bo$4b3obo$3bo4bo$2bobobob2o$2bo3bobo$2ob2obobo$bobobobo$bobobo$2b2ob2o!
 
-p4  35 cells  rotor p4 r9 4x5 ....3 .1A1. .@@.3 C.B..
+p4  35 cells  exposed rotor  rotor p4 r9 4x5 ....3 .1A1. .@@.3 C.B..
 x = 11, y = 11, rule = B3/S23-a5
 7bo$7b3o$5b2o3bo$4bo3b3o$4bob2o$2o6bo$o2bobobo$b5obobo$5bo2b2o$3bobo$3b2o!
 
-p4  36 cells  rotor p4 r9 4x5 ....2 .221A 2AA.. ..A..
+p4  36 cells  exposed rotor  rotor p4 r9 4x5 ....2 .221A 2AA.. ..A..
 x = 10, y = 10, rule = B3/S23-a5
 4bo2b2o$3bobo2bo$3bobob3o$2obobo$bo2b4o$bo2b3o$2b3o2bo$5b2o$bob2o$b2obo!
 
-p4  36 cells  rotor p4 r6 3x4 ..3. 3003 ..3.
+p4  36 cells  billiard table  rotor p4 r6 3x4 ..3. 3003 ..3.
 x = 11, y = 12, rule = B3/S23-a5
 5bob2o$5b2obo2$3b5o$obo5bobo$2obobobob2o$3bobobo$3bo3bo$4b3o2$4b2obo$4bob2o!
 
-p4  36 cells  rotor p4 r8 4x5 ...1. .AA@2 .A... 2A...
+p4  36 cells  exposed rotor  rotor p4 r8 4x5 ...1. .AA@2 .A... 2A...
 x = 10, y = 12, rule = B3/S23-a5
 6bo$2bo2bobo$2b4obo$8b2o$2b3obobo$bo4bobo$ob2o2bob2o$bo2bobo$2b3obo$5bo$4bo$4b2o!
 
-p4  36 cells  rotor p4 r8 3x4 .22. A00A .22.
+p4  36 cells  exposed rotor  rotor p4 r8 3x4 .22. A00A .22.
 x = 9, y = 10, rule = B3/S23-a5
 7b2o$8bo$3b2obo$4bob2o$obobo2bo$3ob3o$bo2b4o$obobo2bo$obobobo$b2ob2o!
 
-p4  36 cells  rotor p4 r8 4x4 ..1. .A0A 3A.. .2A.
+p4  36 cells  exposed rotor  rotor p4 r8 4x4 ..1. .A0A 3A.. .2A.
 x = 9, y = 10, rule = B3/S23-a5
 4b2ob2o$3bobobo$o2bobo2bo$3o2b4o2$2b2ob4o$o2bo3bo$2o3b3o$6b3o$6bo!
 
-p4  36 cells  rotor p4 r8 4x4 ...3 ..2. B12A A@..
+p4  36 cells  exposed rotor  rotor p4 r8 4x4 ...3 ..2. B12A A@..
 x = 10, y = 11, rule = B3/S23-a5
 7b2o$3b2obobo$4bobo$2bobobo$bobob2o$o2bob2o$b2o2bo$2bobo3bo$2bo2b4o$b2o4b3o$7bo!
 
-p4  36 cells  rotor p4 r7 3x4 ..2A C.12 C.3.
+p4  36 cells  exposed rotor  rotor p4 r7 3x4 ..2A C.12 C.3.
 x = 10, y = 9, rule = B3/S23-a5
 2b2ob2o$bob3o$obobobo$obob2obo$bobobobo$3bo2bob2o$2bo3bobo$2bobobobo$3b2ob2o!
 
-p4  36 cells  rotor p4 r7 4x4 ..1A .B.1 C.B. .C..
+p4  36 cells  exposed rotor  rotor p4 r7 4x4 ..1A .B.1 C.B. .C..
 x = 12, y = 11, rule = B3/S23-a5
 4bo2bo$4b4o$2b2o$bo2b4o$obobo3bo$3obo3bo$2bobo3bob2o$5b3o2bo$10bo$7b3o$7bo!
 
-p4  37 cells  rotor p4 r6 3x4 ..2. A@.1 2.2.  (Life rotor: new 4.0.2)
+p4  37 cells  exposed rotor  rotor p4 r6 3x4 ..2. A@.1 2.2.  (Life rotor: new 4.0.2)
 x = 11, y = 11, rule = B3/S23-a5
 5bobo$4bob2o$5b2o$2b3ob2o$bo6bo$ob2ob3o$bo4bo$2b3obobobo$5b2ob3o$4bobobo$5bo!
 
-p4  38 cells  rotor p4 r7 3x4 ..1. 1AAA B..B  (Life rotor: new 4.4.1)
+p4  38 cells  exposed rotor  rotor p4 r7 3x4 ..1. 1AAA B..B  (Life rotor: new 4.4.1)
 x = 11, y = 10, rule = B3/S23-a5
 4b2o$5b3o$3bo4bo$2bob4obo$2bo4bobo$obob3o2b2o$3obob2o2bo$2bobo3b2o$5b3o$7bo!
 
-p4  38 cells  rotor p4 r9 4x5 ...1. .A.@A 1@@A. ..2..
+p4  38 cells  exposed rotor  rotor p4 r9 4x5 ...1. .A.@A 1@@A. ..2..
 x = 9, y = 9, rule = B3/S23-a5
 2b2ob2o$3bobobo$3bobo2bo$b2ob5o$o2b2o$b2ob5o$2bobo2bo$2bobobobo$3b2ob2o!
 
-p4  40 cells  rotor p4 r11 4x5 ..1.B ..A@A A@@A. .A.1.
+p4  40 cells  exposed rotor  rotor p4 r11 4x5 ..1.B ..A@A A@@A. .A.1.
 x = 10, y = 11, rule = B3/S23-a5
 7bo$4bobobo$2b5obo$bo4bob2o$o2b2obo$b2o3b4o$3bo5bo$3bob4o$2b2o$bo2b3o$b2o3bo!
 
-p4  41 cells  rotor p4 r8 4x4 ..3. 30@. .0@3 .C..  (Life rotor: clock II (SC 4.1.3))
+p4  41 cells  billiard table  rotor p4 r8 4x4 ..3. 30@. .0@3 .C..  (Life rotor: clock II (SC 4.1.3))
 x = 12, y = 12, rule = B3/S23-a5
 6b2o$6bobo$8b3o$4b4o3bo$3bo4bobo$3bo3b2ob2o$2obob2obo$bobo4bo$o3b4o$b3o$3bobo$4b2o!
 
-p4  42 cells  rotor p4 r11 4x5 ...2. B..A2 AAAA2 .B..2
+p4  42 cells  exposed rotor  rotor p4 r11 4x5 ...2. B..A2 AAAA2 .B..2
 x = 11, y = 12, rule = B3/S23-a5
 3b2o$4bo$bo2bob2ob2o$obobo2bobo$obo2bobo2bo$bobobo2b2o$3bo4bo$2bob3o2bo$2b2o3b2o$5b2o$2b3obo$2bo!
 
-p4  42 cells  rotor p4 r8 4x5 ...3. 2@1.. .1.B. ...CC
+p4  42 cells  exposed rotor  rotor p4 r8 4x5 ...3. 2@1.. .1.B. ...CC
 x = 11, y = 11, rule = B3/S23-a5
 5b2o$2o2bo2bo$o2bob2obo$b3o2bobo$4b3ob3o$3bo2bobobo$3b4o$2b3obo$4bobobo$4bo2b2o$3b2o!
 
-p4  43 cells  rotor p4 r12 4x5 ..3.. 1@@1A 1@@1A ..3..
+p4  43 cells  exposed rotor  rotor p4 r12 4x5 ..3.. 1@@1A 1@@1A ..3..
 x = 12, y = 12, rule = B3/S23-a5
 5bo2bo$5b4o$b2o$2bo2b4o$2bobo4bo$b2obo3bobo$2bobo3bo2bo$2bobo4bobo$3o2b4obo$obo6bo$7bo$7b2o!
 
-p4  43 cells  rotor p4 r9 4x4 ..2. ..A2 3.11 .23B
+p4  43 cells  exposed rotor  rotor p4 r9 4x4 ..2. ..A2 3.11 .23B
 x = 11, y = 11, rule = B3/S23-a5
 5bo$5b3o$3b2o3bo$2bo2b2o2bo$bobobob2o$bobo2bo$2ob2o2b2o$2bo5b3o$2bobobob2o$3b3obobo$2b2ob2o!
 
-p4  45 cells  rotor p4 r10 4x4 .1.C B0B. B0B. .1.C
+p4  45 cells  exposed rotor  rotor p4 r10 4x4 .1.C B0B. B0B. .1.C
 x = 12, y = 12, rule = B3/S23-a5
 4b2o$5bo$5bobo2b2o$3b2obobo2bo$2bobo3bobo$bo2b2obobo$bob3ob4o$2o2bo3bobo$2bobobo$2b3ob2o$3bo$2b2o!
 
-p4  45 cells  rotor p4 r9 4x4 ...1 .2A1 2B@1 ..3.
+p4  45 cells  exposed rotor  rotor p4 r9 4x4 ...1 .2A1 2B@1 ..3.
 x = 11, y = 11, rule = B3/S23-a5
 6bo$6b3o$2o7bo$bo2b4o2bo$bobo4b2o$2obob6o$o2bob2obo$b2obo3b3o$4bobobobo$4b3o$6bo!
 
-p4  45 cells  rotor p4 r8 3x5 ..1.3 CA0A. .B..3
+p4  45 cells  exposed rotor  rotor p4 r8 3x5 ..1.3 CA0A. .B..3
 x = 10, y = 12, rule = B3/S23-a5
 4bo$2b3o$bo$b2ob3o$5o2bobo$bo2b3ob2o$b4obo$4bobo$b2obo2b2o$o2bobobo$2o3bobo$5b2o!
 
-p4  46 cells  rotor p4 r8 3x4 ..3. 21AB 221.
+p4  46 cells  billiard table  rotor p4 r8 3x4 ..3. 21AB 221.
 x = 11, y = 12, rule = B3/S23-a5
 7bo$3b2obobo$4b3obo$3bobo2b2o$b3o3bo2bo$o3bo3b2o$2obobob4o$bobobo2bo$o2bob4o$2o2bo$6bo$5b2o!
 
-p4  46 cells  rotor p4 r8 4x5 ....3 .3B23 .A... 22...
+p4  46 cells  exposed rotor  rotor p4 r8 4x5 ....3 .3B23 .A... 22...
 x = 11, y = 10, rule = B3/S23-a5
 2bobobob2o$2b5obo$3bobo3bo$2b2ob5o$bo2b2o2b3o$b4o3bo$3obobobo$2bobob2o$2bobo$3b2o!
 
-p4  48 cells  rotor p4 r12 4x5 ..3.. .222. .@0.A 3@112
+p4  48 cells  billiard table  rotor p4 r12 4x5 ..3.. .222. .@0.A 3@112
 x = 12, y = 11, rule = B3/S23-a5
 b2o3b2o2b2o$2bo2bo2bo2bo$2bobobo2b2o$2o2bo3b4o$bobo5bo$bo2bob2ob3o$2bobo4bobo$b2o2b4o$3b2o$3bo2bo$5b2o!
 
-p4  52 cells  rotor p4 r9 4x5 ..2.. ..A2. .2.A. 33.22
+p4  52 cells  billiard table  rotor p4 r9 4x5 ..2.. ..A2. .2.A. 33.22
 x = 11, y = 12, rule = B3/S23-a5
 5bo$5b3o$3b4obo$b3obo3bo$ob2ob5o$o2b3o2b3o$b2obo3bo$2bobobobo$2bob2obob2o$3bo3bo2bo$bobo3b2o$b2o!
 

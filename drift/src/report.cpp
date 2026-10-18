@@ -230,6 +230,12 @@ static std::string countLines(const Search &s, int gen) {
 void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
   const long *var = s.P.var;
   int gen = s.gen;
+  if (o.mustReach) {   // the border is flagged too, but never changes
+    bool reached = false;
+    for (int q = s.chgd[1]; q < s.nays[gen] && !reached; q++)
+      reached = s.flag[s.idx(s.chglist[q].r, s.chglist[q].c)] & MUSTREACH;
+    if (!reached) { unreached++; return; }
+  }
   OscInfo main, hist;
   std::string kind, title;
   switch (oc) {
@@ -399,6 +405,7 @@ void Reporter::footer(double seconds, long long steps, bool finished, bool resum
          "printed %ld. Highest generation reached: %d.\n",
          counts[PERIODIC], unknownOsc, counts[STABLE], counts[FIZZLE], counts[MAXGEN], printed,
          maxgen);
+  if (o.mustReach) printf("%ld results never reached a --must-reach region.\n", unreached);
   fflush(stdout);
 }
 

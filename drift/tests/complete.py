@@ -127,6 +127,33 @@ def check(res, table, margins):
     return ok, hist, len(hist[0])
 
 
+def exposed(g0, period, table):
+    """True if some rotor cell can be reached from outside the pattern without
+    crossing a live stator cell (4-connected steps, so a diagonal chain of
+    stator cells counts as a wall). False = billiard table."""
+    phases = [frozenset(g0)]
+    for _ in range(period - 1):
+        phases.append(frozenset(step(phases[-1], table)))
+    cells = set().union(*phases)
+    stator = frozenset.intersection(*phases)
+    rotor = cells - stator
+    rs = [r for r, c in cells]
+    cs = [c for r, c in cells]
+    r0, r1, c0, c1 = min(rs) - 1, max(rs) + 1, min(cs) - 1, max(cs) + 1
+    seen = {(r0, c0)}
+    todo = [(r0, c0)]
+    while todo:
+        r, c = todo.pop()
+        if (r, c) in rotor:
+            return True
+        for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            q = (r + dr, c + dc)
+            if r0 <= q[0] <= r1 and c0 <= q[1] <= c1 and q not in seen and q not in stator:
+                seen.add(q)
+                todo.append(q)
+    return False
+
+
 def best(a, table):
     groups = {}
     for line in open(a.jsonl):
@@ -154,6 +181,8 @@ def best(a, table):
                             h.append(frozenset(step(h[-1], table)))
                         if h[p] == h[0] and h[2 * p] == h[p] and not any(h[d] == h[0] for d in range(1, p)):
                             g0, pop = m
+                if a.no_billiards and not exposed(g0, res["period"], table):
+                    continue   # try another stator for the same rotor
                 found.append((res["period"], pop, rotor, res, g0))
                 break
         else:
@@ -162,7 +191,8 @@ def best(a, table):
     with open(a.best, "w") as out:
         for per, pop, rotor, res, g0 in found:
             name = f"  (Life rotor: {res['name']})" if res.get("known") else ""
-            out.write(f"p{per}  {pop} cells  rotor {rotor}{name}\n")
+            kind = "exposed rotor" if exposed(g0, per, table) else "billiard table"
+            out.write(f"p{per}  {pop} cells  {kind}  rotor {rotor}{name}\n")
             out.write(to_rle(g0, a.name or res["rule"]) + "\n\n")
     by = {}
     for f in found:
@@ -183,6 +213,8 @@ def main():
     ap.add_argument("--best", metavar="OUT", help="complete every rotor, keep one working pattern each")
     ap.add_argument("--tries", type=int, default=8, help="with --best: candidates tried per rotor")
     ap.add_argument("--minimize", action="store_true", help="with --best: shrink each stator (SAT)")
+    ap.add_argument("--no-billiards", action="store_true",
+                    help="with --best: drop billiard tables (rotor walled in by the stator)")
     ap.add_argument("--min-margin", type=int, default=4, help="stator box margin around the rotor")
     ap.add_argument("--min-seconds", type=float, default=20, help="time limit per oscillator")
     a = ap.parse_args()
