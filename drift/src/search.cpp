@@ -639,6 +639,8 @@ bool Search::trycell() {
     }
   }
 
+  for (const Params::Push &p : P.pushes)
+    if (p.den * (p.dr * r + p.dc * c) < p.num * gen + p.k) return ERR;
   if (var[104] && 3 * c < 2 * gen + var[104]) return ERR;   // right at >= 2c/3
   if (var[105] && 3 * r < 2 * gen + var[105]) return ERR;   // down at >= 2c/3
   if (var[109] && 2 * r < gen + var[109]) return ERR;       // down at >= c/2

@@ -4,6 +4,8 @@
 #include "options.h"
 
 #include <cctype>
+#include <climits>
+#include <cstring>
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -29,6 +31,7 @@ struct Ctx {
   Region persistRegion;
   bool pushRight = false, pushDown = false, pushDownC2 = false;
   bool help = false;
+  std::vector<Params::Push> pushes;   // k still pattern-relative
   bool uncheckedBorder = false;
   std::string baseDir;   // directory of the config file, for relative paths
 };
@@ -215,6 +218,51 @@ const std::vector<Opt> &opts() {
      }},
     {"diag-width-ne", "N", "Constraints", "Bound on the changed region's NE-SW diagonal width (v102).", VAR(102)},
     {"diag-width-nw", "N", "Constraints", "Bound on the changed region's NW-SE diagonal width (v103).", VAR(103)},
+    {"push", "DIR SPEED [SLACK]", "Constraints",
+     "Make the disturbance keep moving: every newly changed cell must be at least\n"
+     "SPEED*gen - SLACK cells beyond where the disturbance started (the gen-0 changed\n"
+     "cells' trailing edge) in direction DIR (right, left,\n"
+     "up, down, a diagonal ne/nw/se/sw where both coordinates must keep up, or a vector\n"
+     "R,C for oblique motion: SPEED c/N then means R rows down and C columns right every\n"
+     "N gens). SPEED like c/2, 2c/3, c/4. SLACK defaults to 2.\n"
+     "E.g. --push \"right c/2 3\", --push \"1,2 c/6\".",
+     [](Ctx &c, const std::string &v) {
+       std::istringstream in(v);
+       std::string dir, speed;
+       long slack = 2;
+       in >> dir >> speed;
+       if (!(in >> slack)) slack = 2;
+       long num = 1, den = 1;
+       size_t cpos = speed.find('c');
+       if (cpos == std::string::npos) fail("--push: speed must look like c/2 or 2c/3");
+       if (cpos > 0) num = toLong("push", speed.substr(0, cpos));
+       if (cpos + 1 < speed.size()) {
+         if (speed[cpos + 1] != '/') fail("--push: speed must look like c/2 or 2c/3");
+         den = toLong("push", speed.substr(cpos + 2));
+       }
+       if (num <= 0 || den <= 0 || num > den) fail("--push: speed must be between 0 and c");
+       int vr, vc;
+       if (sscanf(dir.c_str(), "%d,%d", &vr, &vc) == 2) {   // oblique: project on (vr,vc)
+         if (!vr && !vc) fail("--push: zero direction");
+         long len2 = (long)vr * vr + (long)vc * vc;
+         c.pushes.push_back({vr, vc, num * len2, den, -den * slack * (labs(vr) + labs(vc))});
+         return;
+       }
+       int dr = 0, dcol = 0;
+       for (char ch : dir) {
+         if (ch == 'n' || dir == "up") dr = -1;
+         if (ch == 's' || dir == "down") dr = 1;
+         if (ch == 'e' || dir == "right") dcol = 1;
+         if (ch == 'w' || dir == "left") dcol = -1;
+       }
+       if (dir == "up") dcol = 0, dr = -1;
+       if (dir == "down") dcol = 0, dr = 1;
+       if (dir == "right") dr = 0, dcol = 1;
+       if (dir == "left") dr = 0, dcol = -1;
+       if (!dr && !dcol) fail("--push: unknown direction '" + dir + "'");
+       if (dr) c.pushes.push_back({dr, 0, num, den, -den * slack});
+       if (dcol) c.pushes.push_back({0, dcol, num, den, -den * slack});
+     }},
     {"push-right", "K", "Constraints",
      "Force a signal moving right at >= 2c/3: changed cells need 3*col >= 2*gen + K,\n"
      "col counted from the pattern's left edge (v104).",
@@ -308,8 +356,13 @@ const std::vector<Opt> &opts() {
      [](Ctx &c, const std::string &v) { c.o.skipStable = toBool("skip-stable", v); }},
     {"skip-fizzle", nullptr, "Output", "Same as --skip fizzle (dr2: skipfizzle).",
      [](Ctx &c, const std::string &v) { c.o.skipFizzle = toBool("skip-fizzle", v); }},
+    {"max-results", "N", "Output",
+     "Stop printing after N results (the search continues and keeps counting).\n"
+     "Default 10000; 0 = no limit.",
+     [](Ctx &c, const std::string &v) { c.o.maxResults = toLong("max-results", v); }},
     {"per-rotor", "N", "Output",
-     "Print at most N results with the same rotor (or history, for fizzles).",
+     "Print at most N results with the same rotor (history for fizzles; for max-gen results,\n"
+     "the same change counts over the last 30 gens). Default 10; 0 = no limit.",
      [](Ctx &c, const std::string &v) { c.o.perRotor = (int)toLong("per-rotor", v); }},
     {"min-period", "P", "Output", "Don't print oscillators with period below P.",
      [](Ctx &c, const std::string &v) { c.o.minPeriod = (int)toLong("min-period", v); }},
@@ -623,6 +676,15 @@ bool readModern(const std::vector<std::string> &args, Options &o) {
   if (c.symmFromSet) {
     long v = P.symm == VERTSYMM ? c.symmFrom + o.top : c.symmFrom + o.left;
     P.var[P.symm == VERTSYMM ? 115 : 114] = std::max(v, 1L);
+  }
+  for (Params::Push p : c.pushes) {   // measured from the trailing edge of the gen-0 changes
+    long ref = LONG_MAX;
+    for (int r = 0; r < (int)lines.size(); r++)
+      for (int col = 0; col < (int)lines[r].size() && lines[r][col] != '!'; col++)
+        if (strchr("0123", lines[r][col])) ref = std::min(ref, (long)p.dr * r + (long)p.dc * col);
+    if (ref == LONG_MAX) ref = 0;
+    p.k += p.den * ((long)p.dr * o.top + (long)p.dc * o.left + ref);
+    P.pushes.push_back(p);
   }
   if (c.pushRight) P.var[104] += 3L * o.left;
   if (c.pushDown) P.var[105] += 3L * o.top;

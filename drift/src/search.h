@@ -55,6 +55,10 @@ struct Params {
   bool checkBorder = false;
   long var[NUMVARS] = {};
   std::vector<int> reqchgcount;     // dr's "cc" command
+  // Minimum-speed constraints: every newly changed cell needs
+  // den * (dr*row + dc*col) >= num * gen + k (one axis per entry).
+  struct Push { int dr, dc; long num, den, k; };
+  std::vector<Push> pushes;
   std::vector<PatternOp> ops;
 };
 

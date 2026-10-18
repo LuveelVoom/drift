@@ -11,6 +11,10 @@ oscillators, die out, or keep moving. It is a port of Dean Hickerson's
 - **Long runs**: all CPU cores, a progress line, and saving/resuming.
 - **Speed**: 1.5–5.5× dr2 on one core, about 9× more on 14 cores.
 
+**New here? Read [docs/GUIDE.md](docs/GUIDE.md)**. It covers searches for
+oscillators, sparky oscillators, spark converters, wires and turns, with
+pictures of each input.
+
 Contents: [Build](#build) · [How a search works](#how-a-search-works) ·
 [Walkthrough](#walkthrough) · [Reading results](#reading-results) ·
 [Setting up your own search](#setting-up-your-own-search) · [Recipes](#recipes) ·
@@ -224,8 +228,11 @@ the background is possible, so a large partial background (typically from a
 long transient) may have no still life that fits all of it. `--best` simply
 tries other results with the same rotor. dr2 has the same limitation.
 
-`--per-rotor N` prints at most N results per rotor. Without it a search can
-print thousands of copies of the same few oscillators.
+`--per-rotor N` prints at most N results per rotor (default 10, `0` = all).
+Without it a search can print thousands of copies of the same few
+oscillators. `--max-results N` (default 10,000) caps the output of a single
+run. With both, a typical one-minute search writes a few MB instead of tens
+of MB.
 
 ## Setting up your own search
 
@@ -384,6 +391,11 @@ converter (`attempts/a5/converters.txt`).
   want. Results already printed aren't printed again. Results go to stdout, so
   redirect them (`> results.txt`, `>> results.txt` when resuming).
 - **Stopping early**: `--max-steps N` stops after about N search steps.
+- **Signals and outputs**:
+  - `--push "DIR SPEED [SLACK]"` keeps the disturbance moving. DIR is
+    right/left/up/down, a diagonal (se, …), or an oblique vector `R,C`.
+  - `--must-reach REGION` reports only results that change a cell in REGION.
+  - See the guide for how these are used to find wires and spark converters.
 
 ## Coming from dr2
 

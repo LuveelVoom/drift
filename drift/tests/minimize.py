@@ -22,8 +22,8 @@ OFFS = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1
 WEIGHT = [256, 128, 64, 32, 16, 8, 4, 2, 1]
 
 
-def minimize(states, table, cyclic, margin=4, seconds=20, empty=()):
-    """states: list of sets of live cells. empty: cells that must stay dead.
+def minimize(states, table, cyclic, margin=4, seconds=20, empty=None):
+    """states: list of sets of live cells. empty(p): True for cells that must stay dead.
     Returns (live cells of states[0] with the smallest stator found, population)
     or None if no stator fits in the box."""
     T = len(states)
@@ -40,9 +40,10 @@ def minimize(states, table, cyclic, margin=4, seconds=20, empty=()):
             if (r, c) not in active:
                 var[(r, c)] = len(var) + 2   # 0 and 1 are the constants dead/alive
     clauses = []
-    for p in empty:
-        if p in var:
-            clauses.append([-var[p]])
+    if empty:
+        for p, v in var.items():
+            if empty(p):
+                clauses.append([-v])
 
     def value(p, t):   # constant 0/1 (dead/alive) or a variable number >= 2
         if p in active:

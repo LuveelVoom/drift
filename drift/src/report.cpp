@@ -72,7 +72,7 @@ Reporter::~Reporter() {
 // dr2.c's display(), plus LifeHistory and two-state RLE cropped to the known
 // cells and to the live cells respectively.
 std::string Reporter::picture(const Search &s, int g, std::string *lifehistory,
-                              std::string *plain) const {
+                              std::string *plain, int *origin) const {
   int HT = s.HT, WD = s.WD;
   int minr = HT, maxr = -1, minc = WD, maxc = -1;
   for (int r = 2; r < HT - 2; r++)
@@ -119,6 +119,7 @@ std::string Reporter::picture(const Search &s, int g, std::string *lifehistory,
   int r0, r1, c0, c1;
   if (lifehistory) {
     crop([&](int i) { return s.bkgd[i] != UNK; }, r0, r1, c0, c1);
+    if (origin) { origin[0] = r0 - o.top; origin[1] = c0 - o.left; }
     std::vector<std::string> rows;
     for (int r = r0; r <= r1; r++) {
       std::string row;
@@ -269,7 +270,13 @@ void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
       title = fmt("still going at gen %d: possible moving signal", gen);
       break;
   }
-  if (o.perRotor && oc != MAXGEN && ++seenRotor[main.desc] > o.perRotor) return;
+  if (o.perRotor) {
+    std::string key = main.desc;
+    if (oc == MAXGEN)
+      for (int g = std::max(0, gen - 30); g <= gen; g++) key += " " + std::to_string(s.numchanged(g));
+    if (++seenRotor[key] > o.perRotor) return;
+  }
+  if (o.maxResults && printed >= o.maxResults) { capped++; return; }
   printed++;
   if (semifzl && (oc == PERIODIC || oc == STABLE)) title += " (semifizzle)";
 
@@ -287,7 +294,8 @@ void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
   else if (oc != MAXGEN) out += "history: " + main.desc + "\n";
   out += countLines(s, gen);
   std::string lh, plain;
-  std::string pic = picture(s, 0, &lh, &plain);
+  int origin[2] = {0, 0};
+  std::string pic = picture(s, 0, &lh, &plain, origin);
   if (!o.noPics) out += pic;
   if (!o.noRle) out += lh;
   if ((o.showFin && oc != FIZZLE) || oc == MAXGEN) {
@@ -320,7 +328,7 @@ void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
     if (oc == PERIODIC) j += ",\"history\":" + jsonStr(hist.desc);
     j += ",\"change_counts\":[" + cc + "],\"sizes\":[" + sz + "]";
     j += ",\"rule\":" + jsonStr(o.rule.canonical());
-    j += ",\"lifehistory\":" + jsonStr(lh) + ",\"gen0\":" + jsonStr(plain) + "}\n";
+    j += ",\"lifehistory\":" + jsonStr(lh) + fmt(",\"origin\":[%d,%d]", origin[0], origin[1]) + "}\n";
     fputs(j.c_str(), json);
     fflush(json);
   }
@@ -406,6 +414,7 @@ void Reporter::footer(double seconds, long long steps, bool finished, bool resum
          counts[PERIODIC], unknownOsc, counts[STABLE], counts[FIZZLE], counts[MAXGEN], printed,
          maxgen);
   if (o.mustReach) printf("%ld results never reached a --must-reach region.\n", unreached);
+  if (capped) printf("%ld more results weren't printed (--max-results %ld).\n", capped, o.maxResults);
   fflush(stdout);
 }
 

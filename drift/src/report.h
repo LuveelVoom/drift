@@ -31,7 +31,7 @@ class Reporter {
   // State that survives a checkpoint
   std::unordered_set<uint64_t> hashes;
   long counts[4] = {0, 0, 0, 0};   // all outcomes found, by Outcome
-  long printed = 0, unknownOsc = 0, unreached = 0;
+  long printed = 0, unknownOsc = 0, unreached = 0, capped = 0;
   int maxgen = 0;                  // highest generation reached so far
 
  private:
@@ -42,7 +42,9 @@ class Reporter {
 
   void classic(Search &s, Outcome o, int per, bool semifzl, uint64_t h);
   void modern(Search &s, Outcome o, int per, bool semifzl);
-  std::string picture(const Search &s, int g, std::string *lifehistory, std::string *plain) const;
+  // origin (if given): pattern-relative row/col of the LifeHistory RLE's top-left cell
+  std::string picture(const Search &s, int g, std::string *lifehistory, std::string *plain,
+                      int *origin = nullptr) const;
 };
 
 }  // namespace drift

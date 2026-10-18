@@ -27,8 +27,9 @@ WEIGHT = [256, 128, 64, 32, 16, 8, 4, 2, 1]
 OFFS = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)]
 
 
-def complete(cells, table, margin):
-    """Returns {(r,c): 0/1} background, or None if no completion fits."""
+def complete(cells, table, margin, empty=None):
+    """Returns {(r,c): 0/1} background, or None if no completion fits.
+    empty(p): True for cells that must stay dead."""
     rs = [r for r, c in cells]
     cs = [c for r, c in cells]
     r0, r1, c0, c1 = min(rs) - margin, max(rs) + margin, min(cs) - margin, max(cs) + margin
@@ -37,6 +38,10 @@ def complete(cells, table, margin):
         for c in range(c0, c1 + 1):
             var[(r, c)] = len(var) + 1
     s = Cadical153()
+    if empty:
+        for p, v in var.items():
+            if empty(p) and cells.get(p) not in (1, 4):
+                s.add_clause([-v])
     for p, st in cells.items():
         if st in (1, 4):
             s.add_clause([var[p]])
@@ -97,13 +102,13 @@ def to_rle(live, rule):
     return f"x = {max(cs) - min(cs) + 1}, y = {max(rs) - min(rs) + 1}, rule = {rule}\n{out}!"
 
 
-def check(res, table, margins):
-    """Complete one result. Returns (ok, rle_of_gen0, population) or (False, None, 0)."""
+def check(res, table, margins, empty=None):
+    """Complete one result. Returns (ok, history, population) or (False, None, 0)."""
     cells = parse_rle(res["lifehistory"])
     known = {p: s for p, s in cells.items() if s in (1, 2, 3, 4)}
     bk = None
     for m in margins:
-        bk = complete(known, table, m)
+        bk = complete(known, table, m, empty)
         if bk:
             break
     if not bk:
@@ -154,6 +159,35 @@ def exposed(g0, period, table):
     return False
 
 
+def parse_regions(specs):
+    regs = []
+    for s in specs or []:
+        r0, c0, r1, c1 = map(int, s.replace(",", " ").split())
+        regs.append((min(r0, r1), min(c0, c1), max(r0, r1), max(c0, c1)))
+    return regs
+
+
+def empty_pred(regs, res):
+    """Cells (in the result's RLE coordinates) inside a --keep-empty region."""
+    if not regs:
+        return None
+    orr, occ = res.get("origin", (0, 0))
+    return lambda p: any(r0 <= p[0] + orr <= r1 and c0 <= p[1] + occ <= c1 for r0, c0, r1, c1 in regs)
+
+
+def sparks(g0, period, table, empty):
+    """Rotor cells inside the empty regions, and how far the furthest one is
+    from the nearest live stator cell (1 = next to the object)."""
+    phases = [frozenset(g0)]
+    for _ in range(period - 1):
+        phases.append(frozenset(step(phases[-1], table)))
+    stator = frozenset.intersection(*phases)
+    rotor = set().union(*phases) - stator
+    sp = [p for p in rotor if empty(p)]
+    depth = max((min(max(abs(p[0] - q[0]), abs(p[1] - q[1])) for q in stator) for p in sp), default=0)
+    return len(sp), depth
+
+
 def best(a, table):
     groups = {}
     for line in open(a.jsonl):
@@ -165,16 +199,20 @@ def best(a, table):
             continue
         groups.setdefault(res["rotor"], []).append(res)
     margins = list(map(int, a.margins.split(",")))
+    regs = parse_regions(a.keep_empty)
     found, failed = [], 0
     for rotor, cands in groups.items():
         cands.sort(key=lambda r: r["gen"])          # short transients first
         for res in cands[:a.tries]:
-            ok, hist, pop = check(res, table, margins)
+            empty = empty_pred(regs, res)
+            ok, hist, pop = check(res, table, margins, empty)
             if ok:
-                g0 = hist[0]
+                g0 = hist[res["gen"]]   # a phase of the oscillator itself (gen 0 still has the spark)
+                pop = len(g0)
                 if a.minimize:
                     p, g = res["period"], res["gen"]
-                    m = minimize(hist[g - p:g], table, True, margin=a.min_margin, seconds=a.min_seconds)
+                    m = minimize(hist[g - p:g], table, True, margin=a.min_margin, seconds=a.min_seconds,
+                                 empty=empty)
                     if m and m[1] < pop:
                         h = [frozenset(m[0])]   # re-check the minimised pattern
                         for _ in range(2 * p):
@@ -183,16 +221,20 @@ def best(a, table):
                             g0, pop = m
                 if a.no_billiards and not exposed(g0, res["period"], table):
                     continue   # try another stator for the same rotor
-                found.append((res["period"], pop, rotor, res, g0))
+                sp = sparks(g0, res["period"], table, empty) if empty else (0, 0)
+                if a.sparky and not sp[0]:
+                    continue   # the spark was only in the transient
+                found.append((res["period"], pop, rotor, res, g0, sp))
                 break
         else:
             failed += 1
-    found.sort(key=lambda f: (-f[0], f[1]))
+    found.sort(key=lambda f: (-f[5][1], -f[0], f[1]) if a.sparky else (-f[0], f[1]))
     with open(a.best, "w") as out:
-        for per, pop, rotor, res, g0 in found:
+        for per, pop, rotor, res, g0, sp in found:
             name = f"  (Life rotor: {res['name']})" if res.get("known") else ""
             kind = "exposed rotor" if exposed(g0, per, table) else "billiard table"
-            out.write(f"p{per}  {pop} cells  {kind}  rotor {rotor}{name}\n")
+            spark = f"  spark: {sp[0]} cells, depth {sp[1]}" if regs else ""
+            out.write(f"p{per}  {pop} cells  {kind}{spark}  rotor {rotor}{name}\n")
             out.write(to_rle(g0, a.name or res["rule"]) + "\n\n")
     by = {}
     for f in found:
@@ -213,6 +255,11 @@ def main():
     ap.add_argument("--best", metavar="OUT", help="complete every rotor, keep one working pattern each")
     ap.add_argument("--tries", type=int, default=8, help="with --best: candidates tried per rotor")
     ap.add_argument("--minimize", action="store_true", help="with --best: shrink each stator (SAT)")
+    ap.add_argument("--keep-empty", action="append", metavar="R0,C0,R1,C1",
+                    help="pattern-relative rectangle that must stay empty (repeatable)")
+    ap.add_argument("--sparky", action="store_true",
+                    help="with --best and --keep-empty: keep oscillators whose own cycle puts live "
+                         "cells into the empty area; sorted by how far the spark sticks out")
     ap.add_argument("--no-billiards", action="store_true",
                     help="with --best: drop billiard tables (rotor walled in by the stator)")
     ap.add_argument("--min-margin", type=int, default=4, help="stator box margin around the rotor")

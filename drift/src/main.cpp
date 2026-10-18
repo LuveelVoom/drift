@@ -72,6 +72,10 @@ uint64_t fingerprint(const Options &o) {
   h = fnv(h, nums, sizeof nums);
   h = fnv(h, P.var, sizeof P.var);
   for (int v : P.reqchgcount) h = fnv(h, &v, sizeof v);
+  for (const Params::Push &p : P.pushes) {
+    long f[] = {p.dr, p.dc, p.num, p.den, p.k};
+    h = fnv(h, f, sizeof f);
+  }
   for (const PatternOp &op : P.ops) {
     long f[] = {op.kind, op.r, op.c, op.bit, op.reg.type, op.reg.r0, op.reg.c0, op.reg.r1,
                 op.reg.c1, op.reg.r2, op.reg.c2};
@@ -557,6 +561,7 @@ int main(int argc, char **argv) {
     if (it != args.end()) {
       args.erase(it);
       o.classic = true;
+      o.perRotor = 0;
       std::vector<std::string> classicArgs;
       for (size_t i = 0; i < args.size(); i++) {   // drift options may be mixed in
         if (args[i] == "--threads" && i + 1 < args.size()) o.threads = atoi(args[++i].c_str());

@@ -21,7 +21,8 @@ struct Options {
   bool skipKnown = false;          // only print oscillators/fizzles not in known rotors
   int minPeriod = 0;
   bool mustReach = false;          // results must change a --must-reach cell
-  int perRotor = 0;                // print at most this many results per rotor (0 = all)
+  long maxResults = 10000;         // stop printing after this many (0 = no limit)
+  int perRotor = 10;               // modern mode default; classic prints everything                // print at most this many results per rotor (0 = all)
   bool noPics = false, noRle = false, showFin = false, showAll = false;
 
   std::string knownRotorsFile;     // empty = default lookup
