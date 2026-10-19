@@ -21,3 +21,7 @@ ref/t1.*
 *-results.txt
 *-finished.txt
 run-all.log
+drift/real.txt
+drift/results.txt
+drift/beehive-spark.cfg
+*.err
