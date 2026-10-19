@@ -22,6 +22,8 @@ in the same order. Full documentation: [drift/README.md](drift/README.md).
 | `drift/tests/` | Rule-table tests, comparison with dr2, benchmark, independent result checker |
 | `dr2.c`, `dr2.zip` | The original program, its documentation and the `knownrotors` list |
 | `ref/dr2fixed.c` | `dr2.c` with its 64-bit `v`-command bug fixed; the reference for the tests |
+| `findings/` | Verified patterns found so far (B3/S23-a5, B3/S23-q4i, HighLife), with notes |
+| `attempts/` | The configs and scripts behind them |
 | `HANDOFF.md` | Notes for continuing the work |
 
 ## Quick check

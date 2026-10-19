@@ -199,6 +199,16 @@ The signal is started at the lower left and runs up and to the right.
 found nothing in 12 s each. The free run worked better: it lets the signal pick
 its own speed.
 
+**Tools for wires:**
+
+    python3 tests/wirecheck.py signals.jsonl          # which results ran along a repeating track?
+    python3 tests/wirebuild.py signals.jsonl --rule MAP… --n N --out wire.rle
+
+`wirebuild.py` measures the signal (its period and displacement), then asks a
+SAT solver for an exactly periodic background that carries it, tiles that into
+a long wire and checks that a single signal crosses it. This is how
+B3/S23-q4i's diagonal 2c/3 wire in `findings/` was made.
+
 ## 5. Turns
 
 ![turn input](img/turn-left.svg)
@@ -233,7 +243,27 @@ rotated 90° (the rule is isotropic) beyond the gap, and let drift search only
 for the connector. That is a much smaller problem than building the corner
 and a new wire at once.
 
-## 6. Other classics
+**Connector searches** work better (`attempts/a5/turns2/make_connector2.py`):
+- give both wires, the incoming one and a rotated copy;
+- leave only the gap between them unknown;
+- first check a `straight` control, which must find the missing piece of wire;
+- then scan the alignment of the two wires.
+
+## 6. Catalysts (fizzles)
+
+A fizzle is a reaction that dies out completely and leaves the still life
+exactly as it was: the still life is a catalyst for that spark.
+
+    ./drift spark.cfg --skip oscillator,stable --jsonl fizzles.jsonl
+    python3 tests/complete.py fizzles.jsonl --rule MAP… --best fizzles.txt \
+            --kind fizzle --max-extent 8 --limit 30 --minimize
+
+- `--max-extent 8` drops long, thin reactions; those are almost always a
+  signal running along a short wire.
+- `--limit 30` keeps the 30 longest reactions, which are the most interesting
+  catalysts.
+
+## 7. Other classics
 
 **Glider eaters** (`examples/glider-eater.cfg`): a glider flies through a
 cleared path. Eaters show up as fizzles named `g-eater …`.

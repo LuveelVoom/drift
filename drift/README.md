@@ -472,6 +472,8 @@ each unknown neighbour can be forced on its own.
     python3 tests/bench.py         # speed vs dr2.c on identical work
     python3 tests/validate.py results.jsonl [--rule MAP…]   # re-simulate results independently
     python3 tests/complete.py results.jsonl --rule MAP… --best real.txt --minimize   # real, small patterns
+    python3 tests/wirecheck.py results.jsonl        # wire candidates among max-gen results
+    python3 tests/wirebuild.py results.jsonl --rule MAP… --n N --out wire.rle   # exact periodic wire
 
 The comparison with dr2 needs the original program built with the `v` fix,
 in `../ref`:

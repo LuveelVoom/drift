@@ -1,3 +1,12 @@
 *.txt
 !oscillators.txt
 !converters.txt
+conn-*.rle
+old/
+plumb.*
+!scan4.log
+!scan5.log
+a5/turns2/*.cfg
+a5/turns/left-*.cfg
+a5/turns/right-*.cfg
+a5/wires/w-*.cfg

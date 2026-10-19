@@ -1,0 +1,120 @@
+fizzle: reaction lasts 11 gens, 57 cells (gen 0 incl. spark)  history f11 r13 6x6 .....C ...433 ..1.B. 533... ..C... D44...
+x = 13, y = 14, rule = B36/S23
+10bo$6bob3o$6b2o3b2o$9bo2bo$2o2b7o$o2bo$2b2o2b2ob2o$7bobo$2b5o2bo$bobo2bobo$o2bobo2b2o$ob2obobo$bo2bo2bo$2b2o3b2o!
+
+fizzle: reaction lasts 11 gens, 94 cells (gen 0 incl. spark)  history f11 r13 3x7 ...A.B. 1A@1233 .B1A..C
+x = 17, y = 14, rule = B36/S23
+13b2o$10bobo2bo$2o2b2obo2b2obo2bo$obo2bob3o3b4o$2bobo5b3o$b2ob5obo2bob2o$o2bo5b2o2bob2o$o2bob2obo2bobo$b3o2bobobo2bob2o$4b2o2b2o3b2obo$3bo2b2o$2bobo2bo$bobo3bob2ob2ob2o$2bo3b2ob2ob2ob2o!
+
+fizzle: reaction lasts 10 gens, 51 cells (gen 0 incl. spark)  history f10 r12 6x6 .....C ...433 ..1.B. 533... ..C... .D4...
+x = 13, y = 13, rule = B36/S23
+4b2o$4bo4b2o$6bobo2bo$5b2obob2o$4bo3b2o$4bo3bob2o$b2obobob2o2bo$2bobob2o3b2o$bo2bo4b2o$bob2ob3obo$2o2bobo$2bo$2b2o!
+
+fizzle: reaction lasts 10 gens, 91 cells (gen 0 incl. spark)  history f10 r14 4x5 ..4AA 4.200 CA1@A .0A..
+x = 14, y = 16, rule = B36/S23
+3bo3b2o$2bobobo2bo$bo2bobo2bo2b2o$bobobob3obobo$2b2obo4bobo$4bobobobo$3obobob2obo$o2bobo5bo$bobo2b5o$2b2o2bo4b3o$4b3obobo2bo$bobo3b2obobo$b2ob2o4bob2o$4bo5bo2bo$b2obo2b2obobo$bobo3bob2ob2o!
+
+fizzle: reaction lasts 9 gens, 47 cells (gen 0 incl. spark)  history f9 r11 5x6 ....1B .3C333 B3.... .4.... .D....
+x = 11, y = 12, rule = B36/S23
+3bobo$b3ob3o$o7bo$ob5obo$bobo3bo$3bob2o$2b2obo3b2o$5bo4bo$5bob3o$b2o3bo$bo2bobob2o$3b2ob2obo!
+
+fizzle: reaction lasts 9 gens, 55 cells (gen 0 incl. spark)  history f9 r15 5x8 .....5.D .....3.4 .5..13C4 .3.4.... 13C4....
+x = 12, y = 15, rule = B36/S23
+6b2o$5bobo$5bo$4b2o$8bo$2o2b7o$o2bo7bo$2b2o2b2ob2o$7bobo$2b5o2bo$bobo2bobo$o2bobo2b2o$ob2obobo$bo2bo2bo$2b2o3b2o!
+
+fizzle: reaction lasts 9 gens, 90 cells (gen 0 incl. spark)  history f9 r12 4x5 ...B. 4.211 CA1@A .0A..
+x = 14, y = 16, rule = B36/S23
+4bo7b2o$2b3o8bo$bo3b2obob3o$bobobob2obo$2b2obo$4bobob2o$3obobobobo2bo$o2bobo4b4o$bobo2b4o$2b2o2bo3bob2o$4b3obobob2o$bobo3b2obo$b2ob2o4bob2o$4bo5bo2bo$b2obo2b2obobo$bobo3bob2ob2o!
+
+fizzle: reaction lasts 8 gens, 46 cells (gen 0 incl. spark)  history f8 r10 4x6 ....1B .3C333 B3.... .D....
+x = 10, y = 12, rule = B36/S23
+bob2ob2o$b2obobobo$4bo3bo$b3obo2b2o$o4bo3bo$2o3bobo$4b2ob2o$3bo2bo2bo$2bob4obo$2bo5bo$3b3obo$5b2o!
+
+fizzle: reaction lasts 8 gens, 49 cells (gen 0 incl. spark)  history f8 r14 5x8 .....5.. .....3.D .5..13C4 .3.4.... 13C4....
+x = 14, y = 12, rule = B36/S23
+5b2o$5bo4b2o$7bobo2bo$6b2obob2o$3bobo3b2o$b3obo3bob2o$o4bobob2o2bo$2o3bob2o3b2o$4b2o4b2o$5bob3obo$5bobo$6bo!
+
+fizzle: reaction lasts 8 gens, 53 cells (gen 0 incl. spark)  history f8 r12 5x7 .....1B ..4C333 ..3.... 4BB.... .B.....
+x = 14, y = 12, rule = B36/S23
+4b2o$2obobo4bo$bobo4b3o$o2bo3bo$3o3bobob3o$3b4obobo2bo$2o5b2o3bo$o4bo2b4o$bo3b3o$2o6b2o$7bo2bo$8b2o!
+
+fizzle: reaction lasts 8 gens, 64 cells (gen 0 incl. spark)  history f8 r16 7x8 ......B. .....BB4 .....3.. C3..C4.. .1@0.... .A@@.... ...2....
+x = 15, y = 15, rule = B36/S23
+3b2o$3bo4bo$5bobobo$4b2obo2bo$2bo5bobo$2b5obob2o$5bo2bo$4o3bobob3o$o2b5obobo2bo$bo6b2o3bo$2b3obo2b4o$4bob3o$9b2o$8bo2bo$9b2o!
+
+fizzle: reaction lasts 8 gens, 85 cells (gen 0 incl. spark)  history f8 r12 4x5 ...1. ..2A3 D1A@2 ..324
+x = 14, y = 15, rule = B36/S23
+6b2o$6bobobo2bo$3b2obo2b5o$b3o2bo$o4bob3o2b2o$ob2obo4bo2bo$bobo2b2obob2o$3bo3bobobo$2bob3o2bo2bo$bobo3bobo3bo$o2bo2b3o3b2o$2obobo$3bob2o$2obo3bob2ob2o$2ob2ob2ob2ob2o!
+
+fizzle: reaction lasts 8 gens, 93 cells (gen 0 incl. spark)  history f8 r12 4x5 ...1. ..2A3 .1A@2 D.324
+x = 14, y = 16, rule = B36/S23
+2ob2o3b2o$2obobobobo$3bo2b2o4b2o$3bo4bo4bo$b2ob4obobo$o2bo5bob2o$o2bo2b2obo3bo$b3obobo2bob2o$5bo2b2o$ob2obo2bo$2obo2b3obob2o$4b2o3b3obo$6b2o$6bob2o$2ob2obo3bob2o$2ob2ob2ob2ob2o!
+
+fizzle: reaction lasts 7 gens, 31 cells (gen 0 incl. spark)  history f7 r6 3x4 ...C D433 ..B.
+x = 11, y = 9, rule = B36/S23
+4b2o$3bobo3b2o$2bo6bo$2b6obo$2o4bobo$bob2obo$bo2bob2o$2bobo$3b2o!
+
+fizzle: reaction lasts 7 gens, 33 cells (gen 0 incl. spark)  history f7 r6 3x4 ..2. 5CBA ..2.
+x = 10, y = 10, rule = B36/S23
+6bo$4b3o$3bo3b2o$3bob2o2bo$2obobo2bo$obo2b2ob2o$3b2obo2bo$4bobobo$2bo4bo$2b2o!
+
+fizzle: reaction lasts 7 gens, 35 cells (gen 0 incl. spark)  history f7 r6 3x4 ..B. .433 D..C
+x = 10, y = 10, rule = B36/S23
+4b2o$3bo2bo$2bo2bobo$2bob2o2bo$b2o2bob2o$o2bobobo$bobobo2bo$2obob2obo$4bobob2o$5bo!
+
+fizzle: reaction lasts 7 gens, 42 cells (gen 0 incl. spark)  history f7 r10 2x6 .3C333 B0@.1B
+x = 9, y = 14, rule = B36/S23
+2b2o$2bo$4bo$4obo$o2bobo$5bob2o$3b3obo$2o3bo2bo$o4bob2o$b3obobo$4bo2bo$b2obobo$bobobo$4bo!
+
+fizzle: reaction lasts 7 gens, 42 cells (gen 0 incl. spark)  history f7 r11 4x4 ..1. .2A3 AA@2 .324
+x = 11, y = 12, rule = B36/S23
+2b2o$2bo2bob2o$obob3obo$2obo$3bo2b2o$2obobo2bobo$bob3obob2o$bo5bo$2b4obo$6bo$4bo$4b2o!
+
+fizzle: reaction lasts 7 gens, 43 cells (gen 0 incl. spark)  history f7 r7 3x5 ...C. D433. ..B.5
+x = 11, y = 12, rule = B36/S23
+5b2o$b2o2bobo$bobobo2bo$3bob2obo$2bobobob2o$2bobobo$2obo2bob2o$o2bob2obo$bobobo2bo$2bo4bo$8b3o$10bo!
+
+fizzle: reaction lasts 7 gens, 46 cells (gen 0 incl. spark)  history f7 r10 4x6 ....1B .3C333 BC.... .4....
+x = 10, y = 12, rule = B36/S23
+bob2ob2o$b2obobobo$4bo3bo$b3obo2b2o$o4bo3bo$2o3bobo$4b2ob2o$3bobo3bo$2bob4obo$2bo5bo$3b3obo$5b2o!
+
+fizzle: reaction lasts 7 gens, 52 cells (gen 0 incl. spark)  history f7 r11 5x6 .....C ...B34 .111.. D.3... 4C....
+x = 13, y = 13, rule = B36/S23
+3b2o4bo$2bobo2b3o$bo2bobo$bob2obo2b3o$2obo2bobo2bo$4b2o2bobo$8bob2o$7b2o$4bo2bob3o$4b5o3bo$10b2o$6bob2o$6b2obo!
+
+fizzle: reaction lasts 6 gens, 27 cells (gen 0 incl. spark)  history f6 r5 3x3 ..C D33 .B.
+x = 8, y = 9, rule = B36/S23
+b2o$2bo$2bob2o$b2ob2o$2bo$b7o$o6bo$bob2o$2ob2o!
+
+fizzle: reaction lasts 6 gens, 38 cells (gen 0 incl. spark)  history f6 r6 3x4 ..C. D33. .B.5
+x = 11, y = 10, rule = B36/S23
+b2obo2b2o$bob2o3bo$5b3o$2b3o$bobo2b2o$o2b4o$b2o5bo$3bob3obo$3bobo3bo$4bo4b2o!
+
+fizzle: reaction lasts 6 gens, 39 cells (gen 0 incl. spark)  history f6 r9 3x6 ....B1 .444B. 1B...C
+x = 12, y = 10, rule = B36/S23
+3b2obo$2bo2b2o3b2o$bobo6bo$bo2b5obo$2o2bo4bo$2b3ob2o$2o2bobo$bobo2bo$bo2b2o$2o!
+
+fizzle: reaction lasts 6 gens, 41 cells (gen 0 incl. spark)  history f6 r9 3x5 ...A. 1A@13 .B1A.
+x = 12, y = 10, rule = B36/S23
+5b2o$2b2o2bo$3b3o$bo4b3o$ob3obo2bo$o4b2o2bo$b2obo2bob2o$2bobobo2bo$bo2b2o3bobo$b2o7b2o!
+
+fizzle: reaction lasts 6 gens, 46 cells (gen 0 incl. spark)  history f6 r10 4x6 ....C4 ...3.D ..111. 54C...
+x = 12, y = 13, rule = B36/S23
+2b2o$bo2bo$2b2obo$5bo2b2o$2b2obobo2bo$o2b2o2bobo$2o5bob2o$6b2o$3bo2bob3o$3b5o3bo$9b2o$5bob2o$5b2obo!
+
+fizzle: reaction lasts 6 gens, 49 cells (gen 0 incl. spark)  history f6 r10 4x5 ...B4 D111. 4.3.. 4C...
+x = 12, y = 12, rule = B36/S23
+b2o$2bo2bob2o$2bobob2o$2o2bo4bo$bobob4obo$o2bobo4bo$2ob2o3b2o$3bo3bo$3bobo2b2o$2b2ob3o2bo$8bobo$7b2ob2o!
+
+fizzle: reaction lasts 6 gens, 49 cells (gen 0 incl. spark)  history f6 r9 4x5 ....5 4C31. 4.3.. D.5..
+x = 11, y = 13, rule = B36/S23
+6b2o$6bo$8bo$2o2b4obo$o2bo5bo$2b2o2b2ob2o$7bobo$2b5o2bo$bobo2bobo$o2bobo2b2o$ob2obobo$bo2bo2bo$2b2o3b2o!
+
+fizzle: reaction lasts 6 gens, 106 cells (gen 0 incl. spark)  history f6 r13 5x5 ....1 333BB B0AA. ..2.. ..4C.
+x = 15, y = 16, rule = B36/S23
+4b2o5b2o$2obo2bob2o2bo$o3bob2obobo$2b2obo5b4o$b2o2bob4o3bo$o3b2obo3bo$b3o4bo2bo2bo$4b6ob4o$b2obo2bobo$2bo2bo3bob2o$o2bobobobobobo$4o2bobo5bo$4bobobob5o$2b2obo2bobo$bo3bobo3bob2o$b2ob2ob2ob2ob2o!
+
+fizzle: reaction lasts 5 gens, 34 cells (gen 0 incl. spark)  history f5 r7 3x4 ..B. .2A3 1AA.
+x = 9, y = 10, rule = B36/S23
+4b2obo$2b3ob2o$bo$bo2b4o$2obobo2bo$3bobobo$3o2b2o$o2b2o$bo2bo$2b2o!
+

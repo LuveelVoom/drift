@@ -1,0 +1,4 @@
+p4  24 cells  exposed rotor  spark: 1 cells, depth 2  rotor p4 r10 4x5 ...0. .11A0 .1.AA C...3
+x = 10, y = 7, rule = B3/S23-q4i
+4b3o$4b2o$obo4bo$7obo$8bo$2b3o3b2o$2bobo!
+

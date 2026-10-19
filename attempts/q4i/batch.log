@@ -1,0 +1,5 @@
+spark: Search stopped after 70.8s, 12000014108 steps | Found 78671 oscillators (29188 with unknown rotors), 0 stable, 14251 fizzles, 0 max gen | printed 1903
+sparky: Search complete after 0.7s, 192665117 steps | Found 1562 oscillators (233 with unknown rotors), 0 stable, 124 fizzles, 0 max gen | printed 148
+signals: Search stopped after 65.9s, 12000014221 steps | Found 105052 oscillators (0 with unknown rotors), 0 stable, 19488 fizzles, 180492 max gen | printed 10000
+converter: Search complete after 0.1s, 15457116 steps | Found 143 oscillators (0 with unknown rotors), 0 stable, 26 fizzles, 0 max gen | printed 0
+done

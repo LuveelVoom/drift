@@ -195,17 +195,39 @@ def best(a, table):
             res = json.loads(line)
         except ValueError:
             continue
-        if res["kind"] != "oscillator":
+        if res["kind"] != a.kind:
             continue
-        groups.setdefault(res["rotor"], []).append(res)
+        if a.max_extent and a.kind == "fizzle":   # long thin rotors = a signal run along a wire
+            h, w = map(int, res["history"].split()[2].split("x"))
+            if max(h, w) > a.max_extent:
+                continue
+        groups.setdefault(res["rotor"] if a.kind == "oscillator" else res["history"], []).append(res)
     margins = list(map(int, a.margins.split(",")))
     regs = parse_regions(a.keep_empty)
     found, failed = [], 0
-    for rotor, cands in groups.items():
+    items = list(groups.items())
+    if a.limit:   # only the most interesting groups: longest reactions / highest periods
+        key = (lambda kv: -max(r["gen"] for r in kv[1])) if a.kind == "fizzle" else \
+              (lambda kv: -kv[1][0]["period"])
+        items = sorted(items, key=key)[:a.limit]
+    for rotor, cands in items:
         cands.sort(key=lambda r: r["gen"])          # short transients first
         for res in cands[:a.tries]:
             empty = empty_pred(regs, res)
             ok, hist, pop = check(res, table, margins, empty)
+            if ok and a.kind == "fizzle":
+                g0, pop = hist[0], len(hist[0])
+                if a.minimize:
+                    m = minimize(hist[:res["gen"] + 1], table, False, margin=a.min_margin,
+                                 seconds=a.min_seconds, empty=empty)
+                    if m and m[1] < pop:   # re-check: same reaction, back to a stable background
+                        h = [frozenset(m[0])]
+                        for _ in range(res["gen"] + 1):
+                            h.append(frozenset(step(h[-1], table)))
+                        if h[-1] == h[-2] and len(h[0] ^ h[-1]) > 0:
+                            g0, pop = m
+                found.append((res["gen"], pop, rotor, res, g0, (0, 0)))
+                break
             if ok:
                 g0 = hist[res["gen"]]   # a phase of the oscillator itself (gen 0 still has the spark)
                 pop = len(g0)
@@ -229,6 +251,14 @@ def best(a, table):
         else:
             failed += 1
     found.sort(key=lambda f: (-f[5][1], -f[0], f[1]) if a.sparky else (-f[0], f[1]))
+    if a.kind == "fizzle":
+        with open(a.best, "w") as out:
+            for gen, pop, hist_desc, res, g0, _ in found:
+                out.write(f"fizzle: reaction lasts {gen} gens, {pop} cells (gen 0 incl. spark)  history {hist_desc}\n")
+                out.write(to_rle(g0, a.name or res["rule"]) + "\n\n")
+        print(f"{len(groups)} distinct reactions: {len(found)} completed and verified, "
+              f"{failed} not completed. Longest: " + ", ".join(str(f[0]) for f in found[:8]) + " gens")
+        return 0
     with open(a.best, "w") as out:
         for per, pop, rotor, res, g0, sp in found:
             name = f"  (Life rotor: {res['name']})" if res.get("known") else ""
@@ -254,6 +284,13 @@ def main():
     ap.add_argument("--margins", default="3,6,10")
     ap.add_argument("--best", metavar="OUT", help="complete every rotor, keep one working pattern each")
     ap.add_argument("--tries", type=int, default=8, help="with --best: candidates tried per rotor")
+    ap.add_argument("--limit", type=int, default=0, help="with --best: only the N most interesting groups")
+    ap.add_argument("--max-extent", type=int, default=0,
+                    help="with --kind fizzle: skip fizzles whose rotor is longer than N cells "
+                         "(signals running along a wire)")
+    ap.add_argument("--kind", default="oscillator", choices=["oscillator", "fizzle"],
+                    help="with --best: oscillators (one per rotor) or fizzles (one per reaction, "
+                         "longest reactions first)")
     ap.add_argument("--minimize", action="store_true", help="with --best: shrink each stator (SAT)")
     ap.add_argument("--keep-empty", action="append", metavar="R0,C0,R1,C1",
                     help="pattern-relative rectangle that must stay empty (repeatable)")

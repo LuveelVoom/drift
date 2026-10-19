@@ -1,0 +1,11 @@
+p5  27 cells  exposed rotor  spark: 1 cells, depth 3  rotor p5 r13 5x6 ...1.. ...10. ..A0@0 B1.@0. .B.1..
+x = 12, y = 7, rule = B3/S23-a5
+5bo$6bo$3bobo2bo$b3obob4o$o3bobo4bo$2o2bobob3o$5b2obo!
+
+p5  33 cells  exposed rotor  spark: 1 cells, depth 3  rotor p5 r16 6x7 .....3. ..1.B23 .0@.1B. 00@A... .0A.... ..1....
+x = 12, y = 8, rule = B3/S23-a5
+4b3o3b2o$3bobo2bo2bo$b3obob3o$o3bobo$2o2bobo2b3o$5b2obo2bo$8bo$8b2o!
+
+p10  37 cells  exposed rotor  spark: 1 cells, depth 1  rotor p10 r14 5x7 ....3.. ..A000C .00.2.. 11AA... ....3..
+x = 11, y = 10, rule = B3/S23-a5
+2bo3b2o$bobobobo$o2bobobob2o$2obobobo2bo$3bo3bobo$2obo3bob2o$bo2b3o$bo$2b3o$4bo!
