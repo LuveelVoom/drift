@@ -17,9 +17,10 @@ in the same order. Full documentation: [drift/README.md](drift/README.md).
 | Path | What it is |
 |---|---|
 | `drift/` | Source. `cd drift && make`, then `./drift examples/stillater.cfg` |
-| `drift/README.md` | How to use it: walkthrough, reading results, every option, recipes |
+| `drift/README.md`, `drift/docs/GUIDE.md` | Quick start; how to build searches and read results |
 | `drift/examples/` | Ready-to-run config files |
-| `drift/tests/` | Rule-table tests, comparison with dr2, benchmark, independent result checker |
+| `drift/tools/` | `finish.py` (complete and check results; drift runs it), picture, wire and checking tools |
+| `drift/tests/` | Rule-table tests, comparison with dr2, benchmark |
 | `dr2.c`, `dr2.zip` | The original program, its documentation and the `knownrotors` list |
 | `ref/dr2fixed.c` | `dr2.c` with its 64-bit `v`-command bug fixed; the reference for the tests |
 | `findings/` | Verified patterns found so far (B3/S23-a5, B3/S23-q4i, HighLife), with notes |
@@ -30,6 +31,6 @@ in the same order. Full documentation: [drift/README.md](drift/README.md).
 
 ```
 cd drift && make
-./drift examples/stillater.cfg          # ~0.1 s, 92 oscillators (stillater, cuphook, ...)
+./drift examples/beehive-spark.cfg      # ~1 s; writes examples/beehive-spark-finished.txt
 make test                               # needs ref/dr2fixed, see drift/README.md#tests
 ```

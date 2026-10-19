@@ -16,18 +16,15 @@ usually only roughly periodic. This:
 3. tiles that background into a long wire, puts one signal on it and
    simulates, checking the signal keeps its shape and speed across the wire.
 
-Usage: wirebuild.py RESULTS.jsonl --rule MAP --n N [--width 5] [--kmax 4] [--out wire.rle]
+Usage: tools/wirebuild.py RESULTS.jsonl --n N [--width 5] [--kmax 4] [--out wire.rle]
 """
 import argparse
 import json
 import os
 import sys
 
-from pysat.solvers import Cadical153
-
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from validate import parse_rle, rule_table  # noqa: E402
-from complete import complete, step  # noqa: E402
+from driftlib import complete, need_pysat, parse_rle, rule_for, step  # noqa: E402
 
 OFFS = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)]
 WEIGHT = [256, 128, 64, 32, 16, 8, 4, 2, 1]
@@ -137,6 +134,8 @@ def solve(P, D, shapes, table, width, K):
             win = [(b(q), int(canon(q) in sig[t])) for q in ((x[0] + dr, x[1] + dc) for dr, dc in OFFS)]
             if not constrain(win, None, b(x), int(canon(x) in sig[(t + 1) % T])):
                 return None
+    need_pysat()
+    from pysat.solvers import Cadical153
     s = Cadical153(bootstrap_with=clauses)
     if not s.solve():
         return None
@@ -194,15 +193,15 @@ def rle(cells, rule):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("jsonl")
-    ap.add_argument("--rule", required=True)
+    ap.add_argument("--rule", help="default: the rule stored in the results")
     ap.add_argument("--name", default="")
     ap.add_argument("--n", type=int, required=True)
     ap.add_argument("--width", type=int, default=5)
     ap.add_argument("--kmax", type=int, default=4)
     ap.add_argument("--out")
     a = ap.parse_args()
-    table = rule_table(a.rule)
     res = next(r for r in map(json.loads, open(a.jsonl)) if r["n"] == a.n)
+    table = rule_for(a.rule or res["rule"])
     m = measure(res, table)
     if not m:
         print(f"#{a.n}: no clean periodic signal")

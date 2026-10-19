@@ -1,0 +1,40 @@
+p5  26 cells  exposed rotor  rotor p5 r9 4x4 ..1. .0A2 1B13 .4..
+x = 11, y = 8, rule = B36/S23
+8b2o$6bo2bo$5b4o$4b2o$3bobob4o$b3obobo2bo$o5bo$2o!
+
+p4  24 cells  exposed rotor  rotor p4 r4 2x2 1B B3
+x = 8, y = 9, rule = B36/S23
+2b2o2b2o$2bobo2bo$4bobo$4bob2o$o2bobo$4obo$4bo$2bo$2b2o!
+
+p3  26 cells  exposed rotor  rotor p3 r4 2x2 34 43
+x = 8, y = 10, rule = B36/S23
+4bo$2b3o$bo5bo$bob5o$2bo$5bo$5obo$o5bo$3bobo$3b2o!
+
+p3  29 cells  exposed rotor  rotor p3 r5 3x3 .2. 3B3 .2.
+x = 10, y = 8, rule = B36/S23
+4bo$2obobo$2obo2bo$3b4o2bo$2obo3b3o$2obob2o$4bo2bo$6b2o!
+
+p3  33 cells  exposed rotor  rotor p3 r6 3x4 ..2. E3B3 ..2.
+x = 9, y = 11, rule = B36/S23
+3b2o$3b2o2$b4o$o4bo$ob3obo$b2obobo$4bo2b2o$b2obo3bo$o2bo3bo$b2o4b2o!
+
+p2  3 cells  exposed rotor  rotor p2 r4 3x3 .1. A.A .1.
+x = 3, y = 1, rule = B36/S23
+3o!
+
+p2  3 cells  exposed rotor  rotor p2 r4 3x3 .1. A.A .4.
+x = 1, y = 3, rule = B36/S23
+o$o$o!
+
+p2  6 cells  exposed rotor  rotor p2 r8 6x7 .....1. ....A.A .....1. .1..... A.A.... .1.....
+x = 7, y = 4, rule = B36/S23
+4b3o3$3o!
+
+p2  8 cells  exposed rotor  rotor p2 r2 2x2 .3 3.
+x = 4, y = 4, rule = B36/S23
+2o$2o$2b2o$2b2o!
+
+p2  17 cells  exposed rotor  rotor p2 r2 1x2 5E
+x = 8, y = 6, rule = B36/S23
+2b2o$bobo2b2o$o6bo$b6o$3bo$3b2o!
+

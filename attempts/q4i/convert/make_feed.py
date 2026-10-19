@@ -9,10 +9,10 @@ carrying its signal, ending in unknown space.
     are cleared (known dead), and everything past the front end is unknown.
 Usage: make_feed.py RULEMAP [PERIODS] > feed.cfg   (writes feed.rle)"""
 import json, os, sys
-T = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "drift", "tests")
+T = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "drift", "tools")
 sys.path.insert(0, T)
 import wirebuild as wb
-from validate import rule_table
+from driftlib import rule_table
 
 table = rule_table(sys.argv[1])
 PERIODS = int(sys.argv[2]) if len(sys.argv) > 2 else 6

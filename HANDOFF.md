@@ -22,7 +22,8 @@ The user's goals were:
 | `drift/src/classic.cpp` | dr2's command language (`drift --classic < old.in`) |
 | `drift/src/report.*` | Output: dr2's exact format (classic) or drift's format, RLE, JSON lines |
 | `drift/src/main.cpp` | Threads, work splitting, progress line, checkpoint/resume, Ctrl-C |
-| `drift/tests/` | `ruletest.cpp`, `regress.py` (vs dr2), `bench.py`, `validate.py` |
+| `drift/tools/` | `finish.py` (complete/check/sort/shrink; run by drift after a search), `driftlib.py` (shared: rules, RLE, SAT completion and minimisation), `render.py`, `wirecheck.py`, `wirebuild.py`, `validate.py` |
+| `drift/tests/` | `ruletest.cpp`, `regress.py` (vs dr2), `bench.py` |
 | `dr2.c`, `dr2.zip` | The original; `dr2.zip` has `dr.documentation.txt` and `knownrotors` |
 | `ref/dr2fixed.c` | The oracle: dr2.c with `"%d %d"` → `"%d %ld"` in the `v` command |
 
@@ -100,7 +101,7 @@ original arguments, plus a fingerprint of the search settings.
   border and relied on it, so they couldn't be completed. Modern mode now
   checks the border (`P.checkBorder`); `--classic` and `--unchecked-border`
   keep dr2's behaviour.
-- **Partial results.** Completion is `tests/complete.py` (pysat).
+- **Partial results.** `drift/tools/finish.py` completes and checks them (pysat), using `driftlib.py`.
   `tests/minimize.py` shrinks stators with the rotor fixed phase by phase:
   about 70% smaller, at most a few seconds each. Earlier bug: SAT variable
   numbers overlapped the constants 0/1; they now start at 2.

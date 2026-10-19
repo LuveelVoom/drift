@@ -16,3 +16,8 @@ ref/t1.*
 *.jsonl
 # saved forum pages (contain a login session id)
 *.html
+
+# search outputs
+*-results.txt
+*-finished.txt
+run-all.log

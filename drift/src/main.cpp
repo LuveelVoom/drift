@@ -551,6 +551,14 @@ bool fileExists(const std::string &p) {
 
 int main(int argc, char **argv) {
   std::vector<std::string> args(argv + 1, argv + argc);
+  if (args.empty()) {
+    printf("drift: search Life-like rules for oscillators, sparkers, catalysts and signals.\n\n"
+           "  drift CONFIG               run a search described in CONFIG (see docs/GUIDE.md)\n"
+           "  drift CONFIG --dry-run     show the starting position without searching\n"
+           "  drift --help               all options\n\n"
+           "Example: drift examples/beehive-spark.cfg\n");
+    return 0;
+  }
   Options o;
   Saved saved;
   bool resumed = false;
@@ -626,9 +634,23 @@ int main(int argc, char **argv) {
     Search base;
     base.init(o.params, &o.rule, &known);
     base.start();
+    if (!o.classic && base.nays[0] > base.chgd[0]) {   // can drift build anything near the spark?
+      bool unknownNear = false;
+      for (int q = base.chgd[0]; q < base.nays[0] && !unknownNear; q++)
+        for (int dr = -2; dr <= 2 && !unknownNear; dr++)
+          for (int dc = -2; dc <= 2 && !unknownNear; dc++)
+            unknownNear = base.bkgd[base.idx(base.chglist[q].r + dr, base.chglist[q].c + dc)] == UNK;
+      if (!unknownNear)
+        o.warnings.push_back("every cell within 2 of the spark is known, so drift can't build anything "
+                             "until the spark's own evolution reaches unknown cells (it may outgrow the "
+                             "limits first). Leave unknown cells next to the spark where things may be built "
+                             "(ignore this if the spark is meant to fly through empty space first).");
+    }
+    if (resumed) o.freshOutputs = false;
 
     int threads = o.threads > 0 ? o.threads : (int)std::max(1u, std::thread::hardware_concurrency());
     Reporter rep(o, &known, known.names.size());
+    rep.finishScript = exeDir(argv[0]) + "/tools/finish.py";
     if (resumed) {
       rep.hashes.insert(saved.hashes.begin(), saved.hashes.end());
       rep.printed = saved.printed;
@@ -654,6 +676,16 @@ int main(int argc, char **argv) {
       else printf("computecellorbackup calls: %lld %06lld\n", steps / 1000000, steps % 1000000);
     }
     rep.footer(co.sessionSeconds(), steps, finished, resumed);
+    if (!o.classic && !o.noFinish && rep.printed > 0 && !o.configPath.empty() && !gSignal.load()) {
+      std::string cmd = "python3 \"" + rep.finishScript + "\" \"" + o.configPath + "\"";
+      std::string base = o.configPath;
+      if (base.size() > 4 && base.compare(base.size() - 4, 4, ".cfg") == 0) base.resize(base.size() - 4);
+      if (o.jsonl != base + "-results.jsonl") cmd += " --jsonl \"" + o.jsonl + "\"";
+      printf("\nFinishing the results (tools/finish.py; --no-finish skips this)...\n");
+      fflush(stdout);
+      if (system(cmd.c_str()) != 0)
+        printf("finish.py didn't complete. Run it yourself with:\n  %s\n", cmd.c_str());
+    }
     return finished ? 0 : 3;
   } catch (const std::exception &e) {
     fflush(stdout);

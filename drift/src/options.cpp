@@ -382,6 +382,16 @@ const std::vector<Opt> &opts() {
      [](Ctx &c, const std::string &v) { c.o.knownRotorsFile = resolve(c, v); c.o.knownRotorsExplicit = true; }},
     {"jsonl", "FILE", "Output", "Append each result to FILE as one JSON object per line.",
      [](Ctx &c, const std::string &v) { c.o.jsonl = v; }},
+    {"out", "FILE", "Output",
+     "Also write the printed results to FILE. With a config file, results are saved to\n"
+     "<config>-results.txt and <config>-results.jsonl by default.",
+     [](Ctx &c, const std::string &v) { c.o.textOut = v; }},
+    {"no-save", nullptr, "Output", "Don't save results to files by default.",
+     [](Ctx &c, const std::string &v) { c.o.noSave = toBool("no-save", v); }},
+    {"no-finish", nullptr, "Output",
+     "Don't run tools/finish.py after the search (it turns the results into complete,\n"
+     "checked patterns in <config>-finished.txt).",
+     [](Ctx &c, const std::string &v) { c.o.noFinish = toBool("no-finish", v); }},
     {"quiet", nullptr, "Output", "No progress line on stderr.",
      [](Ctx &c, const std::string &v) { c.o.quiet = toBool("quiet", v); }},
     {"progress", "SECONDS", "Output", "Progress line interval. Default 10.",
@@ -542,17 +552,18 @@ void printHelp() {
       "stable background) in Life-like, INT and MAP rules.\n"
       "A port of Dean Hickerson's dr2.c.\n\n"
       "Usage:\n"
-      "  drift [CONFIG] [--option value ...]\n"
-      "  drift --resume run.ckpt [--option value ...]\n"
-      "  drift --classic [dr2 commands ...] < dr2-input-file\n\n"
-      "CONFIG is a file of 'option = value' lines (# starts a comment) and may contain the\n"
-      "pattern inline after a 'pattern:' line. Options on the command line override it.\n");
-  std::string group;
-  for (const Opt &o : opts()) {
-    if (group != o.group) {
-      group = o.group;
-      printf("\n%s:\n", o.group);
-    }
+      "  drift CONFIG [--option value ...]      search, then finish the results\n"
+      "  drift --resume run.ckpt                continue a saved search\n"
+      "  drift --classic < dr2-input-file       run an old dr2.c input file\n\n"
+      "CONFIG is a file of 'option = value' lines (# starts a comment) ending with the\n"
+      "pattern after a 'pattern:' line; see docs/GUIDE.md. Options on the command line\n"
+      "override the file. Results go to CONFIG-results.txt / .jsonl, and complete,\n"
+      "checked patterns to CONFIG-finished.txt.\n");
+  static const char *ORDER[] = {"Search", "Regions", "Output", "Run", "Constraints"};
+  for (const char *group : ORDER) {
+    printf("\n%s:\n", strcmp(group, "Constraints") == 0 ? "Advanced constraints (dr2.c's v100..v139)" : group);
+    for (const Opt &o : opts()) {
+    if (strcmp(o.group, group) != 0) continue;
     std::string head = std::string("  --") + o.name + (o.arg ? std::string(" ") + o.arg : "");
     printf("%-28s", head.c_str());
     if (head.size() > 27) printf("\n%28s", "");
@@ -563,9 +574,9 @@ void printHelp() {
       h = h.substr(pos + 1);
     }
     printf("%s\n", h.c_str());
+    }
   }
-  printf("\nExample (dr2.c's documentation example, a stillater):\n"
-         "  drift --pattern sparker.txt --max-changed 3 --size 3x3\n");
+  printf("\nExample: drift examples/beehive-spark.cfg\n");
 }
 
 bool readModern(const std::vector<std::string> &args, Options &o) {
@@ -588,8 +599,10 @@ bool readModern(const std::vector<std::string> &args, Options &o) {
       apply(c, name, value, "");
     } else if (a == "-h")
       c.help = true;
-    else
+    else {
       readConfig(c, a);
+      o.configPath = a;
+    }
   }
   if (c.help) {
     printHelp();
@@ -704,6 +717,13 @@ bool readModern(const std::vector<std::string> &args, Options &o) {
     P.var[135] = P.WD;
   }
   P.checkBorder = !c.uncheckedBorder;
+  if (!o.configPath.empty() && !o.noSave && o.jsonl.empty() && o.textOut.empty()) {
+    std::string base = o.configPath;
+    if (base.size() > 4 && base.compare(base.size() - 4, 4, ".cfg") == 0) base.resize(base.size() - 4);
+    o.jsonl = base + "-results.jsonl";
+    o.textOut = base + "-results.txt";
+    o.freshOutputs = true;
+  }
   if (P.maxgen < 1) fail("--max-gen must be at least 1");
   return true;
 }

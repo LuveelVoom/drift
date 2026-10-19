@@ -1,0 +1,15 @@
+drift: rule B36/S23, space 77x75, at most 12 changed cells in 6x6 (w x h), max gen 500
+symmetry none, seed 1, 14 threads, known rotors: 0
+legend: o on  . off  , unknown  1 on in gen 0 only  0 off in gen 0 only
+starting position (rows/cols relative to the pattern's top-left):
+gen 0, rows 3..9, cols 5..10
+......
+......
+...1..
+..11..
+...1..
+......
+......
+
+Search complete after 0.0s, 201294 steps (53.87M/s).
+Found 0 oscillators (0 with unknown rotors), 0 stable, 0 fizzles, 0 max gen; printed 0. Highest generation reached: 8.

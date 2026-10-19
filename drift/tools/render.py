@@ -5,13 +5,15 @@ Shows the pattern (live, known dead, unknown, the gen-0 spark) and the regions
 given by clear / no-change / no-count / no-check / must-reach, in rows and
 columns relative to the pattern's top-left cell, as drift uses them.
 
-Usage: docs/render.py CONFIG OUT.svg [--pad N] [--window R0 C0 R1 C1] [--cell PX]
-       docs/render.py --rle FILE OUT.svg      (a finished two-state pattern)
+Usage: tools/render.py CONFIG OUT.svg [--pad N] [--window R0 C0 R1 C1] [--cell PX]
+       tools/render.py --rle FILE OUT.svg      (a finished two-state pattern)
 """
 import argparse
 import os
 import re
 import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from driftlib import contains, load_pattern, read_config  # noqa: E402
 
 STYLE = {
     "on": "#1f1f1f", "off": "#ffffff", "unknown": "#cfcfcf",
@@ -27,98 +29,6 @@ LABEL = {
     "no-check": "no-check",
 }
 # dr2 characters -> cell kind
-CHARS = {"o": "on", "O": "on", "3": "on", ".": "off", ":": "off", "2": "off",
-         "1": "spark_on", "0": "spark_off", ",": "unknown", "?": "unknown", "s": "unknown",
-         "4": "unchecked"}
-LH = {0: "unknown", 1: "on", 2: "off", 3: "spark_on", 4: "spark_off", 5: "on", 6: "off"}
-
-
-def parse_region(text):
-    t = text.split()
-    kind = t[0] if t[0] in "rltp" else "r"
-    nums = list(map(int, t[1:] if t[0] in "rltp" else t))
-    return kind, nums
-
-
-def contains(reg, r, c):
-    kind, n = reg
-    if kind == "p":
-        return (r, c) == (n[0], n[1])
-    if kind in "rl":
-        r0, c0, r1, c1 = n
-        if not (min(r0, r1) <= r <= max(r0, r1) and min(c0, c1) <= c <= max(c0, c1)):
-            return False
-        return kind == "r" or r0 * (c1 - c) + r1 * (c - c0) + r * (c0 - c1) == 0
-    r0, c0, r1, c1, r2, c2 = n
-    o = r0 * (c1 - c2) + r1 * (c2 - c0) + r2 * (c0 - c1)
-    return (o * (r0 * (c1 - c) + r1 * (c - c0) + r * (c0 - c1)) >= 0 and
-            o * (r0 * (c - c2) + r * (c2 - c0) + r2 * (c0 - c)) >= 0 and
-            o * (r * (c1 - c2) + r1 * (c2 - c) + r2 * (c - c1)) >= 0)
-
-
-def load_pattern(text):
-    lines = [l.rstrip("\r") for l in text.split("\n")]
-    lines = [l for l in lines if l.strip() and not l.strip().startswith(("#", ";"))]
-    cells = {}
-    if any(l.strip().startswith("x") and "=" in l for l in lines) or any("$" in l for l in lines):
-        body = "".join(l.strip() for l in lines if not (l.strip().startswith("x") and "=" in l))
-        r = c = 0
-        run = ""
-        for ch in body:
-            if ch.isdigit():
-                run += ch
-                continue
-            n = int(run) if run else 1
-            run = ""
-            if ch == "!":
-                break
-            if ch == "$":
-                r += n
-                c = 0
-                continue
-            st = 0 if ch in "b." else 1 if ch == "o" else ord(ch) - ord("A") + 1
-            for _ in range(n):
-                cells[(r, c)] = LH[st]
-                c += 1
-    else:
-        for r, l in enumerate(lines):
-            for c, ch in enumerate(l.strip()):
-                if ch == "!":
-                    return cells
-                cells[(r, c)] = CHARS.get(ch, "unknown")
-            if "!" in l:
-                break
-    return cells
-
-
-def read_config(path):
-    text = open(path).read().split("\n")
-    regions, pattern, i = [], None, 0
-    base = os.path.dirname(os.path.abspath(path))
-    while i < len(text):
-        l = text[i].strip()
-        i += 1
-        if not l or l.startswith("#"):
-            continue
-        l = re.sub(r"\s+#.*$", "", l)
-        if l.rstrip(":= ") == "pattern" and (l.endswith(":") or l.endswith("=")):
-            block = []
-            while i < len(text):
-                block.append(text[i])
-                i += 1
-                if "!" in block[-1]:
-                    break
-            pattern = "\n".join(block)
-            continue
-        m = re.match(r"([a-z-]+)\s*=?\s*(.*)$", l)
-        if not m:
-            continue
-        key, val = m.group(1), m.group(2)
-        if key in ("clear", "no-change", "no-count", "no-check", "must-reach"):
-            regions.append((key, parse_region(val)))
-        elif key == "pattern":
-            pattern = open(os.path.join(base, val)).read()
-    return load_pattern(pattern), regions
 
 
 def main():

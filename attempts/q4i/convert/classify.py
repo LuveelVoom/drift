@@ -8,9 +8,9 @@ and displacement; the input is the 2c/3 signal moving (2,2) every 3 gens.
 
 Usage: classify.py RULEMAP [feed.jsonl]"""
 import collections, json, os, sys
-T = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "drift", "tests")
+T = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "drift", "tools")
 sys.path.insert(0, T)
-from validate import parse_rle, rule_table, next3, OFFS
+from driftlib import parse_rle, rule_table, next3, OFFS
 
 table = rule_table(sys.argv[1])
 path = sys.argv[2] if len(sys.argv) > 2 else "feed.jsonl"

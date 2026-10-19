@@ -33,11 +33,13 @@ class Reporter {
   long counts[4] = {0, 0, 0, 0};   // all outcomes found, by Outcome
   long printed = 0, unknownOsc = 0, unreached = 0, capped = 0;
   int maxgen = 0;                  // highest generation reached so far
+  std::string finishScript = "tests/finish.py";
 
  private:
   const Options &o;
   size_t nknown;
-  FILE *json = nullptr;
+  FILE *json = nullptr, *text = nullptr;
+  void put(const std::string &s);
   std::unordered_map<std::string, int> seenRotor;
 
   void classic(Search &s, Outcome o, int per, bool semifzl, uint64_t h);

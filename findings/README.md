@@ -1,7 +1,6 @@
 # Findings
 
-These are complete patterns found with drift and finished with the tools in
-`drift/tests/`. Each file holds plain RLE in its rule, ready to paste into
+These are complete patterns found with drift and finished with `drift/tools/finish.py`. Each file holds plain RLE in its rule, ready to paste into
 Golly. Every pattern was re-simulated after completion. Where a separate
 implementation of the rule was written (B3/S23-a5 and HighLife), it was
 checked with that too. The q4i patterns were checked with drift's rule table
@@ -11,17 +10,17 @@ How each kind of file was made:
 
 - **`oscillators.txt`**:
   - a spark search, one spark cell in an unknown background (`attempts/*/spark.cfg`);
-  - then `complete.py --best --minimize`.
+  - then `finish.py`.
 
   This gives one oscillator per distinct rotor, highest period first. "Life
   rotor" means the rotor matches an oscillator in Life's `knownrotors` list.
-- **`sparky.txt`**: the same, with empty space above the start, then
-  `--sparky --keep-empty`. These oscillators throw a spark into empty space in
+- **`sparky.txt`**: the same, with empty space above the start, with
+  `must-reach` regions. These oscillators throw a spark into empty space in
   their own cycle. Spark depth 1 means the spark is born next to the object;
   2 or more means it is a free spark.
 - **`fizzles.txt`**: reactions where a spark hits a still life that then
   recovers completely, i.e. catalysts.
-  - From `complete.py --best --kind fizzle --max-extent 8`.
+  - From `finish.py`.
   - Rotors longer than 8 cells are left out: those are nearly always a signal
     running along a short wire.
   - Sorted by how long the reaction lasts.

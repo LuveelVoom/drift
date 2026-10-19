@@ -28,6 +28,11 @@ struct Options {
   std::string knownRotorsFile;     // empty = default lookup
   bool knownRotorsExplicit = false;
   std::string jsonl;               // append one JSON object per result
+  std::string textOut;             // copy of the printed results
+  bool freshOutputs = false;       // default output files: start them afresh
+  bool noSave = false;
+  bool noFinish = false;           // don't run tools/finish.py afterwards
+  std::string configPath;          // the config file given on the command line
   std::string checkpoint;          // write resumable state here
   double checkpointEvery = 300;
   double progressEvery = 10;

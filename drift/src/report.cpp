@@ -58,14 +58,25 @@ static std::string rle(const std::vector<std::string> &rows, char empty) {
 Reporter::Reporter(const Options &opt, const KnownRotors *k, size_t n)
     : o(opt), nknown(n) {
   (void)k;
+  const char *mode = o.freshOutputs ? "w" : "a";
   if (!o.jsonl.empty()) {
-    json = fopen(o.jsonl.c_str(), "a");
+    json = fopen(o.jsonl.c_str(), mode);
     if (!json) throw std::runtime_error("can't open '" + o.jsonl + "' for writing");
+  }
+  if (!o.textOut.empty() && !o.classic) {
+    text = fopen(o.textOut.c_str(), mode);
+    if (!text) throw std::runtime_error("can't open '" + o.textOut + "' for writing");
   }
 }
 
 Reporter::~Reporter() {
   if (json) fclose(json);
+  if (text) fclose(text);
+}
+
+void Reporter::put(const std::string &s) {   // modern mode output: screen and results file
+  fputs(s.c_str(), stdout);
+  if (text) { fputs(s.c_str(), text); fflush(text); }
 }
 
 // Picture of bkgd + gen g (dr2.c's characters) in the same bounding box as
@@ -307,7 +318,7 @@ void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
   if (o.showAll)
     for (int g = 1; g <= gen; g++) out += picture(s, g, nullptr, nullptr);
   out += "\n";
-  fputs(out.c_str(), stdout);
+  put(out);
 
   if (json) {
     std::string cc, sz;
@@ -385,18 +396,18 @@ void Reporter::header(const Search &base, int threads) {
     fflush(stdout);
     return;
   }
-  printf("drift: rule %s, space %dx%d, at most %d changed cells in %dx%d (w x h), max gen %d\n",
-         o.rule.canonical().c_str(), P.HT, P.WD, P.maxchng, P.maxwidth, P.maxheight, P.maxgen);
-  printf("symmetry %s, seed %lu, %d thread%s, known rotors: %zu%s\n", SYMM_NAMES[P.symm], P.seed,
-         threads, threads == 1 ? "" : "s", nknown,
-         nknown ? (" (" + o.knownRotorsFile + ")").c_str() : "");
-  for (const std::string &w : o.warnings) printf("warning: %s\n", w.c_str());
-  printf("legend: o on  . off  , unknown  1 on in gen 0 only  0 off in gen 0 only\n");
-  printf("starting position (rows/cols relative to the pattern's top-left):\n");
-  std::string lh;
+  std::string s = fmt("drift: rule %s, space %dx%d, at most %d changed cells in %dx%d (w x h), max gen %d\n",
+                      o.rule.canonical().c_str(), P.HT, P.WD, P.maxchng, P.maxwidth, P.maxheight, P.maxgen);
+  s += fmt("symmetry %s, seed %lu, %d thread%s, known rotors: %zu%s\n", SYMM_NAMES[P.symm], P.seed,
+           threads, threads == 1 ? "" : "s", nknown,
+           nknown ? (" (" + o.knownRotorsFile + ")").c_str() : "");
+  if (!o.textOut.empty()) s += "results are saved to " + o.textOut + (o.jsonl.empty() ? "" : " and " + o.jsonl) + "\n";
+  for (const std::string &w : o.warnings) s += "warning: " + w + "\n";
+  s += "legend: o on  . off  , unknown  1 on in gen 0 only  0 off in gen 0 only\n";
+  s += "starting position (rows/cols relative to the pattern's top-left):\n";
   Search &b = const_cast<Search &>(base);
-  fputs(picture(b, 0, &lh, nullptr).c_str(), stdout);
-  printf("\n");
+  s += picture(b, 0, nullptr, nullptr) + "\n";
+  put(s);
   fflush(stdout);
 }
 
@@ -406,15 +417,56 @@ void Reporter::footer(double seconds, long long steps, bool finished, bool resum
     fflush(stdout);
     return;
   }
-  printf("%s after %.1fs%s, %lld steps (%.2fM/s).\n",
-         finished ? "Search complete" : "Search stopped", seconds,
-         resumed ? " (this session)" : "", steps, seconds > 0 ? steps / seconds / 1e6 : 0.0);
-  printf("Found %ld oscillators (%ld with unknown rotors), %ld stable, %ld fizzles, %ld max gen; "
-         "printed %ld. Highest generation reached: %d.\n",
-         counts[PERIODIC], unknownOsc, counts[STABLE], counts[FIZZLE], counts[MAXGEN], printed,
-         maxgen);
-  if (o.mustReach) printf("%ld results never reached a --must-reach region.\n", unreached);
-  if (capped) printf("%ld more results weren't printed (--max-results %ld).\n", capped, o.maxResults);
+  std::string s = fmt("%s after %.1fs%s, %lld steps (%.2fM/s).\n",
+                      finished ? "Search complete" : "Search stopped", seconds,
+                      resumed ? " (this session)" : "", steps, seconds > 0 ? steps / seconds / 1e6 : 0.0);
+  s += fmt("Found %ld oscillators (%ld with unknown rotors), %ld stable, %ld fizzles, %ld max gen; "
+           "printed %ld. Highest generation reached: %d.\n",
+           counts[PERIODIC], unknownOsc, counts[STABLE], counts[FIZZLE], counts[MAXGEN], printed,
+           maxgen);
+  if (o.mustReach) s += fmt("%ld results never reached a --must-reach region.\n", unreached);
+  if (capped) s += fmt("%ld more results weren't printed (--max-results %ld).\n", capped, o.maxResults);
+  long found = counts[0] + counts[1] + counts[2] + counts[3];
+  if (printed == 0) {   // explain why nothing was printed
+    s += "\nNothing was printed. ";
+    if (found == 0) {
+      s += fmt("No branch ended in a result%s; the furthest any got was generation %d.\n",
+               finished ? " (the search is complete)" : "", maxgen);
+      if (maxgen < 30)
+        s += "  The disturbance outgrows the limits within a few generations. Try a larger\n"
+             "  max-changed and size, or make sure the spark touches unknown cells (cells you\n"
+             "  didn't draw): drift can only build where cells are unknown.\n";
+      else if (!finished)
+        s += "  Give it more time (--max-steps), or loosen the limits.\n";
+    } else {
+      // which of the kinds you keep turned up, and what was found instead
+      std::string kept, skipped;
+      auto note = [&](bool skip, const char *name, long n) {
+        if (skip) { if (n) skipped += fmt(" %ld %s,", n, name); }
+        else kept += fmt(" %s (%ld),", name, n);
+      };
+      note(o.skipPeriodic, "oscillators", counts[PERIODIC]);
+      note(o.skipFizzle, "fizzles", counts[FIZZLE]);
+      note(o.skipStable, "stable", counts[STABLE]);
+      note(o.skipMaxgen, "max gen", counts[MAXGEN]);
+      if (!kept.empty()) kept.pop_back();
+      if (!skipped.empty()) skipped.pop_back();
+      s += "The kinds you keep didn't turn up:" + kept + ".\n";
+      if (!skipped.empty()) s += "  Found instead (skipped by your config):" + skipped + ".\n";
+      if (o.mustReach && unreached) s += fmt("  %ld results never reached a must-reach region.\n", unreached);
+      if (o.skipKnown) s += "  only-new hides results with known rotors.\n";
+      if (!o.skipMaxgen && counts[MAXGEN] == 0)
+        s += "  Nothing was still travelling at max gen: try larger limits (size), more room (margin)\n"
+             "  or more time (max-steps).\n";
+    }
+  } else if (!o.jsonl.empty()) {
+    s += "\nResults saved to " + (o.textOut.empty() ? o.jsonl : o.textOut + " and " + o.jsonl) + ".\n";
+    if (o.noFinish || o.configPath.empty())
+      s += "To turn them into complete, checked patterns:\n  python3 \"" + finishScript + "\" \"" +
+           (o.configPath.empty() ? o.jsonl : o.configPath) + "\"" +
+           (o.configPath.empty() ? "" : "") + "\n";
+  }
+  put(s);
   fflush(stdout);
 }
 

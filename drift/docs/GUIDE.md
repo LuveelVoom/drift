@@ -1,131 +1,120 @@
 # Building drift searches
 
-This guide is about writing input files: what goes in them, how to draw the
-pattern, and how to set up the main kinds of search. For the full option list
-run `./drift --help`; for verified patterns found so far see
-[`findings/`](../../findings/README.md).
-
-1. [What drift does, in one paragraph](#1-what-drift-does-in-one-paragraph)
+1. [What drift does](#1-what-drift-does)
 2. [Anatomy of an input file](#2-anatomy-of-an-input-file)
 3. [Building one, step by step](#3-building-one-step-by-step)
-4. [After the search: real patterns](#4-after-the-search-real-patterns)
+4. [Reading the results](#4-reading-the-results)
 5. [Recipes](#5-recipes)
-6. [Reference](#6-reference)
-7. [Pitfalls](#7-pitfalls)
+6. [Troubleshooting](#6-troubleshooting)
+7. [Reference](#7-reference)
 
-## 1. What drift does, in one paragraph
+## 1. What drift does
 
-You give drift a **still life**, usually only a small part of one, and a
-**spark**: a few cells that differ from it in generation 0. Every cell you
-don't specify is **unknown**. drift runs the spark forward one generation at a
-time. When the next generation depends on an unknown cell, it tries that cell
-both ways, always keeping the still life stable. It gives up on a branch as
-soon as the disturbance grows past your size limits. Every branch ends as an
-**oscillator** (the disturbance repeats), a **fizzle** (it dies out and the
-still life is unharmed), or **max gen** (it is still going, usually a moving
-signal). drift reports only the cells it needed, so a result is part of a
-pattern; `complete.py` turns it into a whole one.
+You give drift two things:
+- a **still life**, usually only a small part of one;
+- a **spark**: a few cells that differ from it in generation 0.
+
+Every cell you don't specify is **unknown**. drift runs the spark forward one
+generation at a time. When the next generation depends on an unknown cell, it
+tries that cell both ways, always keeping the still life stable. A branch
+ends when the disturbance outgrows your size limits, or when it becomes one
+of:
+- an **oscillator**: the disturbance repeats;
+- a **fizzle**: it dies out and the still life is back as it was;
+- **max gen**: it is still going, so something is travelling away.
+
+drift fixes only the cells it needed, so each raw result is part of a
+pattern. After the search, `tools/finish.py` (run for you) completes every
+result, checks it by simulation and sorts it.
 
 ## 2. Anatomy of an input file
 
-An input file (a "config") is plain text: `option = value` lines, `#` starts a
-comment, and the pattern goes at the end.
+An input file (a *config*) is plain text: `option = value` lines, `#` starts
+a comment, and the pattern goes last, after a `pattern:` line. This one is
+`examples/beehive-spark.cfg`:
 
 ```
-# --- 1. the rule and the size limits
 rule = B3/S23               # any B/S, INT (e.g. B2-a3/S12) or MAP rule
 max-changed = 6             # at most 6 cells may differ from the still life...
 size = 4x4                  # ...and they must fit in a 4 wide x 4 high box
+skip = fizzle               # don't keep: oscillator, fizzle, stable, maxgen
+per-rotor = 3               # at most 3 raw results per distinct oscillator
 
-# --- 2. what to report
-skip = fizzle               # oscillator, fizzle, stable, maxgen
-per-rotor = 3               # at most 3 results per distinct oscillator
+clear = r -4 -2 -1 5        # rows -4..-1, cols -2..5: empty space
 
-# --- 3. regions (rows/cols counted from the pattern's top-left cell)
-clear = r -4 -2 -1 5        # these cells are dead (empty space)
-
-# --- 4. the pattern (LifeHistory RLE, or dr2-style characters)
 pattern:
 x = 4, y = 4, rule = LifeHistory
 B2AB$A2BA$B2AB$3BC!
 ```
 
-That's `examples/beehive-spark.cfg`. Run it with
-`./drift examples/beehive-spark.cfg`. It finishes in well under a second and
-finds a cuphook and several stillaters. Any option can also be given on the
-command line, where it overrides the file: `--max-changed 8`.
+Run it with `./drift examples/beehive-spark.cfg`; it takes about a second.
+Any option can also go on the command line, where it overrides the file
+(`--max-changed 8`).
 
 ## 3. Building one, step by step
 
 ### Step 1: draw the starting pattern in Golly
 
-1. **File → New**, then **Control → Set Rule**, and type `LifeHistory`. This
-   is only for drawing; the search rule is set in the config.
-2. Pick a drawing state in the edit bar and draw:
+1. **File → New**, then **Control → Set Rule**: `LifeHistory`. This is only for
+   drawing; the search rule is set in the config.
+2. Draw with these states (pick one in the edit bar):
 
-   | state | colour in Golly | means |
+   | state | colour | means |
    |---|---|---|
-   | 0 | empty | **unknown**: drift may decide it |
-   | 1 | green | **alive**, in the still life and in gen 0 |
-   | 2 | dark blue | **known dead** |
-   | 3 | pale green | **the spark**: dead in the still life, alive in gen 0 |
-   | 4 | red | dead in gen 0 but alive in the still life (a spark that removes a cell) |
-   | 5 | yellow | alive and never allowed to change |
-   | 6 | grey | dead and never allowed to change |
+   | 0 | black | **unknown**: drift may build here |
+   | 1 | green | alive (in the still life) |
+   | 2 | dark blue | known dead (empty) |
+   | 3 | pale green | **the spark**: alive in gen 0 only |
+   | 4 | red | dead in gen 0 only (a spark that removes a live cell) |
+   | 5 | yellow | alive, never allowed to change |
+   | 6 | grey | dead, never allowed to change |
 
-   **Undrawn cells are unknown, not dead.** If you want empty space somewhere,
-   draw it in state 2 or add a `clear` region (step 3).
+3. Select it and use **Edit → Copy** (Golly copies RLE).
 
-3. Draw a **stable** background: drift refuses to start if the alive and
-   known-dead cells you drew aren't a still life. Cells next to unknown cells
-   are fine, because drift may fill those in.
-4. Select the pattern and use **Edit → Copy**. Golly puts an RLE starting
-   `x = … rule = LifeHistory` on the clipboard.
-
-For the tutorial example: a beehive in state 1, the dead cells around it in
-state 2, and one spark cell in state 3 at its lower right.
+Three rules of thumb:
+- **Undrawn cells are unknown, not dead.** Draw empty space in state 2, or add
+  a `clear` region.
+- **drift can only build where cells are unknown.** Leave unknown cells next
+  to the spark wherever something may be built. A spark boxed in by state-2
+  cells just evolves on its own, and drift warns you about this.
+- **What you draw must already be stable.** drift says which cell isn't.
 
 ### Step 2: put it in a config
 
-Paste the RLE after a line that says `pattern:`, at the end of the file. You
-can also save it as a file and write `pattern = beehive.rle`. Then add the
-rule and the limits.
+Paste the RLE after `pattern:`, or save it as a file and write
+`pattern = my.rle`. Then set the rule and the limits.
 
-**Choosing limits.** `max-changed` and `size` decide how big a disturbance may
-get. Bigger means bigger and higher-period results, but the search grows very
-fast. Start small (6 cells, 4×4) and widen once a search finishes quickly. The
-`changes:` and `sizes:` lines of results show how close they came to the
-limits.
+**Limits** (`max-changed`, `size`) decide how big the disturbance may get.
+Start small and widen them if nothing is found. A bigger spark needs bigger
+limits: the spark's own cells count too.
 
 ### Step 3: add regions
 
-Regions mark areas of the space. Their coordinates count from the **top-left
-cell of the pattern** you pasted: row 0, col 0, rows going down and columns
-going right. Negative values are above or left of the pattern.
+A region's coordinates count from the pattern's top-left cell (row 0, col 0).
+Rows go down and columns go right; negative values are above or to the left.
 
 ![beehive-spark](img/beehive-spark.svg)
 
-The picture above (from `docs/render.py`) shows `clear = r -4 -2 -1 5`: rows
-−4 to −1, columns −2 to 5, i.e. the four rows above the beehive, are empty.
-
 | option | effect |
 |---|---|
-| `clear = REGION` | make the cells dead (empty space nothing may be built in) |
+| `clear = REGION` | the cells are dead: empty space nothing may be built in |
 | `no-change = REGION` | these cells may never change |
-| `no-count = REGION` | changes here don't count towards `max-changed` / `size` (use sparingly: an uncounted area can make the search explode) |
+| `no-count = REGION` | changes here don't count towards the limits (can make the search explode) |
 | `no-check = REGION` | the still life needn't be stable here |
-| `must-reach = REGION` | only report results that change some cell here |
+| `must-reach = REGION` | only keep results that change some cell here |
 
-A REGION is `r R0 C0 R1 C1` (a rectangle with corners R0,C0 and R1,C1), or
-`p R C` (one cell), `l R0 C0 R1 C1` (a line), or `t R0 C0 R1 C1 R2 C2` (a
-triangle). Every region option can be repeated.
+REGION is one of:
+- `r R0 C0 R1 C1`: a rectangle;
+- `p R C`: one cell;
+- `l R0 C0 R1 C1`: a line;
+- `t R0 C0 R1 C1 R2 C2`: a triangle.
 
-### Step 4: check it before running
+Every region option can be given more than once.
 
-```
-./drift my.cfg --dry-run                          # settings and the starting picture
-python3 docs/render.py my.cfg my.svg              # a picture with the regions coloured
-```
+### Step 4: check it
+
+    ./drift my.cfg --dry-run                  # the settings and starting picture
+    python3 tools/render.py my.cfg my.svg     # a picture with the regions coloured
 
 In the dry-run picture:
 - `o`: alive
@@ -134,214 +123,167 @@ In the dry-run picture:
 - `1`: spark (alive in gen 0 only)
 - `0`: dead in gen 0 only
 
-The coordinates are pattern-relative, like the regions.
+Warnings appear above the picture.
 
 ### Step 5: run it
 
-```
-./drift my.cfg --jsonl results.jsonl
-```
+    ./drift my.cfg
 
-- **Text output:** each result is printed, with a summary at the end.
-- **JSON:** `--jsonl` saves every result for the tools in section 4.
-- **Long runs:** add `--max-steps N` to stop early, `--checkpoint run.ckpt` to
-  be able to resume (Ctrl-C saves it), and `--threads N` (default: all cores).
+drift searches, saves `my-results.txt` and `my-results.jsonl`, then finishes
+them into `my-finished.txt`.
 
-## 4. After the search: real patterns
-
-Each result fixes only the cells it needed. To get something you can paste
-into Golly in your rule:
-
-```
-RULE=$(./drift --rule B3/S23 --show-rule | sed -n 's/^MAP: *//p')
-python3 tests/complete.py results.jsonl --rule "$RULE" --best real.txt --minimize
-```
-
-This does three things:
-- fills in the unknown cells with a SAT solver so the still life is complete;
-- checks that the finished pattern really does what drift reported;
-- shrinks the stator as far as it can.
-
-The output keeps one pattern per distinct oscillator, highest period first.
-
-| for | add |
+| option | effect |
 |---|---|
-| fizzles (catalysts) | `--kind fizzle --max-extent 8 --limit 30` |
-| only oscillators that aren't billiard tables | `--no-billiards` |
-| only oscillators that spark into empty space | `--sparky --keep-empty "R0 C0 R1 C1"` |
+| `max-steps = N` | stop after about N steps; around 3·10⁸ steps per second is typical |
+| `--checkpoint run.ckpt` | save progress, and on Ctrl-C (resume with `--resume run.ckpt`) |
+| `--no-finish` | skip the finishing step |
+
+## 4. Reading the results
+
+**`my-finished.txt`** is the file to open. It has one pattern per distinct
+result, in sections, best first:
+
+| section | meaning |
+|---|---|
+| Clean oscillators | the spark starts an oscillator and the still life loses nothing. With `must-reach` regions, the oscillator's own cycle has to reach them (sparky). |
+| Catalysts | the spark is absorbed and the still life recovers exactly |
+| Spaceship converters | the still life recovers and only spaceships leave |
+| Signals | something is still travelling with a fixed shape |
+
+Each pattern is **generation 0** (still life plus spark), shrunk to as few
+cells as possible. Paste it into Golly with your rule and run it.
+
+After those comes "Damaging oscillators": real oscillators, but the spark
+broke part of the still life to make them. `finish.py --clean-only` leaves
+them out, `--max-cells N` drops big patterns, and `--all` adds long fizzles
+and oscillators that don't reach a `must-reach` area in their own cycle.
+
+**`my-results.txt`** holds drift's raw results. These are partial patterns,
+so pasting them into Golly won't work. Useful lines:
+
+| line | meaning |
+|---|---|
+| `rotor:` | the oscillating cells (Hickerson's rotor descriptor) |
+| `changes:` / `sizes:` | changed cells and their bounding box, per generation; compare with your limits |
+| the picture | `o` alive, `.` dead, `,` unknown, `1`/`0` the spark |
 
 ## 5. Recipes
 
-Each recipe says what to draw and what to add. All of them have been run;
-their configs are in `examples/` and `../attempts/`.
+These are tested; their configs are in `examples/` and `results/`.
 
 ### Oscillators from a spark
 
-**Draw:** one spark cell (state 3) and nothing else. Everything around it is
-unknown, so drift designs the stator too.
+**Draw** one spark cell (state 3) and nothing else; drift designs the stator
+too. Use `skip = fizzle, stable` and `min-period = 4`.
 
 ![spark](img/spark.svg)
 
-```
-rule = B3/S23-a5
-max-changed = 6
-size = 4x4
-skip = fizzle, stable
-min-period = 4
-pattern:
-x = 1, y = 1, rule = LifeHistory
-C!
-```
-
-In 22 s this found 180 distinct B3/S23-a5 oscillators, p4 to p15. Here is the
-p15:
+In 22 s this found 180 B3/S23-a5 oscillators, p4 to p15:
 
 ![p15](img/result-p15.svg)
 
-### Oscillators next to a known object
+### Next to a known object
 
-**Draw:** the object in states 1/2, plus a spark cell beside it. That's the
-beehive example in section 2. Use it to find oscillators or sparkers that work
-next to a particular still life.
+**Draw** the object in states 1/2, and a spark with unknown cells beside it
+(`examples/beehive-spark.cfg`).
 
-### Sparky oscillators (oscillators that throw sparks)
+**A spark arriving from outside** (`results/tspark.cfg`): leave one known-dead
+cell between the spark and the unknown area, so nothing is built touching it.
 
-**Draw:** a spark cell. **Add:** clear the half-plane above it and require
-changes there:
+### Sparky oscillators
 
-```
-clear = r -60 -60 -1 60          # everything above row 0 is empty
-must-reach = r -60 -60 -1 60     # and the reaction must reach into it
-```
+**Draw** a spark, then add:
+
+    clear = r -60 -60 -1 60          # empty above row 0
+    must-reach = r -60 -60 -1 60     # the reaction must reach into it
+
+`finish.py` keeps only oscillators whose own cycle reaches that area.
 
 ![sparky](img/sparky.svg)
 
-Complete with
-`complete.py … --best sparky.txt --minimize --sparky --keep-empty "-60 -60 -1 60"`.
-That keeps only oscillators whose own cycle sparks into the empty half.
+### Catalysts
 
-### Catalysts (useful fizzles)
+Keep fizzles: `skip = oscillator, stable` (or just `skip = stable`). They end
+up under "Catalysts", longest reaction first. Long, thin fizzles are left out,
+because they are nearly always a signal running along a short wire.
 
-**Draw:** a spark cell, or an object plus a spark. **Add:**
-`skip = oscillator, stable`. Then:
+### Converters
 
-```
-complete.py fizzles.jsonl … --best catalysts.txt --kind fizzle --max-extent 8 --limit 30 --minimize
-```
+**Draw** a spark (or a glider) in empty space, then:
+- keep only travelling results (`skip = oscillator, fizzle, stable`);
+- set `per-rotor = 0`;
+- give the escapee room (`margin = 50`);
+- set `max-gen = 120`, so only clean departures survive the size limit;
+- set `size` large enough for the object leaving plus the reaction,
+  e.g. `14x14`.
 
-`--max-extent 8` drops long, thin reactions, which are nearly always a signal
-running along a short wire.
-
-### Spark converters
-
-**Draw:** a spark cell. **Add:**
-- clear everything except a box beside it, where the still life must fit;
-- `must-reach` regions just outside the box, away from the input;
-- `skip = oscillator, stable`, so the still life has to recover.
+See `results/tspark-converter.cfg` and `results/glider-converter.cfg`.
 
 ![converter](img/converter.svg)
 
-`attempts/a5/make_converter.py H W C SIZE` writes this config for an H×W box.
+### Wires
 
-### Wires (signals that travel forever)
+**Draw** a spark, then set `margin = 50`, `max-gen = 80` and
+`skip = oscillator, fizzle, stable`. Then:
 
-**Draw:** a spark cell. **Add:**
+    python3 tools/wirecheck.py my-results.jsonl           # which tracks repeat
+    python3 tools/wirebuild.py my-results.jsonl --n N --out wire.rle
 
-```
-margin = 50                       # plenty of room
-max-gen = 80
-skip = oscillator, fizzle, stable # keep only what is still moving
-```
+`wirebuild.py` requires the signal to repeat at least 3 times, finds an
+exactly periodic wire for it with SAT, and tests a single signal on a long
+copy.
 
-Results still going at gen 80 are signals running on tracks drift built.
-Then:
-
-```
-python3 tests/wirecheck.py results.jsonl                       # tracks that repeat
-python3 tests/wirebuild.py results.jsonl --rule "$RULE" --n N --out wire.rle
-```
-
-`wirebuild.py` checks that the signal repeats at least 3 times. It then asks a
-SAT solver for an exactly periodic wire carrying it, and tests a single signal
-on a long tiled copy. `--push "right c/2 3"` (or a direction such as `se`, or a
-vector `R,C`) can force a speed and direction.
+`push = right c/2 3` forces a direction and speed. DIR can be `se` or a vector
+such as `1,2`; a speed of `0` keeps the disturbance within the slack.
 
 ![wire](img/result-wire.svg)
 
-### Turns, reflectors and converters for a wire
+### Glider reactions
 
-**Draw:** a piece of the wire, carrying its signal, cut off. Draw the signal as
-state 3/4 cells. Leave the space past the cut unknown and clear the space
-beside the wire. There are two ways to continue:
-
-1. **Let drift improvise.** Keep max-gen results and check what the signal
-   became (`attempts/q4i/convert/`).
-2. **Connector search.** Also draw the outgoing wire, rotated, beyond a small
-   gap, and leave only the gap unknown. Success is the signal arriving deep in
-   the outgoing wire (`must-reach` boxes on it).
-
-   Run a "straight" control first, an unrotated copy whose gap is a whole
-   number of wire periods: it must find the missing piece of wire.
-   `attempts/a5/turns2/make_connector2.py` builds all of this.
-
-![turn input](img/turn-left.svg)
+**Draw** a glider in state 3, with dead cells behind it and unknown cells
+ahead (`results/glider.cfg`). The results are glider eaters (catalysts),
+oscillators started by the glider, and with the converter settings,
+reflectors.
 
 ### Symmetric billiard tables
 
-Sokwe's setup (`examples/billiard-rot180.cfg`):
-- **Draw:** a 3×3 block of dr2's `4` cells (unknown and unchecked).
-- **Add:** `symmetry = rot180` and `pattern-no-count`.
+`examples/billiard-rot180.cfg`: the centre is dr2's `4` cells (unknown and
+unchecked), with `symmetry = rot180` and `pattern-no-count`.
 
-![billiard](img/billiard.svg)
+## 6. Troubleshooting
 
-## 6. Reference
+| you see | it means | try |
+|---|---|---|
+| "Nothing was printed … furthest any got was generation 5" | the disturbance outgrew the limits almost at once | larger `max-changed` / `size`; the spark's own cells count |
+| warning "every cell within 2 of the spark is known" | the spark is boxed in by drawn cells | leave unknown cells next to the spark |
+| "pattern background is not stable at row R, col C" | what you drew isn't a still life | fix that cell, or leave its neighbours unknown |
+| "Results were found but none passed the output filters" | they were skipped | check `skip`, `min-period`, `must-reach` |
+| finished file has only "damaging oscillators" | every oscillator found breaks the still life | `skip = stable` to also keep catalysts; move the spark; loosen the limits |
+| the search takes forever | the limits are too loose | `max-steps`, smaller limits, `symmetry` |
+| results look like nonsense in Golly | you pasted a raw result | use `my-finished.txt` |
 
-**LifeHistory states:**
+## 7. Reference
 
-| state | meaning |
-|---|---|
-| 0 | unknown |
-| 1 | alive |
-| 2 | known dead |
-| 3 | spark (alive in gen 0 only) |
-| 4 | dead in gen 0 only |
-| 5 | alive, never changes |
-| 6 | dead, never changes |
-
-**dr2 characters**, an alternative to RLE. Write them as lines of text after
-`pattern:`, ending with `!`:
+**dr2 characters**, an alternative to RLE:
 
 | char | still life | gen 0 | |
 |---|---|---|---|
 | `o` / `.` | alive / dead | same | |
 | `1` / `0` | dead / alive | alive / dead | the spark |
-| `,` or `?` | unknown | unknown | |
-| `O` / `:` / `s` | alive / dead / unknown | same | never changes |
-| `3` / `2` / `4` | alive / dead / unknown | same | not checked for stability |
+| `,` `?` | unknown | unknown | |
+| `O` `:` `s` | alive / dead / unknown | same | never changes |
+| `3` `2` `4` | alive / dead / unknown | same | not checked for stability |
 
-**Options that shape the search** (more under `./drift --help`):
+**Main options** (all of them: `./drift --help`):
 
 | option | effect |
 |---|---|
-| `max-changed`, `size WxH` | the size limits |
-| `max-gen` | how long a disturbance may run (default 500) |
-| `margin` | unknown cells around the pattern (default 30) |
+| `max-changed`, `size WxH` | size limits |
+| `max-gen`, `margin` | how long a disturbance may run (500), and the room around the pattern (30) |
 | `symmetry` | none, hor, vert, diag, rot90, rot180, plus, x, full (background only) |
-| `push "DIR SPEED [SLACK]"` | force motion. DIR: right/left/up/down, se/ne/…, or a vector `R,C`. SPEED: c/2, 2c/3, …, or 0 (stay within SLACK) |
-| `skip`, `min-period`, `per-rotor`, `max-results`, `only-new` | what gets printed |
+| `push "DIR SPEED [SLACK]"` | force motion |
+| `skip`, `min-period`, `per-rotor`, `max-results`, `only-new` | what is kept |
+| `max-steps`, `threads`, `checkpoint`, `resume` | running |
+| `no-finish`, `no-save`, `out` | output files |
 
-## 7. Pitfalls
-
-- **Undrawn cells are unknown.** Empty space has to be drawn in state 2 or
-  given with `clear`.
-- **The background must be stable** where it is known. drift tells you the
-  first cell that isn't.
-- **Pasting results straight into Golly doesn't work.** Results are partial,
-  and their LifeHistory RLE runs as plain Life. Use `complete.py`.
-- **Storage.** Loose limits can produce millions of results. `per-rotor`
-  (default 10) and `max-results` (default 10,000) keep the output small.
-- **`no-count` areas** let anything happen inside them uncounted, which can
-  make the search explode. Prefer counting everything with looser limits.
-- **A repeating track isn't a wire.** A disturbance that zigzags along a track
-  drift improvised can look periodic. `wirebuild.py` only accepts signals that
-  repeat 3 times.
+dr2 users: see [DR2.md](DR2.md).

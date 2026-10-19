@@ -11,7 +11,7 @@ onto itself. For each result this finds the shift with the best agreement
 over known cells (at least MIN overlapping cells) and lists the strongest
 candidates, grouped by shift.
 
-Usage: wirecheck.py RESULTS.jsonl [--min 80] [--top 10]
+Usage: tools/wirecheck.py RESULTS.jsonl [--min 80] [--top 10]
 """
 import argparse
 import json
@@ -19,7 +19,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from validate import parse_rle  # noqa: E402
+from driftlib import parse_rle  # noqa: E402
 
 
 def best_shift(bk, min_overlap):

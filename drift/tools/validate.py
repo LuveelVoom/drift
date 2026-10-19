@@ -9,10 +9,7 @@ For every result in a --jsonl file, decode the LifeHistory RLE, then:
   * the number of changed cells per generation must match "change_counts";
   * oscillators must repeat with the stated period, fizzles must be empty.
 
-The rule must be a Golly MAP string or a B/S totalistic rule (use
-`drift --show-rule` to get the MAP form of an INT rule).
-
-Usage: tests/validate.py RESULTS.jsonl [--rule MAP...]
+Usage: tools/validate.py RESULTS.jsonl [--rule RULE]   (the rule is read from the results by default)
 """
 import argparse
 import base64
@@ -20,72 +17,9 @@ import itertools
 import json
 import re
 import sys
-
-
-def rule_table(rule):
-    """table[k] for k = 256*NW + 128*N + 64*NE + 32*W + 16*C + 8*E + 4*SW + 2*S + SE"""
-    if rule.startswith("MAP"):
-        s = rule[3:]
-        s += "=" * (-len(s) % 4)
-        bits = "".join(f"{b:08b}" for b in base64.b64decode(s))
-        return [bits[k] == "1" for k in range(512)]
-    m = re.fullmatch(r"B(\d*)/S(\d*)", rule)
-    if not m:
-        sys.exit(f"validate.py: can't read rule {rule!r}; pass its MAP form with --rule")
-    birth, surv = set(map(int, m.group(1))), set(map(int, m.group(2)))
-    table = []
-    for k in range(512):
-        n = bin(k & ~16).count("1")
-        table.append(n in surv if k & 16 else n in birth)
-    return table
-
-
-def parse_rle(text):
-    lines = [l for l in text.split("\n") if l and not l.startswith("#") and not l.startswith("x")]
-    body = "".join(lines)
-    cells, r, c, run = {}, 0, 0, ""
-    for ch in body:
-        if ch.isdigit():
-            run += ch
-            continue
-        n = int(run) if run else 1
-        run = ""
-        if ch == "!":
-            break
-        if ch == "$":
-            r += n
-            c = 0
-        elif ch in ".b":
-            c += n
-        else:
-            state = 1 if ch == "o" else ord(ch) - ord("A") + 1
-            for _ in range(n):
-                cells[(r, c)] = state
-                c += 1
-    return cells
-
-
-OFFS = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)]
-WEIGHT = [256, 128, 64, 32, 16, 8, 4, 2, 1]
-
-
-def next3(table, window, cache={}):
-    """window: 9 values (0, 1 or None) -> 0, 1 or None (undetermined)"""
-    key = (id(table), window)
-    if key in cache:
-        return cache[key]
-    unk = [i for i, v in enumerate(window) if v is None]
-    seen = set()
-    for bits in itertools.product((0, 1), repeat=len(unk)):
-        w = list(window)
-        for i, b in zip(unk, bits):
-            w[i] = b
-        seen.add(table[sum(WEIGHT[i] for i in range(9) if w[i])])
-        if len(seen) == 2:
-            break
-    res = int(seen.pop()) if len(seen) == 1 else None
-    cache[key] = res
-    return res
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from driftlib import OFFS, WEIGHT, next3, parse_rle, rule_for  # noqa: E402
 
 
 def check(res, table):
@@ -145,7 +79,7 @@ def main():
         res = json.loads(line)
         rule = a.rule or res["rule"]
         if rule not in tables:
-            tables[rule] = rule_table(rule)
+            tables[rule] = rule_for(rule)
         errs = check(res, tables[rule])
         n += 1
         if errs:
