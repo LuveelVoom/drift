@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Find wire candidates among drift's "max gen" results.
 
+A repeating track is only a candidate: a disturbance that zigzags along a
+track drift improvised also gives a repeating background. Check candidates
+with wirebuild.py, which requires the signal itself to repeat.
+
 A signal still going at max gen has built its own track. If that track is a
 wire, the known background repeats: shifting it by the wire's period maps it
 onto itself. For each result this finds the shift with the best agreement

@@ -224,7 +224,8 @@ const std::vector<Opt> &opts() {
      "cells' trailing edge) in direction DIR (right, left,\n"
      "up, down, a diagonal ne/nw/se/sw where both coordinates must keep up, or a vector\n"
      "R,C for oblique motion: SPEED c/N then means R rows down and C columns right every\n"
-     "N gens). SPEED like c/2, 2c/3, c/4. SLACK defaults to 2.\n"
+     "N gens). SPEED like c/2, 2c/3, c/4, or 0 (don't fall more than SLACK behind in that\n"
+     "direction; use two opposite ones to keep to a line). SLACK defaults to 2.\n"
      "E.g. --push \"right c/2 3\", --push \"1,2 c/6\".",
      [](Ctx &c, const std::string &v) {
        std::istringstream in(v);
@@ -234,13 +235,15 @@ const std::vector<Opt> &opts() {
        if (!(in >> slack)) slack = 2;
        long num = 1, den = 1;
        size_t cpos = speed.find('c');
+       if (speed == "0") { num = 0; cpos = std::string::npos - 1; }   // stay within SLACK
+       else
        if (cpos == std::string::npos) fail("--push: speed must look like c/2 or 2c/3");
-       if (cpos > 0) num = toLong("push", speed.substr(0, cpos));
-       if (cpos + 1 < speed.size()) {
+       if (num && cpos > 0) num = toLong("push", speed.substr(0, cpos));
+       if (num && cpos + 1 < speed.size()) {
          if (speed[cpos + 1] != '/') fail("--push: speed must look like c/2 or 2c/3");
          den = toLong("push", speed.substr(cpos + 2));
        }
-       if (num <= 0 || den <= 0 || num > den) fail("--push: speed must be between 0 and c");
+       if (num < 0 || den <= 0 || num > den) fail("--push: speed must be between 0 and c");
        int vr, vc;
        if (sscanf(dir.c_str(), "%d,%d", &vr, &vc) == 2) {   // oblique: project on (vr,vc)
          if (!vr && !vc) fail("--push: zero direction");

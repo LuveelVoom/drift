@@ -63,8 +63,13 @@ def measure(res, table, gens=160):
             if not a or len(a) != len(b):
                 continue
             d = (b[0][0] - a[0][0], b[0][1] - a[0][1])
-            if d != (0, 0) and all((q[0] - p[0], q[1] - p[1]) == d for p, q in zip(a, b)) \
-                    and all((p in h[t0]) == (q in h[t0 + P]) for p, q in zip(a, b)):
+            def repeats(t):   # the change pattern at t + P is the one at t, moved by d
+                a, b = ch[t], ch[t + P]
+                return a and len(a) == len(b) and \
+                    all((q[0] - p[0], q[1] - p[1]) == d for p, q in zip(a, b)) and \
+                    all((p in h[t]) == (q in h[t + P]) for p, q in zip(a, b))
+            # a real signal keeps repeating; require 3 repeats in a row
+            if d != (0, 0) and all(t0 + (k + 1) * P < len(ch) and repeats(t0 + k * P) for k in range(3)):
                 o = ch[t0][0]
                 shapes = [frozenset((r - o[0], c - o[1]) for r, c in ch[t0 + t]) for t in range(P)]
                 return P, d, shapes

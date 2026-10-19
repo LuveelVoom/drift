@@ -59,9 +59,11 @@ How each kind of file was made:
     made exactly periodic by `wirebuild.py`;
   - the wire repeats every (4,4) with 41 live cells per repeat;
   - a single signal crosses a 40-repeat test wire unchanged.
-- **Oblique (4,1)c/6 signal:** results #6547 and #2657 of that search. It is
-  real on drift's improvised track, but no exactly periodic wire was found
-  with repeats up to 6 signal steps and a band up to 8 cells wide.
+- **Not an oblique signal:** results #6547 and #2657 of that search looked
+  like an oblique (4,1)c/6 signal, but the disturbance repeats only once.
+  It's an irregular disturbance that wanders along a zigzag track drift
+  improvised for it, lasting about 80 gens. An example is in
+  `attempts/q4i/meander-6547.rle`.
 
 ## B36/S23 (HighLife)
 
