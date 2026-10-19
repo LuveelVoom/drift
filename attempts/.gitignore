@@ -10,3 +10,4 @@ a5/turns2/*.cfg
 a5/turns/left-*.cfg
 a5/turns/right-*.cfg
 a5/wires/w-*.cfg
+*.time
