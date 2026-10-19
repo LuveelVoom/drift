@@ -411,6 +411,15 @@ const std::vector<Opt> &opts() {
      [](Ctx &c, const std::string &v) { c.o.resume = v; }},
     {"max-steps", "N", "Run", "Stop after about N search steps (for timing or a quick look).",
      [](Ctx &c, const std::string &v) { c.o.maxSteps = toLong("max-steps", v); }},
+    {"max-time", "SECONDS", "Run",
+     "Stop after this many seconds (with --checkpoint, the rest of the search is saved and can be "
+     "resumed).",
+     [](Ctx &c, const std::string &v) { c.o.maxTime = (double)toLong("max-time", v); }},
+    {"threads-file", "FILE", "Run",
+     "Read the number of threads to use from FILE every second, so it can be changed while the "
+     "search runs (tools/survey.py uses this to move cores between searches). --threads (default: "
+     "all cores) is then the most it can use.",
+     [](Ctx &c, const std::string &v) { c.o.threadsFile = v; }},
     {"dry-run", nullptr, "Run", "Set everything up, show the starting position and exit.",
      [](Ctx &c, const std::string &v) { c.o.dryRun = toBool("dry-run", v); }},
     {"show-rule", nullptr, "Run", "Print the rule in canonical and MAP form and exit.",
@@ -556,7 +565,11 @@ void printHelp() {
       "Usage:\n"
       "  drift CONFIG [--option value ...]      search, then finish the results\n"
       "  drift --resume run.ckpt                continue a saved search\n"
-      "  drift --classic < dr2-input-file       run an old dr2.c input file\n\n"
+      "  drift --classic < dr2-input-file       run an old dr2.c input file\n"
+      "  drift survey RULE [--minutes M]        many searches at once in RULE, sharing the cores;\n"
+      "                                         writes surveys/RULE/SUMMARY.md (survey --help)\n"
+      "  drift finish CONFIG                    complete and check results (also: render,\n"
+      "                                         validate, wirecheck, wirebuild)\n\n"
       "CONFIG is a file of 'option = value' lines (# starts a comment) ending with the\n"
       "pattern after a 'pattern:' line; see docs/GUIDE.md. Options on the command line\n"
       "override the file. Results go to CONFIG-results.txt / .jsonl, and complete,\n"

@@ -243,8 +243,8 @@ Saved readCheckpoint(const std::string &path) {
 
 class Coordinator : public Sink {
  public:
-  Coordinator(Reporter &r, const Search &b, const Options &opt, int n)
-      : rep(r), base(b), o(opt), nthreads(n), workers(n) {
+  Coordinator(Reporter &r, const Search &b, const Options &opt, int n, int active)
+      : rep(r), base(b), o(opt), nthreads(n), workers(n), limit(active) {
     ttyProgress = !o.quiet && isatty(2);
   }
 
@@ -283,18 +283,34 @@ class Coordinator : public Sink {
   bool poll(Search &s) override {
     Worker &w = workers[tid];
     w.steps.store(w.doneSteps + s.steps, std::memory_order_relaxed);
-    if (o.maxSteps && totalSteps() >= o.maxSteps) stopReq = true;
+    if (o.maxSteps && totalSteps() >= o.maxSteps) {
+      if (o.checkpoint.empty()) stopReq = true;
+      else limitHit = true;   // the monitor saves the rest, then stops
+    }
+    if (tid >= limit.load(std::memory_order_relaxed) && !pauseReq.load()) {
+      // This thread has been switched off: hand all its remaining work back.
+      std::lock_guard<std::mutex> l(qMu);
+      std::vector<std::pair<std::vector<uint8_t>, double>> pend;
+      s.pending(pend);
+      for (auto &p : pend) {
+        w.handedBack += p.second;
+        queue.push_back({std::move(p.first), p.second});
+      }
+      w.yielded = true;
+      qCv.notify_all();
+      return true;
+    }
     if ((++w.polls & 15) == 0) w.progress.store(s.progress(), std::memory_order_relaxed);
     if (wantWork.load(std::memory_order_relaxed)) {
       std::lock_guard<std::mutex> l(qMu);
-      if ((int)queue.size() < idle) {
+      if ((int)queue.size() < idleOn()) {
         Item it;
         if (s.donate(it.path, it.w)) {
           queue.push_back(std::move(it));
           qCv.notify_all();
         }
       }
-      if ((int)queue.size() >= idle) wantWork = false;
+      if ((int)queue.size() >= idleOn()) wantWork = false;
     }
     if (pauseReq.load()) {
       std::unique_lock<std::mutex> l(qMu);
@@ -322,13 +338,23 @@ class Coordinator : public Sink {
     std::vector<std::thread> ts;
     for (int i = 0; i < nthreads; i++) ts.emplace_back([this, i] { worker(i); });
 
-    auto lastCkpt = Clock::now(), lastProg = Clock::now();
+    auto lastCkpt = Clock::now(), lastProg = Clock::now(), lastThreads = Clock::now();
     bool interrupted = false;
     while (true) {
       {
         std::unique_lock<std::mutex> l(qMu);
         monCv.wait_for(l, std::chrono::milliseconds(200), [&] { return exited == nthreads; });
         if (exited == nthreads) break;
+      }
+      if (!o.threadsFile.empty() && secondsSince(lastThreads) >= 1) {
+        readThreadsFile();
+        lastThreads = Clock::now();
+      }
+      if (limitHit.load() || (o.maxTime > 0 && sessionSeconds() >= o.maxTime)) {
+        if (!o.checkpoint.empty()) checkpoint(saved, args);
+        stopReq = true;
+        stop();
+        break;
       }
       if (gSignal.load()) {
         interrupted = true;
@@ -352,9 +378,12 @@ class Coordinator : public Sink {
     }
     finished = !interrupted && !stopReq && queue.empty();
     if (!o.checkpoint.empty() && finished) {   // record that nothing is left
+      queue.clear();
       snapshot.clear();
       writeState(saved, args);
     }
+    if (!interrupted && !finished && !o.checkpoint.empty())
+      fprintf(stderr, "\nStopped at the limit. Continue with: drift --resume %s\n", o.checkpoint.c_str());
     if (interrupted)
       fprintf(stderr, "\nInterrupted.%s\n",
               o.checkpoint.empty() ? "" : (" Resume with: drift --resume " + o.checkpoint).c_str());
@@ -375,6 +404,8 @@ class Coordinator : public Sink {
     std::atomic<double> progress{0};
     long long doneSteps = 0;
     unsigned polls = 0;
+    bool yielded = false;    // stopped because the thread limit was lowered
+    double handedBack = 0;   // weight of the work it put back on the queue
   };
   static thread_local int tid;
 
@@ -390,7 +421,8 @@ class Coordinator : public Sink {
   std::vector<Item> snapshot;
   int idle = 0, paused = 0, exited = 0;
   double todo = 0, completed = 0;
-  std::atomic<bool> wantWork{false}, pauseReq{false}, stopReq{false};
+  std::atomic<bool> wantWork{false}, pauseReq{false}, stopReq{false}, limitHit{false};
+  std::atomic<int> limit;   // threads with id >= limit sit out (--threads-file)
   std::atomic<int> maxgenSeen{0};
   bool done = false, finished = false, ttyProgress = false, progressShown = false;
   Clock::time_point t0;
@@ -418,19 +450,20 @@ class Coordinator : public Sink {
             paused--;
             continue;
           }
-          if (!queue.empty()) break;
-          if (idle == nthreads) {   // nobody has work left: the search is over
+          bool on = id < limit.load();
+          if (on && !queue.empty()) break;
+          if (idle == nthreads && queue.empty()) {   // nobody has work left: the search is over
             done = true;
             qCv.notify_all();
             continue;
           }
-          wantWork = true;
+          if (on) wantWork = true;
           qCv.wait(l);
         }
         it = std::move(queue.front());
         queue.pop_front();
         idle--;
-        if ((int)queue.size() < idle) wantWork = true;
+        if ((int)queue.size() < idleOn()) wantWork = true;
       }
       Search s = base;
       s.prefix = it.path;
@@ -447,6 +480,12 @@ class Coordinator : public Sink {
       w.progress.store(0);
       lastHi = s.counthi;
       lastLo = s.countlo;
+      if (w.yielded) {   // its work is back on the queue; wait to be switched on again
+        completed += it.w - s.donatedWeight - w.handedBack;
+        w.yielded = false;
+        w.handedBack = 0;
+        continue;
+      }
       if (!fin) {
         exited++;
         monCv.notify_all();
@@ -469,6 +508,25 @@ class Coordinator : public Sink {
     pauseReq = false;
     qCv.notify_all();
   }
+  // Idle threads that are switched on (switched-off ones are always idle).
+  int idleOn() const { return idle - (nthreads - limit.load(std::memory_order_relaxed)); }
+
+  void readThreadsFile() {
+    FILE *f = fopen(o.threadsFile.c_str(), "r");
+    if (!f) return;
+    int n = 0;
+    if (fscanf(f, "%d", &n) == 1) {
+      n = std::max(1, std::min(n, nthreads));
+      if (n != limit.load()) {
+        std::lock_guard<std::mutex> l(qMu);
+        limit = n;
+        if ((int)queue.size() < idleOn()) wantWork = true;
+        qCv.notify_all();
+      }
+    }
+    fclose(f);
+  }
+
   void stop() {
     std::unique_lock<std::mutex> l(qMu);
     stopReq = true;
@@ -589,10 +647,27 @@ int main(int argc, char **argv) {
     printf("drift: search Life-like rules for oscillators, sparkers, catalysts and signals.\n\n"
            "  drift CONFIG               run a search described in CONFIG (see docs/GUIDE.md)\n"
            "  drift CONFIG --dry-run     show the starting position without searching\n"
+           "  drift survey RULE          run a battery of searches in RULE and summarise the finds\n"
+           "  drift finish CONFIG        complete and check a search's results (also render,\n"
+           "                             validate, wirecheck, wirebuild: the tools/ scripts)\n"
            "  drift --help               all options\n\n"
            "Example: drift examples/beehive-spark.cfg\n");
     return 0;
   }
+  // drift survey|finish|render|validate|wirecheck|wirebuild ...: run tools/<name>.py
+  static const char *tools[] = {"survey", "finish", "render", "validate", "wirecheck", "wirebuild"};
+  for (const char *t : tools)
+    if (args[0] == t && !fileExists(args[0])) {
+      std::string script = exeDir(argv[0]) + "/tools/" + t + ".py";
+      std::vector<std::string> cmd = {"python3", script};
+      cmd.insert(cmd.end(), args.begin() + 1, args.end());
+      std::vector<char *> cargv;
+      for (std::string &c : cmd) cargv.push_back(&c[0]);
+      cargv.push_back(nullptr);
+      execvp("python3", cargv.data());
+      fprintf(stderr, "drift: can't run python3 %s\n", script.c_str());
+      return 1;
+    }
   Options o;
   Saved saved;
   bool resumed = false;
@@ -706,7 +781,16 @@ int main(int argc, char **argv) {
       signal(SIGINT, onSignal);
       signal(SIGTERM, onSignal);
     }
-    Coordinator co(rep, base, o, threads);
+    int active = threads;
+    if (!o.threadsFile.empty()) {   // start as many threads as could ever be asked for
+      if (o.threads <= 0) threads = (int)std::max(1u, std::thread::hardware_concurrency());
+      if (FILE *f = fopen(o.threadsFile.c_str(), "r")) {
+        if (fscanf(f, "%d", &active) != 1) active = threads;
+        fclose(f);
+      }
+      active = std::max(1, std::min(active, threads));
+    }
+    Coordinator co(rep, base, o, threads, active);
     bool finished = co.run(items, saved, args);
     long long steps = co.totalSteps();
     if (o.classic) {

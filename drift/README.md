@@ -28,6 +28,11 @@ files next to the config:
 | `examples/beehive-spark-finished.txt` | **complete, checked patterns**, best first, ready to paste into Golly |
 | `examples/beehive-spark-results.txt` (and `.jsonl`) | drift's raw results: partial patterns, as found |
 
+To look at a whole rule at once, run a survey: a standard set of searches
+that share the cores, with the best finds collected in `SUMMARY.md`:
+
+    ./drift survey B3/S135 --minutes 20      # results in ../surveys/B3-S135/
+
 To set up your own search, read **[docs/GUIDE.md](docs/GUIDE.md)**. It covers
 drawing the starting pattern in Golly, the options, and recipes for each kind
 of search. `./drift --help` lists every option, and `./drift my.cfg --dry-run`
@@ -40,7 +45,8 @@ shows what a config sets up without searching.
 | `examples/` | ready-to-run configs |
 | `docs/GUIDE.md` | how to build searches and read the results |
 | `docs/DR2.md` | for dr2 users: old input files, option mapping, differences |
-| `tools/finish.py` | completes, checks, sorts and shrinks results (drift runs it for you) |
+| `tools/finish.py` | completes, checks, sorts and shrinks results (drift runs it for you; also `drift finish CFG`) |
+| `tools/survey.py` | `drift survey RULE`: spaceship census from soups (`tools/soups.c`), then many searches at once |
 | `tools/render.py` | draws a config's starting position and regions as an SVG picture |
 | `tools/wirecheck.py`, `tools/wirebuild.py` | find wires among travelling signals, and build exactly periodic ones with stable ends |
 | `tools/validate.py` | re-simulates results independently |

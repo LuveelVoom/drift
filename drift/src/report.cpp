@@ -461,10 +461,13 @@ void Reporter::footer(double seconds, long long steps, bool finished, bool resum
     }
   } else if (!o.jsonl.empty()) {
     s += "\nResults saved to " + (o.textOut.empty() ? o.jsonl : o.textOut + " and " + o.jsonl) + ".\n";
-    if (o.noFinish || o.configPath.empty())
-      s += "To turn them into complete, checked patterns:\n  python3 \"" + finishScript + "\" \"" +
-           (o.configPath.empty() ? o.jsonl : o.configPath) + "\"" +
-           (o.configPath.empty() ? "" : "") + "\n";
+    if (o.noFinish && !o.configPath.empty()) {
+      std::string drift = finishScript.substr(0, finishScript.rfind("/tools/")) + "/drift";
+      std::string base = o.configPath;
+      if (base.size() > 4 && base.compare(base.size() - 4, 4, ".cfg") == 0) base.resize(base.size() - 4);
+      s += "To turn them into complete, checked patterns:\n  \"" + drift + "\" finish \"" + o.configPath + "\"" +
+           (o.jsonl == base + "-results.jsonl" ? "" : " --jsonl \"" + o.jsonl + "\"") + "\n";
+    }
   }
   put(s);
   fflush(stdout);

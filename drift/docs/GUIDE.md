@@ -1,5 +1,6 @@
 # Building drift searches
 
+0. [Surveying a whole rule](#0-surveying-a-whole-rule)
 1. [What drift does](#1-what-drift-does)
 2. [Anatomy of an input file](#2-anatomy-of-an-input-file)
 3. [Building one, step by step](#3-building-one-step-by-step)
@@ -7,6 +8,40 @@
 5. [Recipes](#5-recipes)
 6. [Troubleshooting](#6-troubleshooting)
 7. [Reference](#7-reference)
+
+**In a hurry?** `./drift survey RULE` runs a standard set of searches for you
+(next section). Read on when you want a search of your own.
+
+## 0. Surveying a whole rule
+
+    ./drift survey B3/S135                    # 10 minutes on every core
+    ./drift survey B3/S135 --minutes 30 --threads 8
+    ./drift survey B3/S135 --resume --minutes 30   # carry on where it stopped
+
+This first runs random soups for 10 seconds to find the rule's common
+spaceships (`--census`; give your own with `--ship FILE` or `--ship 'RLE'`).
+Then it runs these searches together:
+
+| search | looks for |
+|---|---|
+| `osc`, `osc-big` | oscillators and catalysts from one spark (6 cells in 4x4; 8 in 5x5) |
+| `sparky` | oscillators that throw a spark into empty space |
+| `signals`, `drifters` | disturbances that keep travelling: wires, signals, drifters |
+| `converter` | a spark in, another spark out, and the still life recovers |
+| `SHIP-eaters`, `SHIP-converter`, `SHIP-drifter` | per spaceship: eaters, ship converters, ship → signal; the limits grow with the ship |
+
+All the searches share the cores, and when one finishes its threads move to
+the ones still running. When time is up, each unfinished search saves a
+checkpoint, so `--resume` carries on with it. Then `finish.py` checks each
+search's results (most promising first, at most `--finish-minutes`, default
+3). Everything goes into `surveys/RULE/`:
+
+- `SUMMARY.md`: what each search found and the best patterns;
+- `NAME-finished.txt`: complete patterns;
+- `NAME.cfg`: the config, ready to run or edit on its own.
+
+`--list` shows the searches without running them, and `--jobs osc,sparky`
+picks some of them.
 
 ## 1. What drift does
 
@@ -136,6 +171,8 @@ them into `my-finished.txt`.
 |---|---|
 | `max-steps = N` | stop after about N steps; around 3·10⁸ steps per second is typical |
 | `--checkpoint run.ckpt` | save progress, and on Ctrl-C (resume with `--resume run.ckpt`) |
+| `--max-time SECONDS` | stop after this long; with `--checkpoint` the rest is saved for `--resume` |
+| `--threads-file FILE` | read the thread count from FILE every second, so you can change it mid-run (`echo 4 > FILE`) |
 | `--no-finish` | skip the finishing step |
 
 ## 4. Reading the results

@@ -41,6 +41,8 @@ struct Options {
   bool showRule = false;
   int threads = 0;                 // 0 = all cores (modern), 1 (classic)
   long long maxSteps = 0;          // stop after this many search steps (0 = no limit)
+  double maxTime = 0;              // stop after this many seconds (0 = no limit)
+  std::string threadsFile;         // re-read the thread count from this file while running
   std::string resume;              // checkpoint to resume from
 
   // Pattern placement (modern mode): pattern-relative coordinates are

@@ -140,7 +140,11 @@ class Finisher:
         import wirebuild
         m = wirebuild.measure(res, self.table)
         if m:
-            return "signal", dict(res=res, size=0, what=f"repeats every {m[0]} gens moving {m[1]}")
+            # keep the completed pattern so the signal is written out (it used to be left empty)
+            r = r or self.run(res, 1)
+            hist = r[1] if r else None
+            return "signal", dict(res=res, hist=hist, size=len(hist[0]) if hist else 0,
+                                  what=f"repeats every {m[0]} gens moving {m[1]}")
         return None
 
     def shrink(self, kind, info):
@@ -200,7 +204,13 @@ def main():
     ap.add_argument("--limit", type=int, default=30, help="patterns listed per section (default 30)")
     ap.add_argument("--max-cells", type=int, default=0, help="leave out patterns bigger than this")
     ap.add_argument("--seconds", type=float, default=5, help="time spent shrinking each listed pattern")
+    ap.add_argument("--max-minutes", type=float, default=0,
+                    help="time limit: the most promising results (highest periods, longest reactions) "
+                         "are checked first, and patterns are listed unshrunk once time is short")
     a = ap.parse_args()
+    import time
+    deadline = time.time() + a.max_minutes * 60 if a.max_minutes else float("inf")
+    late = lambda frac: time.time() > deadline - (1 - frac) * a.max_minutes * 60
     base = a.config[:-4] if a.config.endswith(".cfg") else a.config
     jsonl = a.jsonl or base + "-results.jsonl"
     out = a.out or base + "-finished.txt"
@@ -232,7 +242,11 @@ def main():
     found = collections.defaultdict(list)
     counts = collections.Counter()
     rank = {"clean": 0, "catalyst": 0, "converter": 0, "signal": 0, "no-spark": 1, "damaging": 2, "debris": 3}
-    for (kind, _), cands in groups.items():
+    order = sorted(groups.items(), key=lambda kv: -max(r.get("period", 0) * 1000 + r["gen"] for r in kv[1]))
+    for gi, ((kind, _), cands) in enumerate(order):
+        if late(0.6):
+            counts["unchecked"] = len(order) - gi
+            break
         cands.sort(key=lambda r: r["gen"])
         best = None
         for res in cands[:6]:
@@ -269,7 +283,11 @@ def main():
         for info in items:
             if len(written) >= a.limit:
                 break
-            g0 = fin.shrink(key, info)
+            if late(0.95):
+                info["unshrunk"] = True
+                g0 = info["hist"][0] if info.get("hist") else None
+            else:
+                g0 = fin.shrink(key, info)
             if a.max_cells and g0 is not None and len(g0) > a.max_cells:
                 continue
             res = info["res"]
@@ -295,11 +313,14 @@ def main():
         lines.append("")
         lines += [w + "\n" for w in written]
     lines[2] = "# Found: " + (", ".join(summary) if summary else "nothing usable")
+    if counts["unchecked"]:
+        lines[2] += f"\n# {counts['unchecked']} lower-priority results not checked (time limit)"
     open(out, "w").write("\n".join(lines) + "\n")
 
     names = {"clean": "clean oscillators", "catalyst": "catalysts", "converter": "spaceship converters",
              "signal": "signals", "damaging": "damaging oscillators", "no-spark": "oscillators without a spark in their cycle",
-             "debris": "debris (dropped)", "incomplete": "couldn't be completed"}
+             "debris": "debris (dropped)", "incomplete": "couldn't be completed",
+             "unchecked": "not checked (--max-minutes ran out; lowest periods / shortest reactions)"}
     for k, name in names.items():
         if counts[k]:
             print(f"  {counts[k]:4d}  {name}")

@@ -156,34 +156,47 @@ def complete(cells, table, margin, empty=None, free=None, fewest=0):
     need_pysat()
     from pysat.solvers import Cadical153, Glucose4
     s = Glucose4() if fewest else Cadical153()   # Cadical can't be interrupted
+    fixed = {}   # cell -> 0/1 where the value is already known
     if empty:
         for p, v in var.items():
             if empty(p) and cells.get(p) not in (1, 4):
-                s.add_clause([-v])
+                fixed[p] = 0
     for p, st in cells.items():
         if st in (1, 4):
-            s.add_clause([var[p]])
+            fixed[p] = 1
         elif st in (2, 3):
-            s.add_clause([-var[p]])
+            fixed[p] = 0
+    for p, b in fixed.items():
+        if p in var:
+            s.add_clause([var[p] if b else -var[p]])
     # Every cell in the box and the ring around it is stable (outside = dead).
+    # Only the unknown cells of each window are enumerated; known ones are
+    # filled in, so every clause is over unknown cells only.
     for r in range(r0 - 1, r1 + 2):
         for c in range(c0 - 1, c1 + 2):
             if free and free((r, c)):
                 continue
-            nb = [var.get((r + dr, c + dc)) for dr, dc in OFFS]
-            for w in range(512):
-                bits = [(w >> (8 - k)) & 1 for k in range(9)]
-                if table[w] == bool(bits[4]):
-                    continue   # this neighbourhood is stable
-                clause, possible = [], True
-                for v, b in zip(nb, bits):
-                    if v is None:          # outside the box: dead
-                        if b:
-                            possible = False
-                            break
+            base, unk = 0, []
+            for k, (dr, dc) in enumerate(OFFS):
+                q = (r + dr, c + dc)
+                v = var.get(q)
+                if v is None or q in fixed:
+                    if v is not None and fixed[q]:
+                        base |= WEIGHT[k]
+                else:
+                    unk.append((WEIGHT[k], v))
+            for bits in range(1 << len(unk)):
+                w, clause = base, []
+                for i, (wt, v) in enumerate(unk):
+                    if bits >> i & 1:
+                        w |= wt
+                        clause.append(-v)
                     else:
-                        clause.append(-v if b else v)
-                if possible:
+                        clause.append(v)
+                if table[w] != bool(w & 16):   # this neighbourhood isn't stable
+                    if not clause:
+                        s.delete()
+                        return None
                     s.add_clause(clause)
     if not s.solve():
         return None

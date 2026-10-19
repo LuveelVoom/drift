@@ -22,7 +22,7 @@ The user's goals were:
 | `drift/src/classic.cpp` | dr2's command language (`drift --classic < old.in`) |
 | `drift/src/report.*` | Output: dr2's exact format (classic) or drift's format, RLE, JSON lines |
 | `drift/src/main.cpp` | Threads, work splitting, progress line, checkpoint/resume, Ctrl-C |
-| `drift/tools/` | `finish.py` (complete/check/sort/shrink; run by drift after a search), `driftlib.py` (shared: rules, RLE, SAT completion and minimisation), `render.py`, `wirecheck.py`, `wirebuild.py`, `validate.py` |
+| `drift/tools/` | `survey.py` (`drift survey RULE`), `soups.c`, `finish.py` (complete/check/sort/shrink; run by drift after a search), `driftlib.py` (shared: rules, RLE, SAT completion and minimisation), `render.py`, `wirecheck.py`, `wirebuild.py`, `validate.py` |
 | `drift/tests/` | `ruletest.cpp`, `regress.py` (vs dr2), `bench.py` |
 | `dr2.c`, `dr2.zip` | The original; `dr2.zip` has `dr.documentation.txt` and `knownrotors` |
 | `ref/dr2fixed.c` | The oracle: dr2.c with `"%d %d"` → `"%d %ld"` in the `v` command |
@@ -107,6 +107,25 @@ original arguments, plus a fingerprint of the search settings.
   numbers overlapped the constants 0/1; they now start at 2.
 - **First attempt:** `attempts/a5/`, 180 real B3/S23-a5 oscillators (p4–p15)
   from a 22 s spark search.
+
+- **Survey (2026-10-19).** `drift survey RULE` = `tools/survey.py`:
+  - spaceship census from random 16x16 soups (`tools/soups.c`, built on demand into
+    `build/soups`, one process per core, ship test in C); ships are named by
+    their smallest phase and ranked by count. B3/S135: ship12 (~90 per 17k soups)
+    and ship8 (~33);
+  - about 12 searches run at once. Each one's thread count is in `NAME.threads`
+    (drift `--threads-file`); a finished search's threads go to the rest;
+  - `--max-time` + `--checkpoint`: at the limit drift saves the rest of the
+    search (verified exact on resume);
+  - ship searches scale `max-changed`/`size` from the ship's largest phase.
+    The ship-drifter `no-rechange` gap is probed: the smallest value at which
+    the bare ship search keeps going, plus 1 (glider: 4);
+  - `finish.py --max-minutes`: the most promising groups are checked first.
+    `driftlib.complete` now enumerates only unknown cells per window: 12x faster,
+    same output.
+- **Threads-file details.** Switched-off workers hand their whole pending list back
+  to the queue (`Search::pending`, as for checkpoints) and park. Result sets are
+  identical under 8→1→3→14 switching (stillater c7 4x4: 5934 osc).
 
 ## 5. Open ideas
 
