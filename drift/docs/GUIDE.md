@@ -231,12 +231,28 @@ See `results/tspark-converter.cfg` and `results/glider-converter.cfg`.
 
 `wirebuild.py` requires the signal to repeat at least 3 times, finds an
 exactly periodic wire for it with SAT, and tests a single signal on a long
-copy.
+copy. `--out` writes a finite wire (`--periods`, default 10) with stable end
+caps and a signal on it, ready for Golly.
 
 `push = right c/2 3` forces a direction and speed. DIR can be `se` or a vector
 such as `1,2`; a speed of `0` keeps the disturbance within the slack.
 
 ![wire](img/result-wire.svg)
+
+### Drifters (any speed, any direction)
+
+**Draw** a spark (or a glider), then add:
+
+    skip = stable, oscillator
+    no-rechange = 8,80        # a cell can't change again 8..80 gens later
+    per-rotor = 0
+    margin = 40
+
+The disturbance has to keep moving onto fresh cells, but nothing fixes its
+speed or direction. Long fizzles are drifters that ran into a dead end: in
+HighLife, one spark cell gives a 5c/6 diagonal signal that runs along a wire
+and is eaten at the end (`../findings/B36-S23/`). A disturbance that repeats
+3 times can be made into a wire with `wirebuild.py` (see Wires).
 
 ### Glider reactions
 

@@ -70,4 +70,12 @@ How each kind of file was made:
   p10 and an 84-cell p7.
 - **3 sparky p9s**, 27–30 cells, each throwing a spark next to the object.
 - **30 catalyst fizzles** (84 compact reactions); the longest lasts 11 gens.
+- **Diagonal 5c/6 wire** (`wire-diagonal-5c6.rle`):
+  - found by a free drifter search from one spark (9 changed cells in 4×4,
+    `no-rechange = 8,80`; config and scripts in `B36-S23/wire-5c6-work/`);
+  - the signal is 3 cells and moves (+5,+5) every 6 gens; the wire repeats
+    every (5,5);
+  - end caps found by SAT with the fewest cells; the signal runs the length
+    of the wire, but the far cap isn't a clean eater (3 cells stay changed);
+  - a glider-to-signal end cap: 42 lanes × 3·10⁸ steps found nothing (to do).
 - **No signals** within 6 changed cells in 4×4, and no converters.

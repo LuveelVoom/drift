@@ -194,7 +194,8 @@ def main():
     ap.add_argument("--jsonl", help="results file (default: <config>-results.jsonl)")
     ap.add_argument("--out", help="output file (default: <config>-finished.txt)")
     ap.add_argument("--all", action="store_true",
-                    help="also list oscillators without a spark in their cycle, and long fizzles")
+                    help="also list oscillators without a spark in their cycle, and long fizzles "
+                         "(always listed when the config uses no-rechange or push)")
     ap.add_argument("--clean-only", action="store_true", help="don't list damaging oscillators")
     ap.add_argument("--limit", type=int, default=30, help="patterns listed per section (default 30)")
     ap.add_argument("--max-cells", type=int, default=0, help="leave out patterns bigger than this")
@@ -210,6 +211,9 @@ def main():
     fin = Finisher(a.config, L.rule_for(rule), a.seconds)
 
     # 1. group the results (one entry per distinct rotor / reaction / signal)
+    # Long thin fizzles are usually a signal running along a short wire. That's
+    # noise in most searches, but the point of a drifter search.
+    drifters = bool(re.search(r"^\s*(no-rechange|push)\b", open(a.config).read(), re.M))
     groups = collections.defaultdict(list)
     for line in open(jsonl):
         res = json.loads(line)
@@ -218,7 +222,7 @@ def main():
             groups[(k, res["rotor"])].append(res)
         elif k == "fizzle":
             h, w = map(int, res["history"].split()[2].split("x"))
-            if max(h, w) <= 8 or a.all:   # long thin fizzles are signals running along a wire
+            if max(h, w) <= 8 or a.all or drifters:
                 groups[(k, res["history"])].append(res)
         elif k == "maxgen":
             groups[(k, tuple(res["change_counts"][-12:]))].append(res)

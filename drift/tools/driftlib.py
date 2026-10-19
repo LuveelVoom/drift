@@ -141,10 +141,11 @@ def to_rle(live, rule):
     return f"x = {max(cs) - min(cs) + 1}, y = {max(rs) - min(rs) + 1}, rule = {rule}\n{out}!"
 
 
-def complete(cells, table, margin, empty=None, free=None):
+def complete(cells, table, margin, empty=None, free=None, fewest=0):
     """Returns {(r,c): 0/1} background, or None if no completion fits.
     empty(p): True for cells that must stay dead.
-    free(p): True for cells whose stability isn't required (drift's no-check cells)."""
+    free(p): True for cells whose stability isn't required (drift's no-check cells).
+    fewest: if > 0, spend up to this many seconds minimising the live cells added."""
     rs = [r for r, c in cells]
     cs = [c for r, c in cells]
     r0, r1, c0, c1 = min(rs) - margin, max(rs) + margin, min(cs) - margin, max(cs) + margin
@@ -153,8 +154,8 @@ def complete(cells, table, margin, empty=None, free=None):
         for c in range(c0, c1 + 1):
             var[(r, c)] = len(var) + 1
     need_pysat()
-    from pysat.solvers import Cadical153
-    s = Cadical153()
+    from pysat.solvers import Cadical153, Glucose4
+    s = Glucose4() if fewest else Cadical153()   # Cadical can't be interrupted
     if empty:
         for p, v in var.items():
             if empty(p) and cells.get(p) not in (1, 4):
@@ -187,6 +188,24 @@ def complete(cells, table, margin, empty=None, free=None):
     if not s.solve():
         return None
     model = set(x for x in s.get_model() if x > 0)
+    if fewest:
+        from pysat.card import ITotalizer
+        added = [v for p, v in var.items() if p not in cells]
+        tot = ITotalizer(lits=added, ubound=len(added), top_id=len(var))
+        s.append_formula(tot.cnf.clauses)
+        deadline = time.time() + fewest
+        while time.time() < deadline:
+            k = sum(1 for v in added if v in model) - 1
+            if k < 0:
+                break
+            timer = threading.Timer(deadline - time.time(), s.interrupt)
+            timer.start()
+            ok = s.solve_limited(assumptions=[-tot.rhs[k]], expect_interrupt=True)
+            timer.cancel()
+            s.clear_interrupt()
+            if not ok:
+                break
+            model = set(x for x in s.get_model() if x > 0)
     return {p: int(v in model) for p, v in var.items()}
 
 

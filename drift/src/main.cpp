@@ -51,6 +51,40 @@ struct Item {
   double w;
 };
 
+// True if these live cells, alone in empty space, are a spaceship: they come
+// back moved within 40 gens. A spaceship spark is meant to fly in from empty
+// space, so it needn't touch unknown cells.
+bool isSpaceship(const Rule &rule, std::vector<std::pair<int, int>> live) {
+  auto norm = [](std::vector<std::pair<int, int>> v, int &r0, int &c0) {
+    std::sort(v.begin(), v.end());
+    r0 = INT_MAX, c0 = INT_MAX;
+    for (auto &p : v) r0 = std::min(r0, p.first), c0 = std::min(c0, p.second);
+    for (auto &p : v) p.first -= r0, p.second -= c0;
+    return v;
+  };
+  std::sort(live.begin(), live.end());
+  int R0, C0;
+  auto start = norm(live, R0, C0);
+  for (int g = 1; g <= 40 && !live.empty() && live.size() < 200; g++) {
+    std::vector<std::pair<int, int>> cand, next;
+    for (auto &p : live)
+      for (int k = 0; k < 9; k++) cand.push_back({p.first + DR[k], p.second + DC[k]});
+    std::sort(cand.begin(), cand.end());
+    cand.erase(std::unique(cand.begin(), cand.end()), cand.end());
+    for (auto &p : cand) {
+      int code = 0;
+      for (int k = 0; k < 9; k++)
+        if (std::binary_search(live.begin(), live.end(), std::make_pair(p.first + DR[k], p.second + DC[k])))
+          code += POW3[k];
+      if (rule.next3[code] == ON) next.push_back(p);
+    }
+    live = next;
+    int r0, c0;
+    if (norm(live, r0, c0) == start && (r0 != R0 || c0 != C0)) return true;
+  }
+  return false;
+}
+
 uint64_t fnv(uint64_t h, const void *data, size_t n) {
   const unsigned char *p = (const unsigned char *)data;
   for (size_t i = 0; i < n; i++) h = (h ^ p[i]) * 1099511628211ULL;
@@ -640,7 +674,11 @@ int main(int argc, char **argv) {
         for (int dr = -2; dr <= 2 && !unknownNear; dr++)
           for (int dc = -2; dc <= 2 && !unknownNear; dc++)
             unknownNear = base.bkgd[base.idx(base.chglist[q].r + dr, base.chglist[q].c + dc)] == UNK;
-      if (!unknownNear)
+      std::vector<std::pair<int, int>> spark;
+      for (int q = base.chgd[0]; q < base.nays[0]; q++)
+        if (base.curr[base.idx(base.chglist[q].r, base.chglist[q].c)] == ON)
+          spark.push_back({base.chglist[q].r, base.chglist[q].c});
+      if (!unknownNear && !isSpaceship(o.rule, spark))
         o.warnings.push_back("every cell within 2 of the spark is known, so drift can't build anything "
                              "until the spark's own evolution reaches unknown cells (it may outgrow the "
                              "limits first). Leave unknown cells next to the spark where things may be built "

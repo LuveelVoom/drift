@@ -276,7 +276,9 @@ const std::vector<Opt> &opts() {
      [](Ctx &c, const std::string &v) { c.o.params.var[109] = toLong("push-down-c2", v); c.pushDownC2 = true; }},
     {"count-from-gen", "G", "Constraints", "Ignore changes before gen G when checking limits (v106).", VAR(106)},
     {"no-rechange", "A,B", "Constraints",
-     "A cell may not be changed in two gens between A and B gens apart (v107, v108).",
+     "A cell may not be changed in two gens between A and B gens apart (v107, v108). Keeps the "
+     "disturbance moving onto fresh cells, at any speed and in any direction: e.g. 8,80 for drifters. "
+     "Oscillators end soon after they start repeating.",
      [](Ctx &c, const std::string &v) {
        auto x = toLongs("no-rechange", v, 2);
        c.o.params.var[107] = x[0];
@@ -567,13 +569,25 @@ void printHelp() {
     std::string head = std::string("  --") + o.name + (o.arg ? std::string(" ") + o.arg : "");
     printf("%-28s", head.c_str());
     if (head.size() > 27) printf("\n%28s", "");
-    std::string h = o.help;
-    size_t pos;
-    while ((pos = h.find('\n')) != std::string::npos) {
-      printf("%s\n%28s", h.substr(0, pos).c_str(), "");
-      h = h.substr(pos + 1);
+    // word-wrap the help to 72 columns (100 in all)
+    std::string h = o.help, line;
+    std::replace(h.begin(), h.end(), '\n', ' ');
+    h += "\n";
+    bool first = true;
+    auto flush = [&] {
+      printf(first ? "%s\n" : "%28s%s\n", first ? line.c_str() : "", line.c_str());
+      first = false;
+      line.clear();
+    };
+    size_t i = 0;
+    while (i < h.size()) {
+      size_t j = h.find_first_of(" \n", i);
+      std::string word = h.substr(i, j - i);
+      if (!line.empty() && line.size() + 1 + word.size() > 72) flush();
+      if (!word.empty()) line += (line.empty() ? "" : " ") + word;
+      if (h[j] == '\n') flush();
+      i = j + 1;
     }
-    printf("%s\n", h.c_str());
     }
   }
   printf("\nExample: drift examples/beehive-spark.cfg\n");

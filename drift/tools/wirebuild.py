@@ -14,9 +14,12 @@ usually only roughly periodic. This:
    steps to the first, moved by D); the background alone is a still life;
    cells further than WIDTH from the signal's path are dead;
 3. tiles that background into a long wire, puts one signal on it and
-   simulates, checking the signal keeps its shape and speed across the wire.
+   simulates, checking the signal keeps its shape and speed across the wire;
+4. with --out, writes a finite wire of --periods repeats with stable end caps
+   (as few cells as SAT finds in --cap-seconds) and the signal near one end.
 
 Usage: tools/wirebuild.py RESULTS.jsonl --n N [--width 5] [--kmax 4] [--out wire.rle]
+                          [--periods 10] [--cap-seconds 60]
 """
 import argparse
 import json
@@ -175,6 +178,50 @@ def check(P, D, shapes, S, unit, table, periods=40, travel=8):
     return None, 0
 
 
+def capped(P, D, shapes, S, unit, table, periods, seconds):
+    """A finite wire with stable end caps and one signal near its start, or None."""
+    L = S[0] ** 2 + S[1] ** 2
+    proj = lambda p: p[0] * S[0] + p[1] * S[1]
+    perp = lambda p: p[0] * S[1] - p[1] * S[0]
+    wire = {(c[0] + n * S[0], c[1] + n * S[1]) for n in range(periods) for c in unit}
+    pmin, pmax = min(map(proj, wire)), max(map(proj, wire))
+    q0, q1 = min(map(perp, wire)), max(map(perp, wire))
+    cells = {}
+    for r, c in wire:   # keep the middle fixed; the two ends are left to the solver
+        for a in range(-2, 3):
+            for b in range(-2, 3):
+                p = (r + a, c + b)
+                if pmin + 2 * L <= proj(p) <= pmax - 2 * L:
+                    cells[p] = 1 if p in wire else 2
+    bk = None
+    for extra in range(4):   # widen the band the caps may use until one fits
+        W = extra * L
+        bk = complete(cells, table, 7, fewest=seconds, empty=lambda p: not (
+            q0 - W <= perp(p) <= q1 + W and pmin - L <= proj(p) <= pmax + L))
+        if bk:
+            break
+    if not bk:
+        return None
+    live = {p for p, v in bk.items() if v}
+    start = sorted((p for p in live if p in cells), key=proj)[0]
+    shape0 = sorted(shapes[0])
+    for k0 in range(1, 4):   # put the signal a period or so into the fixed part
+        o = (start[0] + k0 * S[0], start[1] + k0 * S[1])
+        for dr in range(-abs(S[0]) - 4, abs(S[0]) + 5):
+            for dc in range(-abs(S[1]) - 4, abs(S[1]) + 5):
+                sig = {(o[0] + dr + r, o[1] + dc + c) for r, c in shape0}
+                h, ok = live ^ sig, True
+                for k in (1, 2):
+                    for _ in range(P):
+                        h = step(h, table)
+                    if h ^ live != {(r + k * D[0], c + k * D[1]) for r, c in sig}:
+                        ok = False
+                        break
+                if ok:
+                    return live ^ sig
+    return None
+
+
 def rle(cells, rule):
     rs = [r for r, c in cells]
     cs = [c for r, c in cells]
@@ -199,6 +246,8 @@ def main():
     ap.add_argument("--width", type=int, default=5)
     ap.add_argument("--kmax", type=int, default=4)
     ap.add_argument("--out")
+    ap.add_argument("--periods", type=int, default=10, help="wire length in repeats for --out")
+    ap.add_argument("--cap-seconds", type=float, default=60, help="time to shrink the end caps")
     a = ap.parse_args()
     res = next(r for r in map(json.loads, open(a.jsonl)) if r["n"] == a.n)
     table = rule_for(a.rule or res["rule"])
@@ -222,8 +271,13 @@ def main():
             print(f"  wire period {S}: background found ({len(unit)} live cells per period); "
                   f"a single signal crosses {periods} wire periods of a tiled wire")
             if a.out:
-                open(a.out, "w").write(rle(g, a.name or res["rule"]))
-                print(f"  wrote {a.out}")
+                w = capped(P, D, shapes, S, unit, table, a.periods, a.cap_seconds)
+                if w:
+                    note = f"{a.periods}-repeat wire with stable end caps and a signal on it"
+                else:
+                    w, note = g, "no stable end caps found: a raw cut of the wire (the ends decay)"
+                open(a.out, "w").write(f"#C {note}\n" + rle(w, a.name or res["rule"]))
+                print(f"  wrote {a.out}: {note}")
             return 0
         print(f"  wire period {S}: background found, but a single signal doesn't travel on it")
     return 1

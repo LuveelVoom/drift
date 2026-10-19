@@ -42,7 +42,7 @@ shows what a config sets up without searching.
 | `docs/DR2.md` | for dr2 users: old input files, option mapping, differences |
 | `tools/finish.py` | completes, checks, sorts and shrinks results (drift runs it for you) |
 | `tools/render.py` | draws a config's starting position and regions as an SVG picture |
-| `tools/wirecheck.py`, `tools/wirebuild.py` | find wires among travelling signals, and build exactly periodic ones |
+| `tools/wirecheck.py`, `tools/wirebuild.py` | find wires among travelling signals, and build exactly periodic ones with stable ends |
 | `tools/validate.py` | re-simulates results independently |
 | `results/` | example searches (`run-all.sh` runs them) |
 | `tests/` | `make test`: rule tables, and a comparison with dr2.c |
