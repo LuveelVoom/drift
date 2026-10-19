@@ -64,6 +64,15 @@ How each kind of file was made:
   improvised for it, lasting about 80 gens. An example is in
   `attempts/q4i/meander-6547.rle`.
 
+- **Glider -> drifter reactions** (`best-glider-drifter.txt` / `.rle`): a
+  glider search with `no-rechange = 4,60` (10 cells in 6x6) found reactions
+  lasting up to 67 gens. The 67-gen one turns the glider into a 2c/3 signal
+  (2 cells, (+2,+2) every 3 gens) and makes a **90-degree turn** before eating
+  it. Plus 11 glider eaters. Search: `attempts/q4i/glider/`.
+- **2c/3 signal loop** (`loop-2c3-p116.rle`): four copies of that turn joined
+  head to tail, stator from SAT; a p116 oscillator (verified). Longer legs
+  give p128, p140, ...
+
 ## B36/S23 (HighLife)
 
 - **37 oscillators**, p3 to p10. 35 aren't Life rotors. The best are a 41-cell
