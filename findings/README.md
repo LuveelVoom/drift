@@ -63,6 +63,9 @@ How each kind of file was made:
   It's an irregular disturbance that wanders along a zigzag track drift
   improvised for it, lasting about 80 gens.
 
+- **Caution:** the glider patterns below place the glider next to the still
+  life at gen 0. None of them can come from infinity: a glider from far away
+  would hit part of the still life a generation or two earlier.
 - **Glider -> drifter reactions** (`best-glider-drifter.txt` / `.rle`): a
   glider search with `no-rechange = 4,60` (10 cells in 6x6) found reactions
   lasting up to 67 gens. The 67-gen one turns the glider into a 2c/3 signal

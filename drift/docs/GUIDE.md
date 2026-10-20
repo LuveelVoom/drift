@@ -304,6 +304,11 @@ ahead (`results/glider.cfg`). The results are glider eaters (catalysts),
 oscillators started by the glider, and with the converter settings,
 reflectors.
 
+For a glider that really comes from infinity, every cell within 2 of its
+past path must be empty, not just the cells behind it, and `no-rechange` (if
+used) must be at least 8 for a glider: a free glider changes some cells
+again 4 to 7 gens later. `examples/q4i-glider-drifter.cfg` does both.
+
 ### Symmetric billiard tables
 
 `examples/billiard-rot180.cfg`: the centre is dr2's `4` cells (unknown and
