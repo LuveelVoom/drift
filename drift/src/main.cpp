@@ -7,6 +7,7 @@
 // A checkpoint is the list of unexplored paths, collected while all workers
 // are paused.
 #include <signal.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include <algorithm>
@@ -806,17 +807,33 @@ int main(int argc, char **argv) {
       std::string extra;
       for (const std::string &l : cliSettings(args)) extra += l + "\n";
       setenv("DRIFT_EXTRA_SETTINGS", extra.c_str(), 1);
-      std::string cmd = "python3 \"" + rep.finishScript + "\" \"" + o.configPath + "\"";
+      // Started directly (not through a shell), so any file name is passed as it is.
+      std::vector<std::string> fa = {"python3", rep.finishScript, o.configPath};
       std::string base = o.configPath;
       if (base.size() > 4 && base.compare(base.size() - 4, 4, ".cfg") == 0) base.resize(base.size() - 4);
-      if (o.jsonl != base + "-results.jsonl") cmd += " --jsonl \"" + o.jsonl + "\"";
-      cmd += " --jobs " + std::to_string(threads);
+      if (o.jsonl != base + "-results.jsonl") fa.insert(fa.end(), {"--jsonl", o.jsonl});
+      fa.insert(fa.end(), {"--jobs", std::to_string(threads)});
       printf("\nFinishing the results (tools/finish.py; --no-finish skips this)...\n");
       fflush(stdout);
-      if (system(cmd.c_str()) != 0)
+      fflush(stderr);
+      int status = -1;
+      pid_t pid = fork();
+      if (pid == 0) {
+        std::vector<char *> av;
+        for (std::string &x : fa) av.push_back(&x[0]);
+        av.push_back(nullptr);
+        execvp("python3", av.data());
+        _exit(127);
+      }
+      if (pid > 0) waitpid(pid, &status, 0);
+      if (!(pid > 0 && WIFEXITED(status) && WEXITSTATUS(status) == 0)) {
+        std::string cmd;
+        for (const std::string &x : fa) cmd += (cmd.empty() ? "" : " ") + ("\"" + x + "\"");
         printf("finish.py didn't complete. Run it yourself with:\n  %s\n", cmd.c_str());
+      }
     }
-    return finished ? 0 : 3;
+    // 0: complete, or stopped at a limit you set (--max-time, --max-steps); 130: Ctrl-C
+    return gSignal.load() ? 130 : 0;
   } catch (const std::exception &e) {
     fflush(stdout);
     fprintf(stderr, "drift: %s\n", e.what());

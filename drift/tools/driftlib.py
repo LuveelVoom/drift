@@ -507,6 +507,21 @@ def contains(reg, r, c):
             o * (r * (c1 - c2) + r1 * (c2 - c) + r2 * (c - c1)) >= 0)
 
 
+UNDO = {"no-change": "allow-change", "no-count": "count", "no-check": "check"}
+
+
+def flagged(regions, kind, r, c):
+    """Whether (r, c) has a region flag: regions apply in order, so a later
+    allow-change / count / check region undoes no-change / no-count / no-check."""
+    on = False
+    for k, g in regions:
+        if k == kind and contains(g, r, c):
+            on = True
+        elif k == UNDO.get(kind) and contains(g, r, c):
+            on = False
+    return on
+
+
 def load_pattern(text):
     lines = [l.rstrip("\r") for l in text.split("\n")]
     lines = [l for l in lines if l.strip() and not l.strip().startswith(("#", ";"))]
@@ -589,7 +604,7 @@ def _pattern_text(lines, base):
 
 def unchecked_cells(path):
     """Cells of a config's pattern drift doesn't check for stability: dr2's
-    '2' '3' '4' characters and no-check regions (pattern-relative)."""
+    '2' '3' '4' characters, and the no-check / check regions in order (use flagged())."""
     _, regions = read_config(path)
     text = _pattern_text(config_lines(path), os.path.dirname(os.path.abspath(path))) or ""
     block, cells = text.split("\n"), set()
@@ -604,7 +619,7 @@ def unchecked_cells(path):
                 if ch in "234":
                     cells.add((r, c))
             r += 1
-    return cells, [g for k, g in regions if k == "no-check"]
+    return cells, [(k, g) for k, g in regions if k in ("no-check", "check")]
 
 
 def read_config(path):
@@ -626,7 +641,7 @@ def read_config(path):
             i += 1
             continue
         m = re.match(r"([a-z-]+)\s*=?\s*(.*)$", l)
-        if m and m.group(1) in ("clear", "no-change", "no-count", "no-check", "must-reach"):
+        if m and m.group(1) in ("clear", "must-reach", *UNDO, *UNDO.values()):
             regions.append((m.group(1), parse_region(m.group(2))))
     pattern = _pattern_text(text, base)
     if pattern is None:

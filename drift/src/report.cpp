@@ -241,6 +241,11 @@ static std::string countLines(const Search &s, int gen) {
 void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
   const long *var = s.P.var;
   int gen = s.gen;
+  OscInfo main, hist;
+  if (oc == PERIODIC) {   // counted whether or not it is printed, like the totals
+    main = s.oscinfo(per, 'p');
+    if (!main.known) unknownOsc++;
+  }
   if (o.mustReach) {   // the border is flagged too, but never changes
     // Only the changed cells of each gen (chgd[g]..nays[g]); the stretch from
     // nays[g] to chgd[g + 1] lists their neighbours, which needn't have changed.
@@ -250,15 +255,12 @@ void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
         reached = s.flag[s.idx(s.chglist[q].r, s.chglist[q].c)] & MUSTREACH;
     if (!reached) { unreached++; return; }
   }
-  OscInfo main, hist;
   std::string kind, title;
   switch (oc) {
     case PERIODIC:
       if (o.skipPeriodic || per < o.minPeriod) return;
       if (var[131] && per <= 6) return;
-      main = s.oscinfo(per, 'p');
       hist = s.oscinfo(gen, 'u');
-      if (!main.known) unknownOsc++;
       if (o.skipKnown && main.known) return;
       kind = "oscillator";
       title = fmt("p%d from gen %d", per, gen - per);

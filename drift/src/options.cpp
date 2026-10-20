@@ -579,7 +579,9 @@ void printHelp() {
       "CONFIG is a file of 'option = value' lines (# starts a comment) ending with the\n"
       "pattern after a 'pattern:' line; see docs/GUIDE.md. Options on the command line\n"
       "override the file. Results go to CONFIG-results.txt / .jsonl, and complete,\n"
-      "checked patterns to CONFIG-finished.txt.\n");
+      "checked patterns to CONFIG-finished.txt.\n"
+      "Exit status: 0 when the search completes or stops at a limit you set (--max-time,\n"
+      "--max-steps; the footer says which), 130 after Ctrl-C, 1 on an error.\n");
   static const char *ORDER[] = {"Search", "Regions", "Output", "Run", "Constraints"};
   for (const char *group : ORDER) {
     printf("\n%s:\n", strcmp(group, "Constraints") == 0 ? "Advanced constraints (dr2.c's v100..v139)" : group);

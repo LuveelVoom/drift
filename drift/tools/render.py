@@ -13,7 +13,7 @@ import os
 import re
 import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from driftlib import contains, load_pattern, read_config  # noqa: E402
+from driftlib import contains, flagged, load_pattern, read_config  # noqa: E402
 
 STYLE = {
     "on": "#1f1f1f", "off": "#ffffff", "unknown": "#cfcfcf",
@@ -66,7 +66,8 @@ def main():
     for r in range(r0, r1 + 1):
         for c in range(c0, c1 + 1):
             kind = cells.get((r, c))
-            reg = [k for k, g in regions if contains(g, r, c)]
+            reg = [k for k, g in regions if k in ("clear", "must-reach") and contains(g, r, c)]
+            reg += [k for k in ("no-change", "no-count", "no-check") if flagged(regions, k, r, c)]
             if kind is None:
                 kind = "off" if "clear" in reg else "unknown"
             fill = STYLE[kind]

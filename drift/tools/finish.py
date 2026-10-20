@@ -48,7 +48,7 @@ class Finisher:
         self.clears = [g for k, g in regions if k == "clear"]
         self.reach = [g for k, g in regions if k == "must-reach"]
         self.free_cells, self.free_regions = L.unchecked_cells(cfg)
-        self.has_free = bool(self.free_cells or self.free_regions)
+        self.has_free = bool(self.free_cells or any(k == "no-check" for k, g in self.free_regions))
 
     def to_pattern(self, res):
         o = res.get("origin", (0, 0))
@@ -77,7 +77,7 @@ class Finisher:
         tp = self.to_pattern(res)
         free = None
         if self.has_free:
-            free = lambda p: tp(p) in self.free_cells or any(L.contains(g, *tp(p)) for g in self.free_regions)
+            free = lambda p: tp(p) in self.free_cells or L.flagged(self.free_regions, "no-check", *tp(p))
         bk = L.complete(known, self.table, 3, empty, free) or L.complete(known, self.table, 6, empty, free)
         if not bk:
             return None

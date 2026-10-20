@@ -336,14 +336,16 @@ def rule_dirname(rule):
     return re.sub(r"[^A-Za-z0-9_-]+", "-", rule if not rule.startswith("MAP") else "MAP" + rule[3:15]).strip("-")
 
 
-def write_configs(rule, out, names, ships, table):
+def write_configs(rule, out, names, ships, table, dry=False):
+    """The searches' configs (dry: only the job list, nothing written or measured)."""
     jobs = []
     for name, (desc, body, pat) in BASIC.items():
         if names and name not in names:
             continue
         cfg = os.path.join(out, name + ".cfg")
-        with open(cfg, "w") as f:
-            f.write(f"# survey of {rule}: {desc}\nrule = {rule}\nno-pics{body}\npattern:\n{pat}\n")
+        if not dry:
+            with open(cfg, "w") as f:
+                f.write(f"# survey of {rule}: {desc}\nrule = {rule}\nno-pics{body}\npattern:\n{pat}\n")
         jobs.append(Job(name, desc, cfg))
     for ship in ships:
         pat, h, w = ship_pattern(ship)
@@ -353,16 +355,18 @@ def write_configs(rule, out, names, ships, table):
             if names and name not in names and ship["name"] not in names:
                 continue
             cfg = os.path.join(out, name + ".cfg")
-            lim = dict(c=pop + dc, w=bw + db, h=bh + db, nr=4)
+            lim = dict(c=pop + dc, w=bw + db, h=bh + db, nr="?" if dry else 4)
             def write():
                 d = desc.format(ship=f"{ship['name']} ({ship['speed']})", **lim)
+                if dry:
+                    return d
                 with open(cfg, "w") as f:
                     f.write(f"# survey of {rule}: {d}\n# the ship flies in from empty space\n"
                             f"rule = {rule}\nno-pics{body.format(**lim)}" + "\n".join(ship_clears(ship, h, w)) +
                             f"\npattern:\n{pat}\n")
                 return d
             d = write()
-            if "{nr}" in body:   # the smallest no-rechange gap the ship survives, plus 1
+            if "{nr}" in body and not dry:   # the smallest no-rechange gap the ship survives, plus 1
                 for nr in range(2, 4 * ship["period"]):
                     r = subprocess.run([DRIFT, cfg, "--no-rechange", f"{nr},60", "--threads", "1", "--quiet",
                                         "--no-save", "--no-finish", "--max-steps", "2000000"],
@@ -611,18 +615,24 @@ def main():
         sys.exit(f"build drift first: cd {os.path.dirname(DRIFT)} && make")
     a.out = a.out or os.path.join(os.path.dirname(DRIFT), "..", "surveys", rule_dirname(a.rule))
     a.out = os.path.abspath(a.out)
-    os.makedirs(a.out, exist_ok=True)
+    if not a.list:
+        os.makedirs(a.out, exist_ok=True)
     table = L.rule_for(a.rule)
     names = set(a.jobs.split(",")) if a.jobs else None
 
     shipfile = os.path.join(a.out, "ships.json")
-    if (a.resume or a.summary) and os.path.exists(shipfile):
+    census_skipped = False
+    if (a.resume or a.summary or a.list) and os.path.exists(shipfile):
         a.ships = json.load(open(shipfile))
-    elif a.no_ships:
+    elif a.no_ships or (a.list and not a.ship):
         a.ships = []
+        census_skipped = a.list and not a.no_ships
     else:
-        print(f"looking for spaceships in random soups ({a.census:g} s; --census changes this)...", flush=True)
-        ships, soups = find_ships(table, a.census, a.threads)
+        if a.list:   # only the ships given with --ship
+            ships, soups = [], 0
+        else:
+            print(f"looking for spaceships in random soups ({a.census:g} s; --census changes this)...", flush=True)
+            ships, soups = find_ships(table, a.census, a.threads)
         a.soups = soups
         for k, text in enumerate(a.ship):   # an RLE file, or the RLE itself
             isfile = os.path.exists(text)
@@ -632,24 +642,30 @@ def main():
                 sys.exit(f"--ship {text}: not a spaceship in {a.rule}")
             key = ship_key(cells, table)
             same = [s for s in ships if ship_key(set(map(tuple, s["cells"])), table) == key]
-            ship = same[0] if same else dict(ships_from(cells, table, f"ship{len(cells)}"))
+            known = {n: {p for p, st in L.parse_rle(r).items() if st == 1} for n, r in KNOWN_SHIPS.items()}
+            named = [n for n, c in known.items() if ship_motion(c, table, 16) and ship_key(c, table) == key]
+            ship = same[0] if same else dict(ships_from(cells, table, named[0] if named else f"ship{len(cells)}"))
             if isfile:
                 ship["name"] = os.path.splitext(os.path.basename(text))[0]
             if ship in ships:
                 ships.remove(ship)
             ships.insert(k, ship)
         a.ships = ships[:max(a.max_ships, len(a.ship))]
-        if ships:
+        if ships and not a.list:
             print(f"{soups} soups: " + ", ".join(f"{s['name']} {s['soups']}x" for s in ships[:6]))
-        json.dump(a.ships, open(shipfile, "w"))
+        if not a.list:
+            json.dump(a.ships, open(shipfile, "w"))
     if a.ships:
         print("searching with: " + ", ".join(f"{s['name']} ({s['speed']}, {len(s['cells'])} cells)" for s in a.ships))
-    else:
+    elif not census_skipped:
         print("no small spaceships found (give one with --ship FILE)")
-    jobs = write_configs(a.rule, a.out, names, a.ships, table)
+    jobs = write_configs(a.rule, a.out, names, a.ships, table, dry=a.list)
     if a.list:
         for j in jobs:
             print(f"  {j.name:18} {j.desc}")
+        if census_skipped:
+            print(f"  SHIP-eaters, SHIP-converter, SHIP-drifter for each of the {a.max_ships} spaceships "
+                  "most common in random soups\n  (found when the survey runs; or give one with --ship FILE)")
         return
     if a.summary:
         write_summary(a, jobs)
