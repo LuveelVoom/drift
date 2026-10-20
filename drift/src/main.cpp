@@ -803,6 +803,7 @@ int main(int argc, char **argv) {
       std::string base = o.configPath;
       if (base.size() > 4 && base.compare(base.size() - 4, 4, ".cfg") == 0) base.resize(base.size() - 4);
       if (o.jsonl != base + "-results.jsonl") cmd += " --jsonl \"" + o.jsonl + "\"";
+      cmd += " --jobs " + std::to_string(threads);
       printf("\nFinishing the results (tools/finish.py; --no-finish skips this)...\n");
       fflush(stdout);
       if (system(cmd.c_str()) != 0)

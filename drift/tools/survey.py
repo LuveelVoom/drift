@@ -315,6 +315,7 @@ class Job:
         self.tfile = self.base + ".threads"
         self.log = self.base + ".log"
         self.proc = self.fin = None
+        self.fin_jobs = 0
         self.state = "waiting"      # waiting, running, finishing, done
         self.complete = False       # the search space was exhausted
         self.threads = 0
@@ -425,15 +426,18 @@ class Survey:
         if not has or self.a.no_finish:
             job.state = "done"
             return
+        # share the cores with the searches still running and the other finishes
+        busy = sum(j.state in ("running", "finishing") for j in self.jobs)
+        job.fin_jobs = max(1, self.threads // max(1, busy))
         cmd = [sys.executable, FINISH, job.cfg, "--seconds", "1", "--limit", "20",
-               "--max-minutes", str(self.a.finish_minutes)]
+               "--max-minutes", str(self.a.finish_minutes), "--jobs", str(job.fin_jobs)]
         job.fin = subprocess.Popen(cmd, stdout=open(job.base + "-finish.log", "w"), stderr=subprocess.STDOUT,
                                    start_new_session=True)
         job.state = "finishing"
 
     def rebalance(self):
         running = [j for j in self.jobs if j.state == "running"]
-        finishing = sum(j.state == "finishing" for j in self.jobs)
+        finishing = sum(j.fin_jobs for j in self.jobs if j.state == "finishing")
         if not running:
             return
         free = max(len(running), self.threads - finishing)
@@ -506,9 +510,9 @@ def sections(path, limit=3):
     i = 0
     while i < len(lines):
         l = lines[i]
-        m = re.match(r"## (.*): (\d+)\+?( \((showing \d+|stopped at --limit)\))?$", l)
+        m = re.match(r"## (.*): (\d+\+?)( \((showing \d+|stopped at --limit)\))?$", l)
         if m:
-            cur = (m.group(1), int(m.group(2)), [])
+            cur = (m.group(1), m.group(2), [])   # count as written, e.g. "20+"
             out.append(cur)
         elif l.startswith("#C ") and cur is not None and len(cur[2]) < limit:
             j = i + 1

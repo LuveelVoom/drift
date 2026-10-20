@@ -169,35 +169,24 @@ def complete(cells, table, margin, empty=None, free=None, fewest=0):
     for p, b in fixed.items():
         if p in var:
             s.add_clause([var[p] if b else -var[p]])
-    # Every cell in the box and the ring around it is stable (outside = dead).
-    # Only the unknown cells of each window are enumerated; known ones are
-    # filled in, so every clause is over unknown cells only.
+    # Every cell in the box and the ring around it is stable (outside = dead):
+    # the rule's clauses with the known cells of each window filled in.
     for r in range(r0 - 1, r1 + 2):
         for c in range(c0 - 1, c1 + 2):
             if free and free((r, c)):
                 continue
-            base, unk = 0, []
-            for k, (dr, dc) in enumerate(OFFS):
+            known, ids = [], []
+            for dr, dc in OFFS:
                 q = (r + dr, c + dc)
                 v = var.get(q)
-                if v is None or q in fixed:
-                    if v is not None and fixed[q]:
-                        base |= WEIGHT[k]
-                else:
-                    unk.append((WEIGHT[k], v))
-            for bits in range(1 << len(unk)):
-                w, clause = base, []
-                for i, (wt, v) in enumerate(unk):
-                    if bits >> i & 1:
-                        w |= wt
-                        clause.append(-v)
-                    else:
-                        clause.append(v)
-                if table[w] != bool(w & 16):   # this neighbourhood isn't stable
-                    if not clause:
-                        s.delete()
-                        return None
-                    s.add_clause(clause)
+                ids.append(v)
+                known.append(0 if v is None else fixed.get(q))
+            red = reduced_clauses(table, "still", tuple(known))
+            if red is None:
+                s.delete()
+                return None
+            for clause in red:
+                s.add_clause([ids[i] if want else -ids[i] for i, want in clause])
     if not s.solve():
         return None
     model = set(x for x in s.get_model() if x > 0)
@@ -220,6 +209,105 @@ def complete(cells, table, margin, empty=None, free=None, fewest=0):
                 break
             model = set(x for x in s.get_model() if x > 0)
     return {p: int(v in model) for p, v in var.items()}
+
+
+# ---- CNF templates
+# A cell's next state as clauses, worked out once per rule and reused for every
+# cell. Inputs are the 9 cells of a window (OFFS order) and, for "step", the
+# cell's state one generation later (input 9). "still" is the same with the
+# centre cell as its own next state. A clause is a tuple of (input, value)
+# pairs and is satisfied when any input has its value.
+
+_CNF = {}       # (rule key, kind) -> prime clauses
+_REDUCED = {}   # (rule key, kind, known) -> clauses over the unknown inputs, or None
+
+
+def _rule_key(table):
+    return bytes(map(bool, table))
+
+
+def _prime_clauses(n, bad):
+    """Few, short clauses ruling out exactly the assignments in bad (bit i = input i):
+    prime implicants of the bad set (Quine-McCluskey), greedily chosen to cover it."""
+    cubes, primes = {(m, 0) for m in bad}, set()
+    while cubes:
+        merged, used = set(), set()
+        for v, mk in cubes:
+            for i in range(n):
+                b = 1 << i
+                if not (mk | v) & b and (v | b, mk) in cubes:
+                    merged.add((v, mk | b))
+                    used.add((v, mk))
+                    used.add((v | b, mk))
+        primes |= cubes - used
+        cubes = merged
+    cover = {}
+    for v, mk in primes:
+        free = [1 << i for i in range(n) if mk >> i & 1]
+        cover[(v, mk)] = {v | sum(f for j, f in enumerate(free) if k >> j & 1) for k in range(1 << len(free))}
+    left, out = set(bad), []
+    while left:
+        best = max(cover, key=lambda c: (len(cover[c] & left), -bin(c[1]).count("0")))
+        left -= cover.pop(best)
+        v, mk = best
+        out.append(tuple((i, 1 - (v >> i & 1)) for i in range(n) if not mk >> i & 1))
+    return out
+
+
+def rule_cnf(table, kind):
+    key = (_rule_key(table), kind)
+    if key not in _CNF:
+        def w(a):
+            return sum(WEIGHT[k] for k in range(9) if a >> k & 1)
+        if kind == "still":
+            bad = [a for a in range(512) if bool(table[w(a)]) != bool(a >> 4 & 1)]
+            _CNF[key] = _prime_clauses(9, bad)
+        else:
+            bad = [a for a in range(1024) if bool(table[w(a & 511)]) != bool(a >> 9 & 1)]
+            _CNF[key] = _prime_clauses(10, bad)
+    return _CNF[key]
+
+
+def cnf_cache():
+    """The templates worked out so far, to hand to worker processes (set_cnf_cache)."""
+    return dict(_CNF)
+
+
+def set_cnf_cache(d):
+    _CNF.update(d)
+
+
+def reduced_clauses(table, kind, known):
+    """The template with some inputs known: known[i] is 0/1, None (unknown), or for
+    "step" input 9 the string "c" (it is the same cell as the centre, input 4).
+    Returns clauses over the unknown inputs, or None if the known inputs already
+    break the rule."""
+    rk = (_rule_key(table), kind, known)
+    if rk in _REDUCED:
+        return _REDUCED[rk]
+    out = set()
+    for clause in rule_cnf(table, kind):
+        lits, sat = set(), False
+        for i, want in clause:
+            if i == 9 and known[9] == "c":
+                i = 4
+            k = known[i]
+            if k is None or k == "c":
+                if (i, 1 - want) in lits:
+                    sat = True   # x or not x
+                    break
+                lits.add((i, want))
+            elif k == want:
+                sat = True
+                break
+        if sat:
+            continue
+        if not lits:
+            out = None
+            break
+        out.add(tuple(sorted(lits)))
+    _REDUCED[rk] = None if out is None else sorted(out)
+    return _REDUCED[rk]
 
 
 def minimize(states, table, cyclic, margin=4, seconds=20, empty=None):
@@ -255,17 +343,16 @@ def minimize(states, table, cyclic, margin=4, seconds=20, empty=None):
 
     def add(x, t, t2):
         """Cell x stepping from state t to state t2."""
-        win = [value((x[0] + dr, x[1] + dc), t) for dr, dc in OFFS]
+        ids = [value((x[0] + dr, x[1] + dc), t) for dr, dc in OFFS]
         target = value(x, t2)
-        vs = sorted({v for v in win + [target] if v > 1})
-        for a in range(1 << len(vs)):
-            asg = {v: (a >> i) & 1 for i, v in enumerate(vs)}
-            w = sum(WEIGHT[k] for k, v in enumerate(win) if (asg[v] if v not in (0, 1) else v))
-            want = asg[target] if target not in (0, 1) else target
-            if int(table[w]) != want:
-                if not vs:
-                    return False   # violated by constants alone
-                clauses.append([-v if asg[v] else v for v in vs])
+        known = [v if v in (0, 1) else None for v in ids]
+        known.append(target if target in (0, 1) else "c" if target == ids[4] else None)
+        ids.append(target)
+        red = reduced_clauses(table, "step", tuple(known))
+        if red is None:
+            return False   # violated by constants alone
+        for clause in red:
+            clauses.append([ids[i] if want else -ids[i] for i, want in clause])
         return True
 
     if cyclic is True:
