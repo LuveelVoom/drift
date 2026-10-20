@@ -15,8 +15,15 @@ as dead and `clear` regions stay empty), simulates it and sorts it:
   catalysts             the spark is absorbed and the still life recovers
   spaceship converters  the still life recovers and only spaceships leave
   signals               a disturbance still travelling with a fixed shape
+  oscillators found     the oscillators that damaging reactions end in, each
+  in damaging reactions on its own with the smallest stator found: real
+                        oscillators even though the spark doesn't start them
+                        cleanly. Separate oscillators are split apart, rotors
+                        already listed are left out, and rotors not in the
+                        known list (B3/S23) come first.
   damaging oscillators  the spark breaks part of the still life to make it
-                        (listed last; --clean-only leaves them out)
+                        (listed last; --clean-only leaves out these and the
+                        section above)
   debris                oscillates without a stator (not listed)
 
 Each pattern is generation 0 (still life plus spark), shrunk as far as possible
@@ -181,12 +188,59 @@ class Finisher:
         info["unshrunk"] = True
         return hist[0]
 
+    def extract(self, info):
+        """One phase of an oscillator part with the smallest stator found (checked),
+        else the part as it was in the reaction."""
+        cyc, p = info["cyc"], info["period"]
+        for margin, seconds in ((4, self.seconds), (7, 3 * self.seconds)):
+            m = L.minimize([set(s) for s in cyc], self.table, True, margin=margin, seconds=seconds)
+            if not m:
+                continue
+            h = [frozenset(m[0])]
+            for _ in range(2 * p):
+                h.append(frozenset(L.step(h[-1], self.table)))
+            if h[p] == h[0] and h[2 * p] == h[0] and not any(h[d] == h[0] for d in range(1, p)):
+                return h[0]
+        info["unshrunk"] = True
+        return cyc[0]
+
+
+TRANSFORMS = [lambda r, c: (r, c), lambda r, c: (r, -c), lambda r, c: (-r, c), lambda r, c: (-r, -c),
+              lambda r, c: (c, r), lambda r, c: (c, -r), lambda r, c: (-c, r), lambda r, c: (-c, -r)]
+
+
+def oscillator_parts(cyc, table):
+    """Split one cycle of a periodic pattern into its separate oscillators (parts more
+    than 2 cells apart can't interact). Returns (phases, period, rotor key) for each
+    part that needs a stator; the key is the same for the same rotor in any phase,
+    position or orientation."""
+    out = []
+    for comp in L.components(set().union(*cyc)):
+        ph = [frozenset(s & comp) for s in cyc]
+        per = next(d for d in range(1, len(ph) + 1) if len(ph) % d == 0 and ph[d % len(ph)] == ph[0])
+        ph = ph[:per]
+        rotor = set().union(*ph) - frozenset.intersection(*ph)
+        if per < 2 or not rotor or not L.needs_stator(ph[0], per, table):
+            continue
+        key = None
+        for t in TRANSFORMS:
+            rs = [{t(*q) for q in s & rotor} for s in ph]
+            r0 = min(r for r, c in map(lambda q: t(*q), rotor))
+            c0 = min(c for r, c in map(lambda q: t(*q), rotor))
+            rs = [tuple(sorted((r - r0, c - c0) for r, c in s)) for s in rs]
+            for k in range(per):
+                cand = tuple(rs[(i + k) % per] for i in range(per))
+                key = cand if key is None or cand < key else key
+        out.append((ph, per, key))
+    return out
+
 
 SECTIONS = [
     ("clean", "Clean oscillators (the spark starts them; the still life loses nothing)"),
     ("catalyst", "Catalysts (the spark is absorbed; the still life recovers exactly)"),
     ("converter", "Spaceship converters (the still life recovers; spaceships leave)"),
     ("signal", "Signals (still travelling with a fixed shape)"),
+    ("extracted", "Oscillators found in damaging reactions (the oscillator alone, without the spark)"),
     ("damaging", "Damaging oscillators (the spark breaks part of the still life)"),
     ("no-spark", "Oscillators that don't reach the must-reach area in their own cycle"),
 ]
@@ -200,7 +254,7 @@ def main():
     ap.add_argument("--all", action="store_true",
                     help="also list oscillators without a spark in their cycle, and long fizzles "
                          "(always listed when the config uses no-rechange or push)")
-    ap.add_argument("--clean-only", action="store_true", help="don't list damaging oscillators")
+    ap.add_argument("--clean-only", action="store_true", help="don't list damaging oscillators, or the oscillators found in them")
     ap.add_argument("--limit", type=int, default=30, help="patterns listed per section (default 30)")
     ap.add_argument("--max-cells", type=int, default=0, help="leave out patterns bigger than this")
     ap.add_argument("--seconds", type=float, default=5, help="time spent shrinking each listed pattern")
@@ -267,6 +321,31 @@ def main():
         if best[0] != "debris":
             found[best[0]].append(best[1])
 
+    # The oscillators a damaging reaction ends in are real oscillators in their
+    # own right, even though the spark doesn't start them cleanly. Each separate
+    # part is checked on its own; parts that oscillate without a stator, and
+    # rotors already listed (here or as clean oscillators), are left out.
+    seen = set()
+    if not a.clean_only:
+        for i in found.get("clean", []):
+            g, p = i["res"]["gen"], i["res"]["period"]
+            seen |= {k for _, _, k in oscillator_parts(i["hist"][g:g + p], fin.table)}
+        ext, queued = [], set()
+        for i in found.get("damaging", []):
+            g, p = i["res"]["gen"], i["res"]["period"]
+            whole = i["hist"][g:g + p]
+            parts = oscillator_parts(whole, fin.table)
+            # drift's known-rotor flag describes the whole rotor, so it only applies to a part that is all of it
+            nrot = len(set().union(*whole) - frozenset.intersection(*whole))
+            for cyc, per, k in parts:
+                if k not in seen and k not in queued:
+                    queued.add(k)
+                    rotor = len(set().union(*cyc) - frozenset.intersection(*cyc))
+                    ext.append(dict(res=i["res"], cyc=cyc, period=per, rotor=rotor, whole=rotor == nrot))
+        known = lambda i: i["whole"] and str(i["res"].get("known")) == "True"
+        ext.sort(key=lambda i: (known(i), -i["period"], -i["rotor"]))
+        found["extracted"] = ext
+
     # 3. shrink and write the ones that are listed
     lines = [f"# drift results for {a.config}, finished by finish.py (rule {rule}).",
              "# Each pattern is gen 0 (still life + spark); paste into Golly with this rule.", None, ""]
@@ -279,18 +358,45 @@ def main():
             items.sort(key=lambda i: (-i["res"]["period"], i.get("damage", 0), i["size"]))
         elif key == "catalyst":
             items.sort(key=lambda i: (-i["res"]["gen"], i["size"]))
-        written = []
+        written, shown = [], set(seen) if key == "extracted" else set()
         for info in items:
             if len(written) >= a.limit:
                 break
-            if late(0.95):
+            res = info["res"]
+            if key == "extracted":
+                if late(0.95):
+                    info["unshrunk"] = True
+                    g0 = info["cyc"][0]
+                else:
+                    g0 = fin.extract(info)
+            elif late(0.95):
                 info["unshrunk"] = True
                 g0 = info["hist"][0] if info.get("hist") else None
             else:
                 g0 = fin.shrink(key, info)
+            if key == "extracted":
+                # A smaller stator can leave separate oscillators side by side: list each new one
+                ph = [g0]
+                for _ in range(info["period"] - 1):
+                    ph.append(frozenset(L.step(ph[-1], fin.table)))
+                for cyc, p, k in oscillator_parts(ph, fin.table):
+                    if k in shown or len(written) >= a.limit:
+                        continue
+                    shown.add(k)
+                    if a.max_cells and len(cyc[0]) > a.max_cells:
+                        continue
+                    head = f"p{p} oscillator, {len(cyc[0])} cells, from the reaction of result #{res['n']}"
+                    if info["whole"] and p == info["period"] and len(cyc[0]) == len(g0):
+                        if str(res.get("known")) == "True":
+                            head += ", known rotor" + (f": {res['name']}" if res.get("name") else "")
+                        elif "known" in res and rule.upper() == "B3/S23":
+                            head += ", rotor not in the known rotors list"
+                    head += ", billiard table" if not L.exposed(cyc[0], p, fin.table) else ""
+                    head += " (couldn't be shrunk)" if info.get("unshrunk") else ""
+                    written.append(f"#C {head}\n" + L.to_rle(cyc[0], rule).rstrip())
+                continue
             if a.max_cells and g0 is not None and len(g0) > a.max_cells:
                 continue
-            res = info["res"]
             if key in ("clean", "damaging", "no-spark"):
                 p = res["period"]
                 head = f"p{p} oscillator, {len(g0)} cells, oscillating from gen {res['gen'] - p}"
@@ -307,6 +413,15 @@ def main():
                 head += " (couldn't be shrunk)"
             written.append(f"#C {head}\n" + (L.to_rle(g0, rule).rstrip() if g0 is not None else ""))
         if not items:
+            continue
+        if key == "extracted":   # counted after shrinking and splitting, so only up to --limit
+            if not written:
+                continue
+            n = f"{len(written)}+" if len(written) >= a.limit else str(len(written))
+            summary.append(f"{n} {title.split(' (')[0].lower()}")
+            lines.append(f"## {title}: {n}" + (" (stopped at --limit)" if n.endswith("+") else ""))
+            lines.append("")
+            lines += [w + "\n" for w in written]
             continue
         summary.append(f"{len(items)} {title.split(' (')[0].lower()}")
         lines.append(f"## {title}: {len(items)}" + (f" (showing {len(written)})" if len(written) < len(items) else ""))

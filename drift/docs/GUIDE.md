@@ -190,9 +190,15 @@ result, in sections, best first:
 Each pattern is **generation 0** (still life plus spark), shrunk to as few
 cells as possible. Paste it into Golly with your rule and run it.
 
-After those comes "Damaging oscillators": real oscillators, but the spark
-broke part of the still life to make them. `finish.py --clean-only` leaves
-them out, `--max-cells N` drops big patterns, and `--all` adds long fizzles
+After those comes "Oscillators found in damaging reactions". When the spark
+breaks part of the still life, what's left can still be a real oscillator.
+This section lists each one on its own, without the spark and with the
+smallest stator found, once per rotor. In B3/S23, rotors that aren't in the
+known rotors list come first and are marked.
+
+Last is "Damaging oscillators": the reactions themselves, with the spark that
+broke part of the still life. `finish.py --clean-only` leaves
+out both, `--max-cells N` drops big patterns, and `--all` adds long fizzles
 and oscillators that don't reach a `must-reach` area in their own cycle.
 
 **`my-results.txt`** holds drift's raw results. These are partial patterns,

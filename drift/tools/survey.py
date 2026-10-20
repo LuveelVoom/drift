@@ -506,7 +506,7 @@ def sections(path, limit=3):
     i = 0
     while i < len(lines):
         l = lines[i]
-        m = re.match(r"## (.*): (\d+)$", l)
+        m = re.match(r"## (.*): (\d+)\+?( \((showing \d+|stopped at --limit)\))?$", l)
         if m:
             cur = (m.group(1), int(m.group(2)), [])
             out.append(cur)
