@@ -182,7 +182,10 @@ def orient(cells, table):
     """Rotate/reflect a ship so it moves right (orthogonal) or down-right."""
     best = None
     for t in transforms(cells):
-        p, dr, dc = ship_motion(t, table, 16)
+        m = ship_motion(t, table, 16)   # None: not a ship in this orientation (non-isotropic rule)
+        if not m:
+            continue
+        p, dr, dc = m
         if dr >= 0 and dc > 0 and dr <= dc:
             key = (dr != 0, sorted(t))
             if best is None or key < best[0]:

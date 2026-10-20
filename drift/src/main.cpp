@@ -759,7 +759,7 @@ int main(int argc, char **argv) {
                              "limits first). Leave unknown cells next to the spark where things may be built "
                              "(ignore this if the spark is meant to fly through empty space first).");
     }
-    if (resumed) o.freshOutputs = false;
+    if (resumed) o.freshJsonl = o.freshText = false;
 
     int threads = o.threads > 0 ? o.threads : (int)std::max(1u, std::thread::hardware_concurrency());
     Reporter rep(o, &known, known.names.size());
@@ -798,7 +798,14 @@ int main(int argc, char **argv) {
       else printf("computecellorbackup calls: %lld %06lld\n", steps / 1000000, steps % 1000000);
     }
     rep.footer(co.sessionSeconds(), steps, finished, resumed);
-    if (!o.classic && !o.noFinish && rep.printed > 0 && !o.configPath.empty() && !gSignal.load()) {
+    if (!o.classic && !o.noFinish && rep.printed > 0 && !o.configPath.empty() && !gSignal.load() &&
+        o.jsonl.empty())
+      printf("\nNot finishing the results: they weren't saved (--no-save).\n");
+    else if (!o.classic && !o.noFinish && rep.printed > 0 && !o.configPath.empty() && !gSignal.load()) {
+      // finish.py reads the config file; settings given on the command line reach it here
+      std::string extra;
+      for (const std::string &l : cliSettings(args)) extra += l + "\n";
+      setenv("DRIFT_EXTRA_SETTINGS", extra.c_str(), 1);
       std::string cmd = "python3 \"" + rep.finishScript + "\" \"" + o.configPath + "\"";
       std::string base = o.configPath;
       if (base.size() > 4 && base.compare(base.size() - 4, 4, ".cfg") == 0) base.resize(base.size() - 4);

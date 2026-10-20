@@ -3,6 +3,7 @@
 // position arguments are relative to the top-left cell of the pattern.
 #include "options.h"
 
+#include <algorithm>
 #include <cctype>
 #include <climits>
 #include <cstring>
@@ -139,7 +140,9 @@ const std::vector<Opt> &opts() {
     {"size", "WxH", "Search", "Shorthand for --max-width W --max-height H.",
      [](Ctx &c, const std::string &v) {
        int w, h;
-       if (sscanf(v.c_str(), "%dx%d", &w, &h) != 2) fail("--size expects WxH, e.g. 5x3");
+       std::string t = v;
+       for (char &ch : t) if (ch == 'X' || ch == '*') ch = 'x';
+       if (sscanf(t.c_str(), "%dx%d", &w, &h) != 2) fail("--size expects WxH, e.g. 5x3");
        c.o.params.maxwidth = w;
        c.o.params.maxheight = h;
      }},
@@ -158,7 +161,9 @@ const std::vector<Opt> &opts() {
      [](Ctx &c, const std::string &v) { c.margin = (int)toLong("margin", v); }},
     {"grid", "HxW", "Search", "Use a fixed H x W space (pattern centred) instead of --margin.",
      [](Ctx &c, const std::string &v) {
-       if (sscanf(v.c_str(), "%dx%d", &c.gridH, &c.gridW) != 2) fail("--grid expects HxW, e.g. 81x81");
+       std::string t = v;
+       for (char &ch : t) if (ch == 'X' || ch == '*') ch = 'x';
+       if (sscanf(t.c_str(), "%dx%d", &c.gridH, &c.gridW) != 2) fail("--grid expects HxW, e.g. 81x81");
      }},
     {"unchecked-border", nullptr, "Search",
      "Don't require the space's dead border to be stable (dr2.c's behaviour; results that\n"
@@ -382,11 +387,12 @@ const std::vector<Opt> &opts() {
     {"known-rotors", "FILE", "Output",
      "Known rotors list. By default dr2.c's 'knownrotors' file is used for B3/S23 only.",
      [](Ctx &c, const std::string &v) { c.o.knownRotorsFile = resolve(c, v); c.o.knownRotorsExplicit = true; }},
-    {"jsonl", "FILE", "Output", "Append each result to FILE as one JSON object per line.",
+    {"jsonl", "FILE", "Output",
+     "Append each result to FILE as one JSON object per line (instead of <config>-results.jsonl).",
      [](Ctx &c, const std::string &v) { c.o.jsonl = v; }},
     {"out", "FILE", "Output",
-     "Also write the printed results to FILE. With a config file, results are saved to\n"
-     "<config>-results.txt and <config>-results.jsonl by default.",
+     "Append the printed results to FILE (instead of <config>-results.txt). With a config\n"
+     "file, results are saved to <config>-results.txt and <config>-results.jsonl by default.",
      [](Ctx &c, const std::string &v) { c.o.textOut = v; }},
     {"no-save", nullptr, "Output", "Don't save results to files by default.",
      [](Ctx &c, const std::string &v) { c.o.noSave = toBool("no-save", v); }},
@@ -627,6 +633,12 @@ bool readModern(const std::vector<std::string> &args, Options &o) {
     } else if (a == "-h")
       c.help = true;
     else {
+      if (i > 0 && args[i - 1].compare(0, 2, "--") == 0 && args[i - 1].find('=') == std::string::npos) {
+        const Opt *prev = findOpt(args[i - 1].substr(2));
+        std::ifstream probe(a);
+        if (prev && !prev->arg && !probe)
+          fail(args[i - 1] + " doesn't take a value (to turn it off, write " + args[i - 1] + "=no)");
+      }
       readConfig(c, a);
       o.configPath = a;
     }
@@ -650,6 +662,26 @@ bool readModern(const std::vector<std::string> &args, Options &o) {
   }
   if (c.patternText.empty()) fail("no pattern given (use --pattern FILE; see --help)");
   std::vector<std::string> lines = loadPatternText(c.patternText);
+  // drift reads RLE as LifeHistory: in a two-state RLE (Golly's copy of a plain
+  // pattern) every 'b' cell is unknown, not dead, and there is no spark.
+  std::string twoState;
+  {
+    std::istringstream in(c.patternText);
+    std::string l;
+    while (std::getline(in, l)) {
+      size_t p = l.find("rule");
+      if (trim(l).compare(0, 1, "x") != 0 || p == std::string::npos) continue;
+      std::string r = trim(l.substr(l.find('=', p) + 1));
+      std::string lower;
+      for (char ch : r) lower += (char)tolower((unsigned char)ch);
+      if (lower.find("history") == std::string::npos) twoState = r;
+      break;
+    }
+  }
+  if (!twoState.empty())
+    o.warnings.push_back("the pattern's RLE header says rule = " + twoState + ", but drift reads patterns "
+                         "as LifeHistory: 'b' cells are unknown, not dead. Draw the pattern in Golly with "
+                         "the LifeHistory rule (dead cells in state 2, the spark in state 3).");
   int ph = (int)lines.size(), pw = 0;
   bool anyChange = false;
   for (const std::string &l : lines) {
@@ -664,13 +696,17 @@ bool readModern(const std::vector<std::string> &args, Options &o) {
   if (!anyChange)
     fail("the pattern has no cells that differ in gen 0. Mark them with LifeHistory state 3\n"
          "(on in gen 0, off in the background) or 4 (the reverse), or dr2.c's '1' / '0'\n"
-         "(or start from unchecked cells: dr2.c's '2' / '3' / '4').");
+         "(or start from unchecked cells: dr2.c's '2' / '3' / '4')." +
+         (twoState.empty() ? std::string()
+                           : "\nThis RLE is a two-state pattern (rule = " + twoState +
+                                 "): draw it in Golly with the LifeHistory rule instead."));
 
   bool square = P.symm == DIAGSYMM || P.symm == ROT90SYMM || P.symm == XSYMM || P.symm == FULLSYMM;
   if (c.gridH) {
     P.HT = c.gridH;
     P.WD = c.gridW;
     if (P.HT < ph + 4 || P.WD < pw + 4) fail("--grid is too small for the pattern");
+    if (square && P.HT != P.WD) fail("--grid must be square (H = W) for this symmetry");
   } else {
     P.HT = ph + 2 * c.margin + 4;
     P.WD = pw + 2 * c.margin + 4;
@@ -744,15 +780,46 @@ bool readModern(const std::vector<std::string> &args, Options &o) {
     P.var[135] = P.WD;
   }
   P.checkBorder = !c.uncheckedBorder;
-  if (!o.configPath.empty() && !o.noSave && o.jsonl.empty() && o.textOut.empty()) {
+  if (!o.configPath.empty() && !o.noSave) {   // default results files, each unless given
     std::string base = o.configPath;
     if (base.size() > 4 && base.compare(base.size() - 4, 4, ".cfg") == 0) base.resize(base.size() - 4);
-    o.jsonl = base + "-results.jsonl";
-    o.textOut = base + "-results.txt";
-    o.freshOutputs = true;
+    if (o.jsonl.empty()) { o.jsonl = base + "-results.jsonl"; o.freshJsonl = true; }
+    if (o.textOut.empty()) { o.textOut = base + "-results.txt"; o.freshText = true; }
   }
   if (P.maxgen < 1) fail("--max-gen must be at least 1");
   return true;
+}
+
+std::vector<std::string> cliSettings(const std::vector<std::string> &args) {
+  static const char *KEEP[] = {"rule", "pattern", "clear", "no-change", "allow-change", "no-count",
+                               "count", "no-check", "check", "must-reach"};
+  std::vector<std::string> out;
+  for (size_t i = 0; i < args.size(); i++) {
+    const std::string &a = args[i];
+    if (a.size() <= 2 || a.compare(0, 2, "--") != 0) {
+      out.push_back("@config");
+      continue;
+    }
+    std::string name = a.substr(2), value;
+    size_t eq = name.find('=');
+    if (eq != std::string::npos) {
+      value = name.substr(eq + 1);
+      name = name.substr(0, eq);
+    } else {
+      const Opt *opt = findOpt(name);
+      if (opt && opt->arg && i + 1 < args.size()) value = args[++i];
+    }
+    for (const char *k : KEEP)
+      if (name == k) {
+        if (name == "pattern" && !value.empty() && value[0] != '/') {
+          char real[PATH_MAX];
+          if (realpath(value.c_str(), real)) value = real;
+        }
+        std::replace(value.begin(), value.end(), '\n', ' ');
+        out.push_back(name + " = " + value);
+      }
+  }
+  return out;
 }
 
 }  // namespace drift

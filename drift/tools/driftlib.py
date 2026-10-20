@@ -542,19 +542,57 @@ def load_pattern(text):
     return cells
 
 
+def config_lines(path):
+    """The config's lines, with the settings drift was given on its command line
+    (DRIFT_EXTRA_SETTINGS, set when drift runs finish.py) before or after them,
+    where they were given."""
+    lines = open(path).read().split("\n")
+    extra = os.environ.get("DRIFT_EXTRA_SETTINGS", "").split("\n")
+    if "@config" not in extra:
+        return lines + extra
+    k = extra.index("@config")
+    return extra[:k] + lines + extra[k + 1:]
+
+
+def config_rule(path):
+    """The rule drift used: the last rule setting (the config's, or the command line's)."""
+    rule = "B3/S23"
+    for line in config_lines(path):
+        m = re.match(r"\s*(?:--)?rule\s*=?\s*(\S+)", line)
+        if m:
+            rule = m.group(1)
+    return rule
+
+
+def _pattern_text(lines, base):
+    """The pattern block or file, as drift reads it (the last one given wins)."""
+    pattern, i = None, 0
+    while i < len(lines):
+        l = re.sub(r"\s+#.*$", "", lines[i].strip())
+        i += 1
+        if l.startswith("--"):
+            l = l[2:]
+        if l.rstrip(":= ") == "pattern" and (l.endswith(":") or l.endswith("=")):
+            block = []
+            while i < len(lines):
+                block.append(lines[i])
+                i += 1
+                if "!" in block[-1]:
+                    break
+            pattern = "\n".join(block)
+        else:
+            m = re.match(r"pattern(?:\s*=\s*|\s+)(\S.*)$", l)   # not pattern-no-count
+            if m and not l.startswith("#"):
+                pattern = open(os.path.join(base, m.group(1).strip())).read()
+    return pattern
+
+
 def unchecked_cells(path):
     """Cells of a config's pattern drift doesn't check for stability: dr2's
     '2' '3' '4' characters and no-check regions (pattern-relative)."""
     _, regions = read_config(path)
-    text, cells = open(path).read().split("\n"), set()
-    block, inside = [], False
-    for line in text:
-        if inside:
-            block.append(line)
-            if "!" in line:
-                break
-        elif line.strip().rstrip(":= ") == "pattern" and line.strip().endswith((":", "=")):
-            inside = True
+    text = _pattern_text(config_lines(path), os.path.dirname(os.path.abspath(path))) or ""
+    block, cells = text.split("\n"), set()
     if block and not any("$" in l or l.strip().startswith("x") for l in block):
         r = 0
         for l in block:
@@ -570,30 +608,27 @@ def unchecked_cells(path):
 
 
 def read_config(path):
-    text = open(path).read().split("\n")
-    regions, pattern, i = [], None, 0
+    text = config_lines(path)
+    regions = []
     base = os.path.dirname(os.path.abspath(path))
+    i = 0
     while i < len(text):
         l = text[i].strip()
         i += 1
-        if not l or l.startswith("#"):
+        if not l or l.startswith(("#", ";")):
             continue
         l = re.sub(r"\s+#.*$", "", l)
+        if l.startswith("--"):
+            l = l[2:]
         if l.rstrip(":= ") == "pattern" and (l.endswith(":") or l.endswith("=")):
-            block = []
-            while i < len(text):
-                block.append(text[i])
+            while i < len(text) and "!" not in text[i]:   # the block itself: _pattern_text reads it
                 i += 1
-                if "!" in block[-1]:
-                    break
-            pattern = "\n".join(block)
+            i += 1
             continue
         m = re.match(r"([a-z-]+)\s*=?\s*(.*)$", l)
-        if not m:
-            continue
-        key, val = m.group(1), m.group(2)
-        if key in ("clear", "no-change", "no-count", "no-check", "must-reach"):
-            regions.append((key, parse_region(val)))
-        elif key == "pattern":
-            pattern = open(os.path.join(base, val)).read()
+        if m and m.group(1) in ("clear", "no-change", "no-count", "no-check", "must-reach"):
+            regions.append((m.group(1), parse_region(m.group(2))))
+    pattern = _pattern_text(text, base)
+    if pattern is None:
+        raise SystemExit(f"{path}: no pattern found")
     return load_pattern(pattern), regions

@@ -29,7 +29,7 @@ struct Options {
   bool knownRotorsExplicit = false;
   std::string jsonl;               // append one JSON object per result
   std::string textOut;             // copy of the printed results
-  bool freshOutputs = false;       // default output files: start them afresh
+  bool freshJsonl = false, freshText = false;   // default output files: start them afresh
   bool noSave = false;
   bool noFinish = false;           // don't run tools/finish.py afterwards
   std::string configPath;          // the config file given on the command line
@@ -57,6 +57,9 @@ void readClassic(const std::vector<std::string> &args, std::istream &in, Options
 // Named options and config files. Throws std::runtime_error with a message
 // meant for the user. Returns false if the program should exit (e.g. --help).
 bool readModern(const std::vector<std::string> &args, Options &o);
+// The command-line settings finish.py needs (rule, pattern, regions) as config
+// lines, in order, with "@config" where a config file was read.
+std::vector<std::string> cliSettings(const std::vector<std::string> &args);
 void printHelp();
 
 // Pattern files: dr2.c's character grid or a LifeHistory RLE. Returns dr2.c

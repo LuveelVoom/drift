@@ -58,13 +58,12 @@ static std::string rle(const std::vector<std::string> &rows, char empty) {
 Reporter::Reporter(const Options &opt, const KnownRotors *k, size_t n)
     : o(opt), nknown(n) {
   (void)k;
-  const char *mode = o.freshOutputs ? "w" : "a";
   if (!o.jsonl.empty()) {
-    json = fopen(o.jsonl.c_str(), mode);
+    json = fopen(o.jsonl.c_str(), o.freshJsonl ? "w" : "a");
     if (!json) throw std::runtime_error("can't open '" + o.jsonl + "' for writing");
   }
   if (!o.textOut.empty() && !o.classic) {
-    text = fopen(o.textOut.c_str(), mode);
+    text = fopen(o.textOut.c_str(), o.freshText ? "w" : "a");
     if (!text) throw std::runtime_error("can't open '" + o.textOut + "' for writing");
   }
 }
@@ -243,9 +242,12 @@ void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
   const long *var = s.P.var;
   int gen = s.gen;
   if (o.mustReach) {   // the border is flagged too, but never changes
+    // Only the changed cells of each gen (chgd[g]..nays[g]); the stretch from
+    // nays[g] to chgd[g + 1] lists their neighbours, which needn't have changed.
     bool reached = false;
-    for (int q = s.chgd[1]; q < s.nays[gen] && !reached; q++)
-      reached = s.flag[s.idx(s.chglist[q].r, s.chglist[q].c)] & MUSTREACH;
+    for (int g = 1; g <= gen && !reached; g++)
+      for (int q = s.chgd[g]; q < s.nays[g] && !reached; q++)
+        reached = s.flag[s.idx(s.chglist[q].r, s.chglist[q].c)] & MUSTREACH;
     if (!reached) { unreached++; return; }
   }
   OscInfo main, hist;

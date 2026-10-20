@@ -40,14 +40,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import driftlib as L  # noqa: E402
 
 
-def config_rule(path):
-    for line in open(path):
-        m = re.match(r"\s*rule\s*=?\s*(\S+)", line)
-        if m:
-            return m.group(1)
-    return "B3/S23"
-
-
 class Finisher:
     def __init__(self, cfg, table, seconds):
         self.table, self.seconds = table, seconds
@@ -340,7 +332,7 @@ def main():
     if not os.path.exists(jsonl):
         sys.exit(f"finish.py: no results file {jsonl}. Run drift on {a.config} first, or pass --jsonl.")
     L.need_pysat()
-    rule = config_rule(a.config)
+    rule = L.config_rule(a.config)
     table = L.rule_for(rule)
     fin = Finisher(a.config, table, a.seconds)
     L.rule_cnf(table, "still")
