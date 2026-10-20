@@ -25,3 +25,6 @@ drift/real.txt
 drift/results.txt
 drift/beehive-spark.cfg
 *.err
+
+# drift survey output (drift survey RULE writes surveys/RULE/ here by default)
+surveys/

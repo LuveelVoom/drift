@@ -1,6 +1,8 @@
-# drift — handoff for a new chat
+# drift: notes for developers
 
-Read this first, then continue. Everything needed to keep working is in this repo.
+How drift is built, the decisions behind it, what has been measured, and what
+is still open. For using drift, see [drift/README.md](drift/README.md) and
+[drift/docs/GUIDE.md](drift/docs/GUIDE.md).
 
 ## 1. What this project is
 
@@ -9,7 +11,7 @@ Life-like cellular automata. It tracks a stable background and a current
 generation that differs from it in a few cells, chooses unknown background
 cells as needed, and backtracks when the changed region gets too big.
 
-The user's goals were:
+The goals:
 1. INT (and MAP) rules;
 2. much easier to use in every respect;
 3. faster and more flexible.
@@ -27,15 +29,7 @@ The user's goals were:
 | `dr2.c`, `dr2.zip` | The original; `dr2.zip` has `dr.documentation.txt` and `knownrotors` |
 | `ref/dr2fixed.c` | The oracle: dr2.c with `"%d %d"` → `"%d %ld"` in the `v` command |
 
-## 2. User preferences (keep following these)
-
-- Be concise; short answers.
-- Short tests and fast iteration. No long serial benchmark loops; wrap up wins.
-- The user sometimes runs their own long searches. Ask before benchmarking,
-  because machine load makes timings noisy.
-- Stop and report when something gets expensive.
-
-## 3. How it works (decisions worth keeping)
+## 2. How it works (decisions worth keeping)
 
 **Rule tables.** A 3×3 window is encoded in base 3 (off 0, on 1, unknown 2;
 position k has weight 3^k, positions row-major from NW). There are two tables:
@@ -67,7 +61,7 @@ original arguments, plus a fingerprint of the search settings.
   2-cell fixed border.
 - Region flags are applied, then the pattern is read, then clears.
 
-## 4. Known facts and measurements
+## 3. Known facts and measurements
 
 - **dr2 bugs.** On 64-bit builds, `v# #` reads `%d` into a `long`, so most `v`
   settings are garbage and silently do nothing. dr2 also appends a stray (0,0)
@@ -105,8 +99,8 @@ original arguments, plus a fingerprint of the search settings.
   `tests/minimize.py` shrinks stators with the rotor fixed phase by phase:
   about 70% smaller, at most a few seconds each. Earlier bug: SAT variable
   numbers overlapped the constants 0/1; they now start at 2.
-- **First attempt:** `attempts/a5/`, 180 real B3/S23-a5 oscillators (p4–p15)
-  from a 22 s spark search.
+- **First search:** 180 real B3/S23-a5 oscillators (p4–p15) from a 22 s spark
+  search (`drift/examples/a5-spark-oscillators.cfg`).
 
 - **Survey (2026-10-19).** `drift survey RULE` = `tools/survey.py`:
   - spaceship census from random 16x16 soups (`tools/soups.c`, built on demand into
@@ -123,18 +117,27 @@ original arguments, plus a fingerprint of the search settings.
   - `finish.py --max-minutes`: the most promising groups are checked first.
     `driftlib.complete` now enumerates only unknown cells per window: 12x faster,
     same output.
+- **Finishing speed.** `finish.py` builds the SAT clauses from per-rule
+  templates (`driftlib.rule_cnf` / `reduced_clauses`: prime-implicant clauses
+  for one cell, worked out once per rule and checked exhaustively against the
+  rule table) and runs results in worker processes (`--jobs`; the output is the
+  same with any number). Clause building had been about 90% of the time; a
+  B3/S135 survey search finishes in 1.5 s instead of 29.5 s.
+- **Damaging oscillators.** `finish.py` also lists the oscillator each damaging
+  reaction settles into, on its own with the smallest stator found, split into
+  separate parts and deduplicated by rotor (any phase, position, orientation).
 - **Threads-file details.** Switched-off workers hand their whole pending list back
   to the queue (`Search::pending`, as for checkpoints) and park. Result sets are
   identical under 8→1→3→14 switching (stillater c7 4x4: 5934 osc).
 
-## 5. Open ideas
+## 4. Open ideas
 
 - Further per-cell speedups in `trycell` and `listneighbors`.
 - `--symmetric-start`: also mirror the gen-0 `1`/`0` cells (asked for on the
   ConwayLife forum).
 - Show `--no-check` cells in pictures (they currently look unknown).
 
-## 6. How to verify a build quickly
+## 5. How to verify a build quickly
 
 ```
 cd drift && make && tests/ruletest

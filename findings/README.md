@@ -9,7 +9,8 @@ only.
 How each kind of file was made:
 
 - **`oscillators.txt`**:
-  - a spark search, one spark cell in an unknown background (`attempts/*/spark.cfg`);
+  - a spark search, one spark cell in an unknown background (like
+    `drift/examples/a5-spark-oscillators.cfg`);
   - then `finish.py`.
 
   This gives one oscillator per distinct rotor, highest period first. "Life
@@ -26,7 +27,7 @@ How each kind of file was made:
   - Sorted by how long the reaction lasts.
   - Each pattern is the still life plus the spark cell.
 - **`converters.txt`**: a spark in, a spark out elsewhere, and the still life
-  recovers (`attempts/a5/make_converter.py`).
+  recovers.
 - **`wire-*.rle`**: a wire with a signal on it. Each one is a whole number of
   repeats long and carries one signal.
 
@@ -41,8 +42,7 @@ How each kind of file was made:
   signal moves 10 cells every 22 gens; the wire repeats every (−10,+10).
 - **Diagonal 2c/3 wire:** the signal moves (+4,+4) every 6 gens; the wire
   repeats every (6,6).
-- **Turns and 180° reflectors** for both wires: none found. See
-  `attempts/a5/turns2/README.md`.
+- **Turns and 180° reflectors** for both wires: none found yet.
 
 ## B3/S23-q4i
 
@@ -54,21 +54,20 @@ How each kind of file was made:
 - **30 catalyst fizzles**, chosen from 758 compact reactions; the longest
   reaction lasts 21 gens.
 - **Diagonal 2c/3 wire** (`wire-diagonal-2c3.rle`):
-  - found by drift's free signal search (`attempts/q4i/signals.cfg`), then
+  - found by drift's free signal search (`drift/examples/q4i-signals.cfg`), then
     made exactly periodic by `wirebuild.py`;
   - the wire repeats every (4,4) with 41 live cells per repeat;
   - a single signal crosses a 40-repeat test wire unchanged.
 - **Not an oblique signal:** results #6547 and #2657 of that search looked
   like an oblique (4,1)c/6 signal, but the disturbance repeats only once.
   It's an irregular disturbance that wanders along a zigzag track drift
-  improvised for it, lasting about 80 gens. An example is in
-  `attempts/q4i/meander-6547.rle`.
+  improvised for it, lasting about 80 gens.
 
 - **Glider -> drifter reactions** (`best-glider-drifter.txt` / `.rle`): a
   glider search with `no-rechange = 4,60` (10 cells in 6x6) found reactions
   lasting up to 67 gens. The 67-gen one turns the glider into a 2c/3 signal
   (2 cells, (+2,+2) every 3 gens) and makes a **90-degree turn** before eating
-  it. Plus 11 glider eaters. Search: `attempts/q4i/glider/`.
+  it. Plus 11 glider eaters. Search: `drift/examples/q4i-glider-drifter.cfg`.
 - **2c/3 signal loop** (`loop-2c3-p116.rle`): four copies of that turn joined
   head to tail, stator from SAT; a p116 oscillator (verified). Longer legs
   give p128, p140, ...
@@ -81,7 +80,7 @@ How each kind of file was made:
 - **30 catalyst fizzles** (84 compact reactions); the longest lasts 11 gens.
 - **Diagonal 5c/6 wire** (`wire-diagonal-5c6.rle`):
   - found by a free drifter search from one spark (9 changed cells in 4×4,
-    `no-rechange = 8,80`; config and scripts in `B36-S23/wire-5c6-work/`);
+    `no-rechange = 8,80`);
   - the signal is 3 cells and moves (+5,+5) every 6 gens; the wire repeats
     every (5,5);
   - end caps found by SAT with the fewest cells; the signal runs the length
