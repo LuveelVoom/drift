@@ -761,6 +761,7 @@ int main(int argc, char **argv) {
                              "(ignore this if the spark is meant to fly through empty space first).");
     }
     if (resumed) o.freshJsonl = o.freshText = false;
+    if (o.dryRun) o.jsonl.clear(), o.textOut.clear();   // a dry run never opens (or empties) result files
 
     int threads = o.threads > 0 ? o.threads : (int)std::max(1u, std::thread::hardware_concurrency());
     Reporter rep(o, &known, known.names.size());
