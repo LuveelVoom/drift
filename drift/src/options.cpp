@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <functional>
+#include <map>
 #include <sstream>
 #include <stdexcept>
 
@@ -25,7 +26,7 @@ struct Ctx {
   explicit Ctx(Options &opt) : o(opt) {}
   std::string patternText, patternSource;
   int margin = 30, gridH = 0, gridW = 0;
-  bool symmFromSet = false;
+  bool symmFromSet = false, symmStart = false;
   long symmFrom = 0;
   std::vector<RegionSpec> regions;
   bool persistRegionSet = false;
@@ -43,6 +44,65 @@ struct Opt {
 };
 
 [[noreturn]] void fail(const std::string &msg) { throw std::runtime_error(msg); }
+
+// The images of grid cell (r, c) under symmetry s, as search.cpp's setbkgd maps them.
+static std::vector<std::pair<int, int>> symmImages(int s, int r, int c, int HT, int WD) {
+  switch (s) {
+    case HORSYMM: return {{HT - 1 - r, c}};
+    case VERTSYMM: return {{r, WD - 1 - c}};
+    case DIAGSYMM: return {{c, r}};
+    case ROT90SYMM: return {{HT - 1 - c, r}, {HT - 1 - r, HT - 1 - c}, {c, HT - 1 - r}};
+    case ROT180SYMM: return {{HT - 1 - r, WD - 1 - c}};
+    case PLUSSYMM: return {{HT - 1 - r, c}, {HT - 1 - r, WD - 1 - c}, {r, WD - 1 - c}};
+    case XSYMM: return {{c, r}, {HT - 1 - r, HT - 1 - c}, {HT - 1 - c, HT - 1 - r}};
+    case FULLSYMM:
+      return {{r, HT - 1 - c}, {HT - 1 - r, c}, {HT - 1 - r, HT - 1 - c}, {c, r},
+              {c, HT - 1 - r}, {HT - 1 - c, r}, {HT - 1 - c, HT - 1 - r}};
+  }
+  return {};
+}
+
+// --symmetric-start: copy each gen-0 change cell ('1', '0') of the pattern into
+// its symmetric images, widening the pattern block with unknown cells as needed.
+static void mirrorStart(PatternOp &rd, const Params &P, bool unsupported) {
+  if (unsupported) fail("--symmetric-start can't be combined with --symmetry-from or --day-night");
+  std::map<std::pair<int, int>, char> cell;
+  for (size_t i = 0; i < rd.lines.size(); i++) {
+    int col = 0;
+    for (char ch : rd.lines[i]) {
+      if (ch == '!') break;
+      if (ch == '\r') continue;
+      cell[{rd.r + (int)i, rd.c + col++}] = ch;
+    }
+  }
+  std::map<std::pair<int, int>, char> add;
+  for (const auto &kv : cell) {
+    char ch = kv.second;
+    if (ch != '0' && ch != '1') continue;
+    for (auto im : symmImages(P.symm, kv.first.first, kv.first.second, P.HT, P.WD)) {
+      if (im.first < 0 || im.first >= P.HT || im.second < 0 || im.second >= P.WD)
+        fail("--symmetric-start: an image of a gen-0 cell falls outside the space");
+      auto it = cell.find(im);
+      char was = it == cell.end() ? ',' : it->second;
+      // the image keeps the same background (the symmetry forces it), so it must not be known otherwise
+      bool ok = was == ch || was == ',' || was == '?' || (ch == '1' ? was == '.' : was == 'o');
+      if (!ok)
+        fail("--symmetric-start: the image of the gen-0 cell at row " + std::to_string(kv.first.first - rd.r) +
+             ", col " + std::to_string(kv.first.second - rd.c) + " is drawn as '" + std::string(1, was) +
+             "' (row " + std::to_string(im.first - rd.r) + ", col " + std::to_string(im.second - rd.c) + ")");
+      add[im] = ch;
+    }
+  }
+  for (const auto &kv : add) cell[kv.first] = kv.second;
+  int r0 = rd.r, c0 = rd.c, r1 = rd.r, c1 = rd.c;
+  for (const auto &kv : cell) {
+    r0 = std::min(r0, kv.first.first), r1 = std::max(r1, kv.first.first);
+    c0 = std::min(c0, kv.first.second), c1 = std::max(c1, kv.first.second);
+  }
+  std::vector<std::string> out(r1 - r0 + 1, std::string(c1 - c0 + 1, ','));
+  for (const auto &kv : cell) out[kv.first.first - r0][kv.first.second - c0] = kv.second;
+  rd.r = r0, rd.c = c0, rd.lines = out;
+}
 
 long toLong(const std::string &name, const std::string &v) {
   char *end;
@@ -162,6 +222,10 @@ const std::vector<Opt> &opts() {
     {"symmetry-from", "N", "Search",
      "With hor (vert) symmetry, only mirror columns (rows) >= N, counted from the pattern.",
      [](Ctx &c, const std::string &v) { c.symmFromSet = true; c.symmFrom = toLong("symmetry-from", v); }},
+    {"symmetric-start", nullptr, "Search",
+     "With --symmetry, also mirror the gen-0 cells (the spark: '1' and '0', LifeHistory 3 and 4)\n"
+     "into every image, so only one copy needs drawing.",
+     [](Ctx &c, const std::string &v) { c.symmStart = toBool("symmetric-start", v); }},
     {"day-night", nullptr, "Search", "Mirror cells with opposite values (hor, vert, rot180 only).",
      [](Ctx &c, const std::string &v) { c.o.params.var[130] = toBool("day-night", v); }},
     {"margin", "N", "Search", "Unknown cells around the pattern on each side. Default 30.",
@@ -754,6 +818,7 @@ bool readModern(const std::vector<std::string> &args, Options &o) {
   rd.r = o.top;
   rd.c = o.left;
   rd.lines = lines;
+  if (c.symmStart && P.symm != NOSYMM) mirrorStart(rd, P, c.symmFromSet || P.var[130]);
   P.ops.push_back(rd);
   for (const RegionSpec &rs : c.regions) {
     if (rs.kind != PatternOp::CLEAR) continue;

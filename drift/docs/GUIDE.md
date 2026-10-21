@@ -351,6 +351,7 @@ unchecked), with `symmetry = rot180` and `pattern-no-count`.
 | `max-changed`, `size WxH` | size limits |
 | `max-gen`, `margin` | how long a disturbance may run (500), and the room around the pattern (30) |
 | `symmetry` | none, hor, vert, diag, rot90, rot180, plus, x, full (background only) |
+| `symmetric-start` | with `symmetry`, also mirror the spark (gen-0 cells), so only one copy needs drawing |
 | `push "DIR SPEED [SLACK]"` | force motion |
 | `skip`, `min-period`, `per-rotor`, `max-results`, `only-new` | what is kept |
 | `max-steps`, `threads`, `checkpoint`, `resume` | running |

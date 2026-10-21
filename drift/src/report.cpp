@@ -82,7 +82,7 @@ void Reporter::put(const std::string &s) {   // modern mode output: screen and r
 // dr2.c's display(), plus LifeHistory and two-state RLE cropped to the known
 // cells and to the live cells respectively.
 std::string Reporter::picture(const Search &s, int g, std::string *lifehistory,
-                              std::string *plain, int *origin) const {
+                              std::string *plain, int *origin, bool unchecked) const {
   int HT = s.HT, WD = s.WD;
   int minr = HT, maxr = -1, minc = WD, maxc = -1;
   for (int r = 2; r < HT - 2; r++)
@@ -109,7 +109,10 @@ std::string Reporter::picture(const Search &s, int g, std::string *lifehistory,
     for (int c = minc; c <= maxc; c++) {
       int i = s.idx(r, c);
       uint8_t b = s.bkgd[i];
-      line += b == OFF ? (changed[i] ? '1' : '.') : b == ON ? (changed[i] ? '0' : 'o') : ',';
+      if (unchecked && (s.flag[i] & DONTCHECK) && !changed[i])   // dr2's characters for unchecked cells
+        line += b == OFF ? '2' : b == ON ? '3' : '4';
+      else
+        line += b == OFF ? (changed[i] ? '1' : '.') : b == ON ? (changed[i] ? '0' : 'o') : ',';
     }
     while (line.size() > 1 && line.back() == ',') line.pop_back();
     pic += line + "\n";
@@ -408,9 +411,12 @@ void Reporter::header(const Search &base, int threads) {
   if (!o.textOut.empty()) s += "results are saved to " + o.textOut + (o.jsonl.empty() ? "" : " and " + o.jsonl) + "\n";
   for (const std::string &w : o.warnings) s += "warning: " + w + "\n";
   s += "legend: o on  . off  , unknown  1 on in gen 0 only  0 off in gen 0 only\n";
+  bool anyUnchecked = false;
+  for (size_t i = 0; i < base.flag.size() && !anyUnchecked; i++) anyUnchecked = base.flag[i] & DONTCHECK;
+  if (anyUnchecked) s += "        not checked (no-check): 4 unknown  2 off  3 on\n";
   s += "starting position (rows/cols relative to the pattern's top-left):\n";
   Search &b = const_cast<Search &>(base);
-  s += picture(b, 0, nullptr, nullptr) + "\n";
+  s += picture(b, 0, nullptr, nullptr, nullptr, true) + "\n";
   put(s);
   fflush(stdout);
 }

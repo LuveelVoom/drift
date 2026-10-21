@@ -46,7 +46,7 @@ class Reporter {
   void modern(Search &s, Outcome o, int per, bool semifzl);
   // origin (if given): pattern-relative row/col of the LifeHistory RLE's top-left cell
   std::string picture(const Search &s, int g, std::string *lifehistory, std::string *plain,
-                      int *origin = nullptr) const;
+                      int *origin = nullptr, bool unchecked = false) const;
 };
 
 }  // namespace drift

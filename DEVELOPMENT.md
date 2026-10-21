@@ -117,6 +117,12 @@ original arguments, plus a fingerprint of the search settings.
   - `finish.py --max-minutes`: the most promising groups are checked first.
     `driftlib.complete` now enumerates only unknown cells per window: 12x faster,
     same output.
+- **`--symmetric-start` (2026-10-20).** Copies the pattern's `1`/`0` cells into
+  their symmetric images before the search (options.cpp `mirrorStart`, same maps
+  as `setbkgd`); an image drawn as a conflicting known cell is an error. Output
+  is byte-identical to drawing every image by hand (rot180, vert, plus, full,
+  diag checked). Not with `symmetry-from` or `day-night`. The starting-position
+  picture now shows no-check cells as dr2's `4`/`2`/`3`.
 - **Survey levels (2026-10-20).** Three real surveys showed `signals` was the
   `osc` search again (same spark and limits, identical counts) and never kept
   anything, so `osc` now has max-gen 80 and keeps travelling signals itself;
@@ -146,9 +152,10 @@ original arguments, plus a fingerprint of the search settings.
 ## 4. Open ideas
 
 - Further per-cell speedups in `trycell` and `listneighbors`.
-- `--symmetric-start`: also mirror the gen-0 `1`/`0` cells (asked for on the
-  ConwayLife forum).
-- Show `--no-check` cells in pictures (they currently look unknown).
+- Survey ship converters and ship drifters have never kept a result (B3/S135,
+  B36/S245, B3/S23-a5): the ship meets unknown cells from gen 0, so the search
+  branches on every contact distance and stays below gen ~40. Needs a different
+  setup (e.g. a known approach lane plus a short unknown window).
 
 ## 5. How to verify a build quickly
 
