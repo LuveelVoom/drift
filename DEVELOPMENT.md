@@ -117,6 +117,10 @@ original arguments, plus a fingerprint of the search settings.
   - `finish.py --max-minutes`: the most promising groups are checked first.
     `driftlib.complete` now enumerates only unknown cells per window: 12x faster,
     same output.
+- **Survey limits too small.** In fast-spreading rules (B34/S34) `sparky` and
+  `converter` were exhausted within a second with nothing printed. `survey.py`
+  now reruns such a search (complete, under 30 s, printed 0) with max-changed +4
+  and size +2x2, at most 3 times; the raised limits stay in its `.cfg`.
 - **Finishing speed.** `finish.py` builds the SAT clauses from per-rule
   templates (`driftlib.rule_cnf` / `reduced_clauses`: prime-implicant clauses
   for one cell, worked out once per rule and checked exhaustively against the
@@ -140,8 +144,5 @@ original arguments, plus a fingerprint of the search settings.
 ## 5. How to verify a build quickly
 
 ```
-cd drift && make && tests/ruletest
-cd ../ref && unzip -o ../dr2.zip knownrotors && cc -O2 -w -std=gnu89 -include stdlib.h \
-   -include string.h -include ctype.h -o dr2fixed dr2fixed.c
-cd ../drift && python3 tests/regress.py --seconds 5      # expect "all identical"
+cd drift && make test      # rule tables, then builds ref/dr2fixed and compares; expect "all identical"
 ```

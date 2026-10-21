@@ -31,5 +31,5 @@ in the same order. Full documentation: [drift/README.md](drift/README.md).
 ```
 cd drift && make
 ./drift examples/beehive-spark.cfg      # ~1 s; writes examples/beehive-spark-finished.txt
-make test                               # needs ref/dr2fixed, see drift/README.md#tests
+make test                               # builds ref/dr2fixed itself; ends with "all identical"
 ```

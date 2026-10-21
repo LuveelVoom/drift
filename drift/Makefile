@@ -16,7 +16,14 @@ build:
 tests/ruletest: tests/ruletest.cpp src/rule.cpp src/rule.h
 	$(CXX) $(CXXFLAGS) -Isrc -o $@ tests/ruletest.cpp src/rule.cpp
 
-test: drift tests/ruletest
+# the reference for tests/regress.py: dr2.c with its 64-bit fix, and dr2's knownrotors list
+../ref/dr2fixed: ../ref/dr2fixed.c
+	cc -O2 -w -std=gnu89 -include stdlib.h -include string.h -include ctype.h -o $@ $<
+
+../ref/knownrotors: ../dr2.zip
+	cd ../ref && unzip -o -q ../dr2.zip knownrotors && touch knownrotors
+
+test: drift tests/ruletest ../ref/dr2fixed ../ref/knownrotors
 	tests/ruletest
 	python3 tests/regress.py --seconds 5
 

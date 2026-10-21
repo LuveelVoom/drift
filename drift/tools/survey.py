@@ -324,6 +324,7 @@ class Job:
         self.threads = 0
         self.started = None
         self.seconds = 0.0
+        self.escalations = 0       # times its limits were raised (see Survey.escalate)
 
     def set_threads(self, n):
         if n != self.threads:
@@ -423,10 +424,37 @@ class Survey:
         job.proc = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
         job.state, job.started = "running", time.time()
 
+    def escalate(self, job):
+        """A search that is exhausted within seconds without printing anything had
+        limits too small for this rule (sparks spread fast in some rules): raise
+        max-changed by 4 and each side of size by 2, and run it again."""
+        if job.escalations >= 3 or self.deadline - time.time() < 60:
+            return False
+        text = open(job.cfg).read()
+        mc = re.search(r"^max-changed = (\d+)", text, re.M)
+        sz = re.search(r"^size = (\d+)x(\d+)", text, re.M)
+        if not (mc and sz):
+            return False
+        text = text.replace(mc.group(0), f"max-changed = {int(mc.group(1)) + 4}")
+        text = text.replace(sz.group(0), f"size = {int(sz.group(1)) + 2}x{int(sz.group(2)) + 2}")
+        open(job.cfg, "w").write(text)
+        for f in (job.ckpt, job.base + "-results.jsonl", job.base + "-results.txt"):
+            if os.path.exists(f):
+                os.remove(f)
+        job.escalations += 1
+        self.say(f"{job.name}: nothing within its limits (search exhausted in {job.seconds:.0f}s); "
+                 f"trying {int(mc.group(1)) + 4} cells in {int(sz.group(1)) + 2}x{int(sz.group(2)) + 2}")
+        job.threads = 0
+        job.set_threads(1)
+        self.start(job, self.deadline - time.time())
+        return True
+
     def finish(self, job):
         job.seconds += time.time() - job.started
         job.complete = ckpt_complete(job.ckpt)
         s, f = footer(job)
+        if job.complete and job.seconds < 30 and re.search(r"printed 0\b", f) and self.escalate(job):
+            return
         has = os.path.exists(job.base + "-results.jsonl") and os.path.getsize(job.base + "-results.jsonl") > 0
         self.say(f"{job.name}: {'complete' if job.complete else 'stopped'} — {s.split(' (')[0]}; "
                  f"{f.split(';')[0]}")

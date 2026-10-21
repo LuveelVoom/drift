@@ -31,7 +31,9 @@ Then it runs these searches together:
 | `SHIP-eaters`, `SHIP-converter`, `SHIP-drifter` | per spaceship: eaters, ship converters, ship → signal; the limits grow with the ship |
 
 All the searches share the cores, and when one finishes its threads move to
-the ones still running. When time is up, each unfinished search saves a
+the ones still running. A search that runs out within seconds without finding
+anything had limits too small for the rule; it is rerun with 4 more changed cells
+and a box 2 wider each way, up to 3 times. When time is up, each unfinished search saves a
 checkpoint, so `--resume` carries on with it. Then `finish.py` checks each
 search's results (most promising first, at most `--finish-minutes`, default
 3). Everything goes into `surveys/RULE/`:
