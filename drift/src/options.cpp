@@ -52,6 +52,12 @@ long toLong(const std::string &name, const std::string &v) {
   return x;
 }
 
+long toLong(const std::string &name, const std::string &v, long min) {
+  long x = toLong(name, v);
+  if (x < min) fail("--" + name + " must be at least " + std::to_string(min) + ", got " + v);
+  return x;
+}
+
 std::vector<long> toLongs(const std::string &name, const std::string &v, size_t n) {
   std::vector<long> out;
   std::istringstream in(v);
@@ -132,17 +138,18 @@ const std::vector<Opt> &opts() {
        c.patternSource = v;
      }},
     {"max-changed", "N", "Search", "Max number of changed cells in a generation (dr2: c). Default 9.",
-     [](Ctx &c, const std::string &v) { c.o.params.maxchng = (int)toLong("max-changed", v); }},
+     [](Ctx &c, const std::string &v) { c.o.params.maxchng = (int)toLong("max-changed", v, 1); }},
     {"max-width", "N", "Search", "Max width of the changed region (dr2: w). Default 3.",
-     [](Ctx &c, const std::string &v) { c.o.params.maxwidth = (int)toLong("max-width", v); }},
+     [](Ctx &c, const std::string &v) { c.o.params.maxwidth = (int)toLong("max-width", v, 1); }},
     {"max-height", "N", "Search", "Max height of the changed region (dr2: h). Default 3.",
-     [](Ctx &c, const std::string &v) { c.o.params.maxheight = (int)toLong("max-height", v); }},
+     [](Ctx &c, const std::string &v) { c.o.params.maxheight = (int)toLong("max-height", v, 1); }},
     {"size", "WxH", "Search", "Shorthand for --max-width W --max-height H.",
      [](Ctx &c, const std::string &v) {
        int w, h;
        std::string t = v;
        for (char &ch : t) if (ch == 'X' || ch == '*') ch = 'x';
        if (sscanf(t.c_str(), "%dx%d", &w, &h) != 2) fail("--size expects WxH, e.g. 5x3");
+       if (w < 1 || h < 1) fail("--size: width and height must be at least 1, got " + v);
        c.o.params.maxwidth = w;
        c.o.params.maxheight = h;
      }},
@@ -158,7 +165,7 @@ const std::vector<Opt> &opts() {
     {"day-night", nullptr, "Search", "Mirror cells with opposite values (hor, vert, rot180 only).",
      [](Ctx &c, const std::string &v) { c.o.params.var[130] = toBool("day-night", v); }},
     {"margin", "N", "Search", "Unknown cells around the pattern on each side. Default 30.",
-     [](Ctx &c, const std::string &v) { c.margin = (int)toLong("margin", v); }},
+     [](Ctx &c, const std::string &v) { c.margin = (int)toLong("margin", v, 0); }},
     {"grid", "HxW", "Search", "Use a fixed H x W space (pattern centred) instead of --margin.",
      [](Ctx &c, const std::string &v) {
        std::string t = v;
@@ -257,6 +264,9 @@ const std::vector<Opt> &opts() {
          return;
        }
        int dr = 0, dcol = 0;
+       if (dir != "up" && dir != "down" && dir != "left" && dir != "right" &&
+           (dir.empty() || dir.find_first_not_of("nsew") != std::string::npos))
+         fail("--push: unknown direction '" + dir + "' (use up, down, left, right, n, ne, sw, ... or R,C)");
        for (char ch : dir) {
          if (ch == 'n' || dir == "up") dr = -1;
          if (ch == 's' || dir == "down") dr = 1;
@@ -279,13 +289,15 @@ const std::vector<Opt> &opts() {
      [](Ctx &c, const std::string &v) { c.o.params.var[105] = toLong("push-down", v); c.pushDown = true; }},
     {"push-down-c2", "K", "Constraints", "Moving down at >= c/2: 2*row >= gen + K (v109).",
      [](Ctx &c, const std::string &v) { c.o.params.var[109] = toLong("push-down-c2", v); c.pushDownC2 = true; }},
-    {"count-from-gen", "G", "Constraints", "Ignore changes before gen G when checking limits (v106).", VAR(106)},
+    {"count-from-gen", "G", "Constraints", "Ignore changes before gen G when checking limits (v106).",
+     [](Ctx &c, const std::string &v) { c.o.params.var[106] = toLong("count-from-gen", v, 0); }},
     {"no-rechange", "A,B", "Constraints",
      "A cell may not be changed in two gens between A and B gens apart (v107, v108). Keeps the "
      "disturbance moving onto fresh cells, at any speed and in any direction: e.g. 8,80 for drifters. "
      "Oscillators end soon after they start repeating.",
      [](Ctx &c, const std::string &v) {
        auto x = toLongs("no-rechange", v, 2);
+       if (!(x[0] == 0 && x[1] == 0) && (x[0] < 1 || x[1] < x[0])) fail("--no-rechange A,B needs 1 <= A <= B (or 0,0 for off), got '" + v + "'");
        c.o.params.var[107] = x[0];
        c.o.params.var[108] = x[1];
      }},
@@ -407,7 +419,7 @@ const std::vector<Opt> &opts() {
 
     // --- Running
     {"threads", "N", "Run", "Worker threads. Default: all cores.",
-     [](Ctx &c, const std::string &v) { c.o.threads = (int)toLong("threads", v); }},
+     [](Ctx &c, const std::string &v) { c.o.threads = (int)toLong("threads", v, 0); }},
     {"checkpoint", "FILE", "Run",
      "Save resumable state to FILE every --checkpoint-every seconds and on Ctrl-C.",
      [](Ctx &c, const std::string &v) { c.o.checkpoint = v; }},
@@ -420,7 +432,7 @@ const std::vector<Opt> &opts() {
     {"max-time", "SECONDS", "Run",
      "Stop after this many seconds (with --checkpoint, the rest of the search is saved and can be "
      "resumed).",
-     [](Ctx &c, const std::string &v) { c.o.maxTime = (double)toLong("max-time", v); }},
+     [](Ctx &c, const std::string &v) { c.o.maxTime = (double)toLong("max-time", v, 0); }},
     {"threads-file", "FILE", "Run",
      "Read the number of threads to use from FILE every second, so it can be changed while the "
      "search runs (tools/survey.py uses this to move cores between searches). --threads (default: "
