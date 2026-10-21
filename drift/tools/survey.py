@@ -7,10 +7,8 @@
 
 Searches (pick some with --jobs; --list shows them):
   osc        one spark cell in an unknown background, 6 changed cells in 4x4:
-             oscillators and catalysts
-  osc-big    the same with 8 cells in 5x5 (much bigger; usually stopped by the clock)
+             oscillators, catalysts, and signals still travelling at max gen
   sparky     oscillators whose own cycle throws a spark into empty space
-  signals    disturbances still travelling at max gen: wires and signals
   drifters   drifters that keep moving onto fresh cells (no-rechange 8,80)
   converter  a spark in, a different spark out, and the still life recovers
   SHIP-...   for each small spaceship of the rule (found automatically, or --ship FILE):
@@ -18,7 +16,11 @@ Searches (pick some with --jobs; --list shows them):
              something travelling out), SHIP-drifter (ship -> drifting signal)
 
 All searches run at the same time, sharing --threads cores. When one finishes,
-its cores go to the others straight away (drift --threads-file). At the time
+its cores go to the others straight away (drift --threads-file). Each search
+starts small and gets deeper: when one is complete and time is left, the next
+level (2 more changed cells, a box 1 larger each way) starts as NAME-2, NAME-3,
+... with its own results. A level that finds nothing at all is rerun in place
+with larger limits instead. At the time
 limit every search still running saves a checkpoint, so --resume continues it.
 Each finished search is completed and checked by finish.py, and SUMMARY.md lists
 the best of everything.
@@ -49,16 +51,12 @@ SPARK = "x = 1, y = 1, rule = LifeHistory\nC!"
 
 # name -> (description, config body without the rule line, pattern)
 BASIC = {
-    "osc": ("oscillators and catalysts (6 cells in 4x4)", """
+    "osc": ("oscillators, catalysts and travelling signals (6 cells in 4x4)", """
 max-changed = 6
 size = 4x4
 skip = stable
-""", SPARK),
-    "osc-big": ("oscillators and catalysts (8 cells in 5x5)", """
-max-changed = 8
-size = 5x5
-skip = stable
-per-rotor = 3
+margin = 50
+max-gen = 80
 """, SPARK),
     "sparky": ("sparky oscillators (8 cells in 5x5, empty space above)", """
 max-changed = 8
@@ -68,14 +66,6 @@ must-reach = r -60 -60 -1 60
 skip = fizzle, stable
 min-period = 3
 per-rotor = 5
-""", SPARK),
-    "signals": ("signals still travelling at max gen (6 cells in 4x4)", """
-max-changed = 6
-size = 4x4
-margin = 50
-max-gen = 80
-skip = oscillator, fizzle, stable
-per-rotor = 3
 """, SPARK),
     "drifters": ("drifters onto fresh cells (9 cells in 4x4, no-rechange 8,80)", """
 max-changed = 9
@@ -113,7 +103,7 @@ max-changed = {c}
 size = {w}x{h}
 skip = stable
 """),
-    "converter": ("{ship} -> something travelling out ({c} cells in {w}x{h})", (10, 9), """
+    "converter": ("{ship} -> something travelling out ({c} cells in {w}x{h})", (6, 5), """
 max-changed = {c}
 size = {w}x{h}
 skip = oscillator, fizzle, stable
@@ -310,9 +300,13 @@ def ship_clears(ship, h, w):
 
 # ---------------------------------------------------------------- jobs
 
+MAX_LEVEL = 6          # deepest level a search is taken to
+
+
 class Job:
-    def __init__(self, name, desc, cfg):
+    def __init__(self, name, desc, cfg, root=None, level=1):
         self.name, self.desc, self.cfg = name, desc, cfg
+        self.root, self.level = root or name, level   # the search it deepens, and its level (1 = as written)
         self.base = cfg[:-4]
         self.ckpt = self.base + ".ckpt"
         self.tfile = self.base + ".threads"
@@ -324,7 +318,7 @@ class Job:
         self.threads = 0
         self.started = None
         self.seconds = 0.0
-        self.escalations = 0       # times its limits were raised (see Survey.escalate)
+        self.escalations = 0       # times its limits were raised in place (see Survey.deepen)
 
     def set_threads(self, n):
         if n != self.threads:
@@ -337,13 +331,38 @@ def rule_dirname(rule):
     return re.sub(r"[^A-Za-z0-9_-]+", "-", rule if not rule.startswith("MAP") else "MAP" + rule[3:15]).strip("-")
 
 
-def write_configs(rule, out, names, ships, table, dry=False):
-    """The searches' configs (dry: only the job list, nothing written or measured)."""
+def cfg_desc(cfg, fallback):
+    """The description in a config's first line ("# survey of RULE: DESC")."""
+    try:
+        m = re.match(r"# survey of [^:]*: (.*)", open(cfg).readline())
+        return m.group(1).strip() if m else fallback
+    except OSError:
+        return fallback
+
+
+def deeper_levels(jobs, out):
+    """Configs of deeper levels written by an earlier run (NAME-2.cfg, NAME-3.cfg, ...)."""
+    found = []
+    for j in jobs:
+        for level in range(2, MAX_LEVEL + 1):
+            cfg = os.path.join(out, f"{j.name}-{level}.cfg")
+            if not os.path.exists(cfg):
+                break
+            found.append(Job(f"{j.name}-{level}", cfg_desc(cfg, j.desc), cfg, j.name, level))
+    return jobs + found
+
+
+def write_configs(rule, out, names, ships, table, dry=False, keep=False):
+    """The searches' configs (dry: only the job list, nothing written or measured;
+    keep: use the configs already in OUT, as written or raised by an earlier run)."""
     jobs = []
     for name, (desc, body, pat) in BASIC.items():
         if names and name not in names:
             continue
         cfg = os.path.join(out, name + ".cfg")
+        if keep and os.path.exists(cfg):
+            jobs.append(Job(name, cfg_desc(cfg, desc), cfg))
+            continue
         if not dry:
             with open(cfg, "w") as f:
                 f.write(f"# survey of {rule}: {desc}\nrule = {rule}\nno-pics{body}\npattern:\n{pat}\n")
@@ -356,6 +375,9 @@ def write_configs(rule, out, names, ships, table, dry=False):
             if names and name not in names and ship["name"] not in names:
                 continue
             cfg = os.path.join(out, name + ".cfg")
+            if keep and os.path.exists(cfg):
+                jobs.append(Job(name, cfg_desc(cfg, desc), cfg))
+                continue
             lim = dict(c=pop + dc, w=bw + db, h=bh + db, nr="?" if dry else 4)
             def write():
                 d = desc.format(ship=f"{ship['name']} ({ship['speed']})", **lim)
@@ -377,7 +399,7 @@ def write_configs(rule, out, names, ships, table, dry=False):
                         break
                 d = write()
             jobs.append(Job(name, d, cfg))
-    return jobs
+    return deeper_levels(jobs, out) if keep else jobs
 
 
 def ckpt_complete(path):
@@ -424,36 +446,62 @@ class Survey:
         job.proc = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
         job.state, job.started = "running", time.time()
 
-    def escalate(self, job):
-        """A search that is exhausted within seconds without printing anything had
-        limits too small for this rule (sparks spread fast in some rules): raise
-        max-changed by 4 and each side of size by 2, and run it again."""
-        if job.escalations >= 3 or self.deadline - time.time() < 60:
+    def deepen(self, job, printed, found):
+        """A complete search with time left goes one level deeper: 2 more changed cells
+        and a box 1 larger each way. With results kept, the next level is a new search
+        (NAME-2, NAME-3, ...) and this one is finished as usual; with none kept, it is
+        rerun in place. If it found nothing at all (kept or skipped), its limits were
+        too small for the rule (sparks spread fast in some rules), so the step is 4
+        cells and 2 each way. Returns True for an in-place rerun."""
+        left = self.deadline - time.time()
+        if self.stopping or left < max(60, 0.1 * self.a.minutes * 60):
             return False
         text = open(job.cfg).read()
         mc = re.search(r"^max-changed = (\d+)", text, re.M)
         sz = re.search(r"^size = (\d+)x(\d+)", text, re.M)
         if not (mc and sz):
             return False
-        text = text.replace(mc.group(0), f"max-changed = {int(mc.group(1)) + 4}")
-        text = text.replace(sz.group(0), f"size = {int(sz.group(1)) + 2}x{int(sz.group(2)) + 2}")
-        open(job.cfg, "w").write(text)
-        for f in (job.ckpt, job.base + "-results.jsonl", job.base + "-results.txt"):
-            if os.path.exists(f):
-                os.remove(f)
-        job.escalations += 1
-        self.say(f"{job.name}: nothing within its limits (search exhausted in {job.seconds:.0f}s); "
-                 f"trying {int(mc.group(1)) + 4} cells in {int(sz.group(1)) + 2}x{int(sz.group(2)) + 2}")
-        job.threads = 0
-        job.set_threads(1)
-        self.start(job, self.deadline - time.time())
-        return True
+        inplace = printed == 0
+        if inplace and job.escalations >= 3 or not inplace and job.level >= MAX_LEVEL:
+            return False
+        dc, ds = (4, 2) if found == 0 else (2, 1)
+        c, w, h = int(mc.group(1)) + dc, int(sz.group(1)) + ds, int(sz.group(2)) + ds
+        text = text.replace(mc.group(0), f"max-changed = {c}").replace(sz.group(0), f"size = {w}x{h}")
+        lim = f"{c} cells in {w}x{h}"
+        text = re.sub(r"\d+ cells in \d+x\d+", lim, text, count=1)   # the description line
+        if inplace:
+            open(job.cfg, "w").write(text)
+            for f in (job.ckpt, job.base + "-results.jsonl", job.base + "-results.txt"):
+                if os.path.exists(f):
+                    os.remove(f)
+            job.escalations += 1
+            job.desc = re.sub(r"\d+ cells in \d+x\d+", lim, job.desc, count=1)
+            why = "nothing within its limits" if found == 0 else "nothing of the kinds it keeps"
+            self.say(f"{job.name}: {why} (complete in {job.seconds:.0f}s); trying {lim}")
+            new = job
+        else:
+            level = job.level + 1
+            name = f"{job.root}-{level}"
+            cfg = os.path.join(os.path.dirname(job.cfg), name + ".cfg")
+            open(cfg, "w").write(text)
+            new = Job(name, re.sub(r"\d+ cells in \d+x\d+", lim, job.desc, count=1), cfg, job.root, level)
+            for f in (new.ckpt, new.base + "-results.jsonl", new.base + "-results.txt"):
+                if os.path.exists(f):
+                    os.remove(f)
+            self.jobs.append(new)
+            self.say(f"{job.name}: complete with time left; going deeper as {name} ({lim})")
+        new.threads = 0
+        new.set_threads(1)
+        self.start(new, self.deadline - time.time())
+        return inplace
 
     def finish(self, job):
         job.seconds += time.time() - job.started
         job.complete = ckpt_complete(job.ckpt)
         s, f = footer(job)
-        if job.complete and job.seconds < 30 and re.search(r"printed 0\b", f) and self.escalate(job):
+        m = re.search(r"printed (\d+)", f)
+        found = sum(map(int, re.findall(r"(\d+) (?:oscillators \(|stable|fizzles|max gen)", f)))
+        if job.complete and m and self.deepen(job, int(m.group(1)), found):
             return
         has = os.path.exists(job.base + "-results.jsonl") and os.path.getsize(job.base + "-results.jsonl") > 0
         self.say(f"{job.name}: {'complete' if job.complete else 'stopped'} — {s.split(' (')[0]}; "
@@ -567,6 +615,45 @@ def finished_line(job):
     return ", ".join(f"{n} {t.split(' (')[0].lower()}" for t, n, _ in secs) or "nothing usable"
 
 
+def across(jobs):
+    """Summary lines for everything the searches finished, taken together: distinct
+    oscillators by period (the smallest of each shown) and the smallest catalysts.
+    Patterns are told apart by their RLE as finished, so a few rotations of the same
+    object may each count once."""
+    osc, cat = {}, {}
+    for j in jobs:
+        for title, _, items in sections(j.base + "-finished.txt", 10 ** 6):
+            for comment, rle in items:
+                key = "".join(rle.split()[1:]) if rle.startswith("x") else "".join(rle.split())
+                m = re.match(r"p(\d+) oscillator, (\d+) cells", comment)
+                if m and (title.startswith("Clean oscillators") or title.startswith("Oscillators found")):
+                    osc.setdefault(int(m.group(1)), {}).setdefault(key, (int(m.group(2)), j.name, comment, rle))
+                m = re.match(r"catalyst, (\d+) cells, reaction lasts (\d+)", comment)
+                if m and title.startswith("Catalysts"):
+                    cat.setdefault(key, (int(m.group(1)), int(m.group(2)), j.name, comment, rle))
+    if not osc and not cat:
+        return []
+    out = ["## Across all searches", ""]
+    if osc:
+        out += ["Oscillators (clean, or found in damaging reactions), by period:", "",
+                "| period | distinct | smallest | found by |", "|---|---|---|---|"]
+        for p in sorted(osc, reverse=True):
+            v = sorted(osc[p].values())
+            out.append(f"| p{p} | {len(v)} | {v[0][0]} cells | {', '.join(sorted({x[1] for x in v}))} |")
+        out.append("")
+        for p in sorted(osc, reverse=True):
+            n, name, comment, rle = min(osc[p].values())
+            out += ["```", f"#C {comment} ({name})", rle, "```"]
+        out.append("")
+    if cat:
+        v = sorted(cat.values())
+        out += [f"Catalysts: {len(v)} distinct; the smallest:", ""]
+        for n, gens, name, comment, rle in v[:5]:
+            out += ["```", f"#C {comment} ({name})", rle, "```"]
+        out.append("")
+    return out
+
+
 def write_summary(a, jobs):
     out = os.path.join(a.out, "SUMMARY.md")
     L_ = [f"# Survey of {a.rule}", "",
@@ -582,10 +669,14 @@ def write_summary(a, jobs):
     for j in jobs:
         s, f = footer(j)
         st = "complete" if ckpt_complete(j.ckpt) else ("stopped (resumable)" if os.path.exists(j.ckpt) else "not run")
-        tm = re.search(r"after ([\d.]+s)", s)
+        try:   # every session's time (a resumed search has several)
+            secs = sum(float(x) for x in re.findall(r"^Search \w+ after ([\d.]+)s", open(j.log).read(), re.M))
+        except OSError:
+            secs = 0
         found = f.replace("Found ", "").split(";")[0] if f else ""
-        L_.append(f"| {j.name} | {st} | {tm.group(1) if tm else ''} | {found} | {finished_line(j)} |")
+        L_.append(f"| {j.name} | {st} | {f'{secs:.0f}s' if secs else ''} | {found} | {finished_line(j)} |")
     L_.append("")
+    L_ += across(jobs)
     L_.append("## Best of each search")
     for j in jobs:
         secs = sections(j.base + "-finished.txt")
@@ -609,7 +700,7 @@ def write_summary(a, jobs):
 def wire_candidates(jobs):
     for j in jobs:
         js = j.base + "-results.jsonl"
-        if (j.name in ("signals", "drifters") or j.name.endswith("-drifter")) and os.path.exists(js):
+        if (j.root in ("osc", "drifters") or j.root.endswith("-drifter")) and os.path.exists(js):
             r = subprocess.run([sys.executable, WIRECHECK, js, "--top", "5"], capture_output=True, text=True)
             with open(j.base + "-wires.txt", "w") as f:
                 f.write(r.stdout)
@@ -687,7 +778,7 @@ def main():
         print("searching with: " + ", ".join(f"{s['name']} ({s['speed']}, {len(s['cells'])} cells)" for s in a.ships))
     elif not census_skipped:
         print("no small spaceships found (give one with --ship FILE)")
-    jobs = write_configs(a.rule, a.out, names, a.ships, table, dry=a.list)
+    jobs = write_configs(a.rule, a.out, names, a.ships, table, dry=a.list, keep=a.resume or a.summary)
     if a.list:
         for j in jobs:
             print(f"  {j.name:18} {j.desc}")

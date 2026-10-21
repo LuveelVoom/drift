@@ -117,10 +117,19 @@ original arguments, plus a fingerprint of the search settings.
   - `finish.py --max-minutes`: the most promising groups are checked first.
     `driftlib.complete` now enumerates only unknown cells per window: 12x faster,
     same output.
-- **Survey limits too small.** In fast-spreading rules (B34/S34) `sparky` and
-  `converter` were exhausted within a second with nothing printed. `survey.py`
-  now reruns such a search (complete, under 30 s, printed 0) with max-changed +4
-  and size +2x2, at most 3 times; the raised limits stay in its `.cfg`.
+- **Survey levels (2026-10-20).** Three real surveys showed `signals` was the
+  `osc` search again (same spark and limits, identical counts) and never kept
+  anything, so `osc` now has max-gen 80 and keeps travelling signals itself;
+  `osc-big` became `osc-2`. Every search deepens while time is left: a complete
+  one starts `NAME-2` (+2 cells, +1x1), and so on to level 6; one that kept
+  nothing is rerun in place (+4/+2x2 only if it found nothing at all; a step
+  that size took `converter` from 746 skipped results to 731k). `--resume` and
+  `--summary` keep the configs in the folder and pick up the levels. SUMMARY.md
+  has an "Across all searches" section (oscillators by period, smallest
+  catalysts). Ship converters start at pop+6 / +5 (they never got past gen ~37
+  at pop+10 / +9). Tried and dropped: clearing the ship's lane beyond a short
+  runway (each reaction is otherwise searched at every contact distance); per
+  fixed work it found 2x the eaters, per wall time slightly fewer.
 - **Finishing speed.** `finish.py` builds the SAT clauses from per-rule
   templates (`driftlib.rule_cnf` / `reduced_clauses`: prime-implicant clauses
   for one cell, worked out once per rule and checked exhaustively against the

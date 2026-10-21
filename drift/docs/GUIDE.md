@@ -24,21 +24,25 @@ Then it runs these searches together:
 
 | search | looks for |
 |---|---|
-| `osc`, `osc-big` | oscillators and catalysts from one spark (6 cells in 4x4; 8 in 5x5) |
+| `osc` | oscillators, catalysts and signals still travelling from one spark (6 cells in 4x4) |
 | `sparky` | oscillators that throw a spark into empty space |
-| `signals`, `drifters` | disturbances that keep travelling: wires, signals, drifters |
+| `drifters` | disturbances that keep moving onto fresh cells: wires, signals, drifters |
 | `converter` | a spark in, another spark out, and the still life recovers |
 | `SHIP-eaters`, `SHIP-converter`, `SHIP-drifter` | per spaceship: eaters, ship converters, ship → signal; the limits grow with the ship |
 
 All the searches share the cores, and when one finishes its threads move to
-the ones still running. A search that runs out within seconds without finding
-anything had limits too small for the rule; it is rerun with 4 more changed cells
-and a box 2 wider each way, up to 3 times. When time is up, each unfinished search saves a
-checkpoint, so `--resume` carries on with it. Then `finish.py` checks each
-search's results (most promising first, at most `--finish-minutes`, default
-3). Everything goes into `surveys/RULE/`:
+the ones still running. Each search starts small and gets deeper: when one is
+complete and time is left, the next level starts as `NAME-2` (2 more changed
+cells, a box 1 larger each way), then `NAME-3`, and so on, each with its own
+results. A level that keeps nothing is rerun in place instead (with 4 more cells
+and a box 2 larger if it found nothing at all: its limits were too small for
+the rule). When time is up, each unfinished search saves a checkpoint, so
+`--resume` carries on with it, deeper levels included. Then `finish.py` checks
+each search's results (most promising first, at most `--finish-minutes`,
+default 3). Everything goes into `surveys/RULE/`:
 
-- `SUMMARY.md`: what each search found and the best patterns;
+- `SUMMARY.md`: what each search found; the oscillators by period and the
+  smallest catalysts across all searches; the best patterns of each search;
 - `NAME-finished.txt`: complete patterns;
 - `NAME.cfg`: the config, ready to run or edit on its own.
 
