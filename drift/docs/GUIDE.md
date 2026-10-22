@@ -315,6 +315,23 @@ past path must be empty, not just the cells behind it, and `no-rechange` (if
 used) must be at least 8 for a glider: a free glider changes some cells
 again 4 to 7 gens later. `examples/q4i-glider-drifter.cfg` does both.
 
+### Glider to anything (escapes)
+
+To find reactions where the still life is rebuilt while something active is
+left outside it (a glider turned into a pi, a spark heading away), make the
+empty space the output goes into `no-count` and add `escape`:
+
+    no-count = r -900 -900 900 4     # empty space left of column 5
+    escape
+
+A branch then stops, as an `escape` result, as soon as every changed cell is
+in no-count space after the reaction has touched the counted area. Without
+`escape` such a branch runs on and is lost when the output comes back and
+breaks the limits. `finish.py` lists them under "Escapes" with what is
+outside at that generation. In HighLife, a glider hitting a pond and block
+with the two eaters unknown (20 changed cells in 8×8) finds the glider-to-pi
+reaction in about a minute.
+
 ### Symmetric billiard tables
 
 `examples/billiard-rot180.cfg`: the centre is dr2's `4` cells (unknown and

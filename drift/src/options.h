@@ -17,7 +17,7 @@ struct Options {
   bool classic = false;
 
   // Which outcomes to print
-  bool skipStable = false, skipFizzle = false, skipMaxgen = false, skipPeriodic = false;
+  bool skipStable = false, skipFizzle = false, skipMaxgen = false, skipEscape = false, skipPeriodic = false;
   bool skipKnown = false;          // only print oscillators/fizzles not in known rotors
   int minPeriod = 0;
   bool mustReach = false;          // results must change a --must-reach cell

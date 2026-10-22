@@ -106,6 +106,7 @@ uint64_t fingerprint(const Options &o) {
                  (long)P.seed, P.symm, P.checkBorder};
   h = fnv(h, nums, sizeof nums);
   h = fnv(h, P.var, sizeof P.var);
+  if (P.escape) h = fnvStr(h, "escape");
   for (int v : P.reqchgcount) h = fnv(h, &v, sizeof v);
   for (const Params::Push &p : P.pushes) {
     long f[] = {p.dr, p.dc, p.num, p.den, p.k};

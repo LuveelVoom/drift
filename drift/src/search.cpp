@@ -805,6 +805,17 @@ bool Search::run(Sink &sink) {
 
     uint64_t h = hash();
     int per;
+    if (P.escape && gen > 0 && gen >= var[106] && chgcount[gen] == 0 && nays[gen] > chgd[gen]) {
+      bool touched = false;
+      for (int g = 0; g < gen && !touched; g++) touched = chgcount[g] > 0;
+      if (touched) {
+        found = true;
+        if (sink.hashnew(h)) sink.outcome(*this, ESCAPE, 0, false, h);
+        gen++;
+        if (var[129]) agesm[gen] = 0;
+        continue;
+      }
+    }
     if (nays[gen] == chgd[gen]) {
       found = true;
       // With DONTCHECK cells the background there may not be stable, so an

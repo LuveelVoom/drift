@@ -14,6 +14,8 @@ as dead and `clear` regions stay empty), simulates it and sorts it:
                         to reach them (a sparky oscillator).
   catalysts             the spark is absorbed and the still life recovers
   spaceship converters  the still life recovers and only spaceships leave
+  escapes               (--escape) the still life is back while something is
+                        outside in no-count space, e.g. a glider turned into a pi
   signals               a disturbance still travelling with a fixed shape
   oscillators found     the oscillators that damaging reactions end in, each
   in damaging reactions on its own with the smallest stator found: real
@@ -46,6 +48,7 @@ class Finisher:
         cells, regions = L.read_config(cfg)
         self.dead = {p for p, k in cells.items() if k == "off"}
         self.clears = [g for k, g in regions if k == "clear"]
+        self.regions = regions
         self.reach = [g for k, g in regions if k == "must-reach"]
         self.free_cells, self.free_regions = L.unchecked_cells(cfg)
         self.has_free = bool(self.free_cells or any(k == "no-check" for k, g in self.free_regions))
@@ -146,6 +149,22 @@ class Finisher:
                                   what=f"repeats every {m[0]} gens moving {m[1]}")
         return None
 
+    def escape(self, res):
+        g = res["gen"]
+        r = self.run(res, g)
+        if not r:
+            return None
+        still, hist, empty = r
+        tp = self.to_pattern(res)
+        out = hist[g] ^ still
+        if not out or not all(L.flagged(self.regions, "no-count", *tp(q)) for q in out):
+            return None
+        kinds = []
+        for comp in L.components(out):
+            k = L.object_kind(frozenset(comp & hist[g]), self.table)
+            kinds.append(k or f"{len(comp)}-cell active region")
+        return "escape", dict(res=res, hist=hist, size=len(hist[0]), what=", ".join(sorted(kinds)))
+
     def shrink(self, kind, info):
         """Smallest gen-0 pattern with the same reaction (checked), else the completed one."""
         hist = info.get("hist")
@@ -231,6 +250,7 @@ SECTIONS = [
     ("clean", "Clean oscillators (the spark starts them; the still life loses nothing)"),
     ("catalyst", "Catalysts (the spark is absorbed; the still life recovers exactly)"),
     ("converter", "Spaceship converters (the still life recovers; spaceships leave)"),
+    ("escape", "Escapes (the still life is back while something is outside it)"),
     ("signal", "Signals (still travelling with a fixed shape)"),
     ("extracted", "Oscillators found in damaging reactions (the oscillator alone, without the spark)"),
     ("damaging", "Damaging oscillators (the spark breaks part of the still life)"),
@@ -249,7 +269,7 @@ def _init(cfg, table, seconds, cnf):
     FIN = Finisher(cfg, table, seconds)
 
 
-RANK = {"clean": 0, "catalyst": 0, "converter": 0, "signal": 0, "no-spark": 1, "damaging": 2, "debris": 3}
+RANK = {"clean": 0, "catalyst": 0, "converter": 0, "escape": 0, "signal": 0, "no-spark": 1, "damaging": 2, "debris": 3}
 
 
 def _classify(job):
@@ -355,6 +375,8 @@ def main():
                 groups[(k, res["history"])].append(res)
         elif k == "maxgen":
             groups[(k, tuple(res["change_counts"][-12:]))].append(res)
+        elif k == "escape":
+            groups[(k, tuple(res["change_counts"]))].append(res)
     print(f"finishing {sum(map(len, groups.values()))} results ({len(groups)} distinct)...", flush=True)
 
     # 2. classify (quick), keeping the best candidate of each group
@@ -462,6 +484,8 @@ def main():
                         head = f"catalyst, {len(g0)} cells, reaction lasts {res['gen']} gens"
                     elif key == "converter":
                         head = f"converter, {len(g0)} cells: {info['what']}"
+                    elif key == "escape":
+                        head = f"escape, {len(g0)} cells, still life back at gen {res['gen']} with outside: {info['what']}"
                     else:
                         head = f"signal: {info['what']} (result #{res['n']} in {os.path.basename(jsonl)})"
                     if info.get("unshrunk"):
@@ -488,6 +512,7 @@ def main():
     open(out, "w").write("\n".join(lines) + "\n")
 
     names = {"clean": "clean oscillators", "catalyst": "catalysts", "converter": "spaceship converters",
+             "escape": "escapes",
              "signal": "signals", "damaging": "damaging oscillators", "no-spark": "oscillators without a spark in their cycle",
              "debris": "debris (dropped)", "incomplete": "couldn't be completed",
              "unchecked": "not checked (--max-minutes ran out; lowest periods / shortest reactions)"}
@@ -497,7 +522,7 @@ def main():
     print(f"Saved to {out}")
     if counts["no-spark"] and not a.all:
         print("  (oscillators without a spark in their cycle aren't listed; add --all)")
-    if not (counts["clean"] + counts["catalyst"] + counts["converter"] + counts["signal"] + counts["damaging"]):
+    if not (counts["clean"] + counts["catalyst"] + counts["converter"] + counts["escape"] + counts["signal"] + counts["damaging"]):
         skip = " ".join(l.split("=", 1)[1] for l in open(a.config) if re.match(r"\s*skip\s*=", l))
         print("Nothing usable was found. Things to try:")
         if "fizzle" in skip:

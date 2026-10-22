@@ -240,6 +240,12 @@ const std::vector<Opt> &opts() {
      "Don't require the space's dead border to be stable (dr2.c's behaviour; results that\n"
      "reach the edge may then be impossible to complete).",
      [](Ctx &c, const std::string &v) { c.uncheckedBorder = toBool("unchecked-border", v); }},
+    {"escape", nullptr, "Search",
+     "Stop a branch as soon as every changed cell is in a no-count region (after the reaction has\n"
+     "touched the counted area) and report it as 'escape': the still life is back and something is\n"
+     "left outside, e.g. a glider turned into a pi or a spark heading away. Without it such a branch\n"
+     "goes on, and is lost if the output comes back and breaks the limits.",
+     [](Ctx &c, const std::string &v) { c.o.params.escape = toBool("escape", v); }},
     {"seed", "N", "Search", "Random seed for the order in which choices are tried. Default 1.",
      [](Ctx &c, const std::string &v) { c.o.params.seed = (unsigned)toLong("seed", v); }},
     {"prob", "PERCENT", "Search", "Chance of trying ON first at each free choice. Default 50.",
@@ -424,7 +430,7 @@ const std::vector<Opt> &opts() {
     // --- Output
     {"only-new", nullptr, "Output", "Don't print outcomes whose rotor is in the known rotors list.",
      [](Ctx &c, const std::string &v) { c.o.skipKnown = toBool("only-new", v); }},
-    {"skip", "KINDS", "Output", "Don't print these outcomes: any of oscillator, stable, fizzle, maxgen.",
+    {"skip", "KINDS", "Output", "Don't print these outcomes: any of oscillator, stable, fizzle, maxgen, escape.",
      [](Ctx &c, const std::string &v) {
        std::string s = v;
        for (char &ch : s) if (ch == ',') ch = ' ';
@@ -435,6 +441,7 @@ const std::vector<Opt> &opts() {
          else if (k == "stable") c.o.skipStable = true;
          else if (k == "fizzle" || k == "fizzles") c.o.skipFizzle = true;
          else if (k == "maxgen") c.o.skipMaxgen = true;
+         else if (k == "escape" || k == "escapes") c.o.skipEscape = true;
          else fail("--skip: unknown kind '" + k + "'");
        }
      }},

@@ -30,7 +30,7 @@ class Reporter {
 
   // State that survives a checkpoint
   std::unordered_set<uint64_t> hashes;
-  long counts[4] = {0, 0, 0, 0};   // all outcomes found, by Outcome
+  long counts[5] = {0, 0, 0, 0, 0};   // all outcomes found, by Outcome
   long printed = 0, unknownOsc = 0, unreached = 0, capped = 0;
   int maxgen = 0;                  // highest generation reached so far
   std::string finishScript = "tests/finish.py";

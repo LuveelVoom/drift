@@ -53,6 +53,9 @@ struct Params {
   // depend on cells that would really be born there. Checking it means
   // "everything outside the space is dead".
   bool checkBorder = false;
+  // --escape: end a branch as soon as every changed cell is in a no-count
+  // region, after the reaction has touched the counted area.
+  bool escape = false;
   long var[NUMVARS] = {};
   std::vector<int> reqchgcount;     // dr's "cc" command
   // Minimum-speed constraints: every newly changed cell needs
@@ -76,7 +79,7 @@ struct OscInfo {
   std::string line;   // dr2.c's printed line, including the newline
 };
 
-enum Outcome { PERIODIC, STABLE, FIZZLE, MAXGEN };
+enum Outcome { PERIODIC, STABLE, FIZZLE, MAXGEN, ESCAPE };
 
 class Search;
 struct Sink {

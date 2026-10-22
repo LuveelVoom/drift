@@ -222,6 +222,14 @@ void Reporter::classic(Search &s, Outcome oc, int per, bool semifzl, uint64_t h)
       showRest(true);
       printed++;
       break;
+    case ESCAPE:
+      if (o.skipEscape) return;
+      printf("*****  Escape at gen %d\n", gen);
+      fputs(s.dispchgcts(gen).c_str(), stdout);
+      display(0);
+      showRest(true);
+      printed++;
+      break;
   }
 }
 
@@ -287,11 +295,17 @@ void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
       kind = "max gen";
       title = fmt("still going at gen %d: possible moving signal", gen);
       break;
+    case ESCAPE:
+      if (o.skipEscape) return;
+      kind = "escape";
+      title = fmt("at gen %d: still life back, %d cells changed outside", gen, s.numchanged(gen));
+      break;
   }
   if (o.perRotor) {
     std::string key = main.desc;
-    if (oc == MAXGEN)
+    if (oc == MAXGEN || oc == ESCAPE)
       for (int g = std::max(0, gen - 30); g <= gen; g++) key += " " + std::to_string(s.numchanged(g));
+    if (oc == ESCAPE) key = "escape" + key;
     if (++seenRotor[key] > o.perRotor) return;
   }
   if (o.maxResults && printed >= o.maxResults) { capped++; return; }
@@ -299,7 +313,7 @@ void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
   if (semifzl && (oc == PERIODIC || oc == STABLE)) title += " (semifizzle)";
 
   std::string name;
-  if (oc != MAXGEN) {
+  if (oc != MAXGEN && oc != ESCAPE) {
     if (main.known) name = main.name;
     else if (oc == PERIODIC) name = "NEW ROTOR";
     if (main.gap) name += (name.empty() ? "" : ", ") + fmt("split rotor, gap %d", main.gap);
@@ -309,18 +323,18 @@ void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
   out += "\n";
   if (oc == PERIODIC) out += "rotor:   " + main.desc + "\n";
   if (oc == PERIODIC) out += "history: " + hist.desc + (hist.known ? "  (" + hist.name + ")" : "") + "\n";
-  else if (oc != MAXGEN) out += "history: " + main.desc + "\n";
+  else if (oc != MAXGEN && oc != ESCAPE) out += "history: " + main.desc + "\n";
   out += countLines(s, gen);
   std::string lh, plain;
   int origin[2] = {0, 0};
   std::string pic = picture(s, 0, &lh, &plain, origin);
   if (!o.noPics) out += pic;
   if (!o.noRle) out += lh;
-  if ((o.showFin && oc != FIZZLE) || oc == MAXGEN) {
+  if ((o.showFin && oc != FIZZLE) || oc == MAXGEN || oc == ESCAPE) {
     std::string lh2;
     std::string pic2 = picture(s, gen, &lh2, nullptr);
     if (!o.noPics) out += pic2;
-    if (!o.noRle && oc == MAXGEN) out += lh2;
+    if (!o.noRle && (oc == MAXGEN || oc == ESCAPE)) out += lh2;
   }
   if (o.showAll)
     for (int g = 1; g <= gen; g++) out += picture(s, g, nullptr, nullptr);
@@ -337,7 +351,7 @@ void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
                         oc == MAXGEN ? "maxgen" : kind.c_str(), gen);
     if (oc == PERIODIC) j += fmt(",\"period\":%d", per);
     if (oc == PERIODIC || oc == STABLE) j += semifzl ? ",\"semifizzle\":true" : ",\"semifizzle\":false";
-    if (oc != MAXGEN) {
+    if (oc != MAXGEN && oc != ESCAPE) {
       j += std::string(oc == PERIODIC ? ",\"rotor\":" : ",\"history\":") + jsonStr(main.desc);
       j += std::string(",\"known\":") + (main.known ? "true" : "false");
       if (main.known) j += ",\"name\":" + jsonStr(main.name);
@@ -434,9 +448,10 @@ void Reporter::footer(double seconds, long long steps, bool finished, bool resum
            "printed %ld. Highest generation reached: %d.\n",
            counts[PERIODIC], unknownOsc, counts[STABLE], counts[FIZZLE], counts[MAXGEN], printed,
            maxgen);
+  if (o.params.escape) s += fmt("Escapes (still life back, something outside): %ld.\n", counts[ESCAPE]);
   if (o.mustReach) s += fmt("%ld results never reached a --must-reach region.\n", unreached);
   if (capped) s += fmt("%ld more results weren't printed (--max-results %ld).\n", capped, o.maxResults);
-  long found = counts[0] + counts[1] + counts[2] + counts[3];
+  long found = counts[0] + counts[1] + counts[2] + counts[3] + counts[4];
   if (printed == 0) {   // explain why nothing was printed
     s += "\nNothing was printed. ";
     if (found == 0) {
@@ -459,6 +474,7 @@ void Reporter::footer(double seconds, long long steps, bool finished, bool resum
       note(o.skipFizzle, "fizzles", counts[FIZZLE]);
       note(o.skipStable, "stable", counts[STABLE]);
       note(o.skipMaxgen, "max gen", counts[MAXGEN]);
+      if (o.params.escape) note(o.skipEscape, "escapes", counts[ESCAPE]);
       if (!kept.empty()) kept.pop_back();
       if (!skipped.empty()) skipped.pop_back();
       s += "The kinds you keep didn't turn up:" + kept + ".\n";
