@@ -265,7 +265,7 @@ def find_ships(table, seconds=10, procs=None):
         n, k = s["name"], 0
         while n in used:
             k += 1
-            n = s["name"] + "bcdefghij"[k - 1]
+            n = s["name"] + ("bcdefghij"[k - 1] if k <= 9 else f"_{k + 1}")   # more than 10 ships of one size
         s["name"] = n
         used.add(n)
     return ships, soups
@@ -431,6 +431,7 @@ class Survey:
         self.threads = a.threads
         self.deadline = time.time() + a.minutes * 60
         self.stopping = False
+        self.t0, self.last_yield = time.time(), time.time()   # --allocate yield bookkeeping
 
     def start(self, job, seconds):
         cmd = [DRIFT]
@@ -518,12 +519,53 @@ class Survey:
                                    start_new_session=True)
         job.state = "finishing"
 
+    def measure_yield(self, running):
+        """Smoothed rate of new distinct results (kind + rotor) per thread-second of each running search."""
+        now = time.time(); dt = now - self.last_yield; self.last_yield = now
+        for j in running:
+            path = j.base + "-results.jsonl"
+            if not hasattr(j, "ykeys"):
+                j.ykeys, j.yoff, j.yrate = set(), 0, None
+            new = 0
+            try:
+                with open(path) as f:
+                    f.seek(j.yoff)
+                    for line in f:
+                        if not line.endswith("\n"):
+                            break   # still being written
+                        j.yoff += len(line.encode())
+                        try:
+                            r = json.loads(line)
+                        except ValueError:
+                            continue
+                        k = (r.get("kind"), r.get("rotor") or r.get("history") or r.get("lifehistory"))
+                        if k not in j.ykeys:
+                            j.ykeys.add(k); new += 1
+            except OSError:
+                pass
+            rate = new / max(1e-9, dt * max(1, j.threads))
+            j.yrate = rate if j.yrate is None else 0.5 * j.yrate + 0.5 * rate
+
     def rebalance(self):
         running = [j for j in self.jobs if j.state == "running"]
         finishing = sum(j.fin_jobs for j in self.jobs if j.state == "finishing")
         if not running:
             return
         free = max(len(running), self.threads - finishing)
+        if self.a.allocate == "yield" and time.time() - self.t0 >= 60:
+            if time.time() - self.last_yield >= 30 or any(getattr(j, "yrate", None) is None for j in running):
+                self.measure_yield(running)
+            floor = max(1, int(self.a.yield_floor * free / len(running)))
+            rates = [max(0.0, j.yrate or 0.0) for j in running]
+            rest = free - floor * len(running)
+            if rest > 0 and sum(rates) > 0:
+                raw = [floor + rest * r / sum(rates) for r in rates]
+                n = [int(x) for x in raw]
+                for i in sorted(range(len(n)), key=lambda i: raw[i] - n[i], reverse=True)[:free - sum(n)]:
+                    n[i] += 1
+                for j, k in zip(running, n):
+                    j.set_threads(max(1, k))
+                return
         share, extra = divmod(free, len(running))
         for i, j in enumerate(running):
             j.set_threads(share + (i < extra))
@@ -583,6 +625,22 @@ class Survey:
 
 # ---------------------------------------------------------------- summary
 
+def canon_key(rle, table, osc):
+    """The same object found twice gets the same key: the smallest orientation, and for
+    an oscillator also the smallest phase (followed for up to 300 gens). Other patterns
+    (catalyst setups, converters, ...) only by orientation: their evolution is the result."""
+    cells = {p for p, st in L.parse_rle(rle).items() if st == 1}
+    if not cells:
+        return rle
+    keys, cur, start = [], set(cells), normalize(cells)
+    for _ in range(300 if osc else 1):
+        keys.append(min(tuple(sorted(t)) for t in transforms(cur)))
+        cur = L.step(cur, table)
+        if not cur or normalize(cur) == start:
+            break
+    return min(keys)
+
+
 def sections(path, limit=3):
     """[(title, count, [(comment, rle)])] from a -finished.txt file."""
     out, cur = [], None
@@ -615,16 +673,16 @@ def finished_line(job):
     return ", ".join(f"{n} {t.split(' (')[0].lower()}" for t, n, _ in secs) or "nothing usable"
 
 
-def across(jobs):
+def across(jobs, table):
     """Summary lines for everything the searches finished, taken together: distinct
     oscillators by period (the smallest of each shown) and the smallest catalysts.
-    Patterns are told apart by their RLE as finished, so a few rotations of the same
-    object may each count once."""
+    The same object found by several searches, or in another phase or orientation,
+    counts once (canon_key)."""
     osc, cat = {}, {}
     for j in jobs:
         for title, _, items in sections(j.base + "-finished.txt", 10 ** 6):
             for comment, rle in items:
-                key = "".join(rle.split()[1:]) if rle.startswith("x") else "".join(rle.split())
+                key = canon_key(rle, table, bool(re.match(r"p\d+ oscillator", comment)))
                 m = re.match(r"p(\d+) oscillator, (\d+) cells", comment)
                 if m and (title.startswith("Clean oscillators") or title.startswith("Oscillators found")):
                     osc.setdefault(int(m.group(1)), {}).setdefault(key, (int(m.group(2)), j.name, comment, rle))
@@ -647,17 +705,42 @@ def across(jobs):
         out.append("")
     if cat:
         v = sorted(cat.values())
-        out += [f"Catalysts: {len(v)} distinct; the smallest:", ""]
+        out += [f"Catalysts: {len(v)} distinct (found by {', '.join(sorted({x[2] for x in v}))}); the smallest:", ""]
         for n, gens, name, comment, rle in v[:5]:
             out += ["```", f"#C {comment} ({name})", rle, "```"]
         out.append("")
     return out
 
 
+def merged_finished(a, jobs):
+    """ALL-finished.txt: every search's finished patterns, section by section, each distinct
+    object once (canon_key) with the searches that found it."""
+    table, by = L.rule_for(a.rule), {}
+    for j in jobs:
+        for title, _, items in sections(j.base + "-finished.txt", 10 ** 6):
+            sec = by.setdefault(title, {})
+            for comment, rle in items:
+                k = canon_key(rle, table, bool(re.match(r"p\d+ oscillator", comment)))
+                if k in sec:
+                    sec[k][2].add(j.name)
+                else:
+                    sec[k] = [comment, rle, {j.name}]
+    if not by:
+        return
+    L_ = [f"# All finished patterns of the survey of {a.rule}, each distinct object once", ""]
+    for title, sec in by.items():
+        L_ += [f"## {title}: {len(sec)}", ""]
+        for comment, rle, names in sec.values():
+            L_ += [f"#C {comment} (found by {', '.join(sorted(names))})", rle, ""]
+    with open(os.path.join(a.out, "ALL-finished.txt"), "w") as f:
+        f.write("\n".join(L_))
+
+
 def write_summary(a, jobs):
     out = os.path.join(a.out, "SUMMARY.md")
     L_ = [f"# Survey of {a.rule}", "",
-          f"Each search's complete patterns are in `NAME-finished.txt`; raw results in `NAME-results.txt`.",
+          f"Each search's complete patterns are in `NAME-finished.txt`; raw results in `NAME-results.txt`;",
+          "`ALL-finished.txt` has every distinct object once (any phase or orientation), with the searches that found it.",
           "Patterns are generation 0 in plain RLE for this rule.", ""]
     if a.ships:
         L_ += ["## Spaceships used", ""]
@@ -676,7 +759,8 @@ def write_summary(a, jobs):
         found = f.replace("Found ", "").split(";")[0] if f else ""
         L_.append(f"| {j.name} | {st} | {f'{secs:.0f}s' if secs else ''} | {found} | {finished_line(j)} |")
     L_.append("")
-    L_ += across(jobs)
+    L_ += across(jobs, L.rule_for(a.rule))
+    merged_finished(a, jobs)
     L_.append("## Best of each search")
     for j in jobs:
         secs = sections(j.base + "-finished.txt")
@@ -727,6 +811,10 @@ def main():
     ap.add_argument("--finish-minutes", type=float, default=3,
                     help="time limit for finishing each search's results (default 3)")
     ap.add_argument("--status", type=float, default=60, help="seconds between status lines (default 60)")
+    ap.add_argument("--allocate", choices=("equal", "yield"), default="equal",
+                    help="how running searches share the cores: equal shares (default), or by yield = new distinct "
+                         "results (kind and rotor) per thread-second, each keeping at least --yield-floor of an equal share")
+    ap.add_argument("--yield-floor", type=float, default=0.25, help="--allocate yield: minimum share (default 0.25)")
     ap.add_argument("--list", action="store_true", help="show the searches that would run, and exit")
     ap.add_argument("--summary", action="store_true", help="only rewrite SUMMARY.md from the files there")
     a = ap.parse_args()

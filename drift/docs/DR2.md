@@ -49,7 +49,7 @@ centred on the pattern rather than the 81×81 space.
 
 **Rule tables.** The rule is applied with two lookup tables indexed by the
 3×3 window of off/on/unknown cells. For B/S rules they force exactly the
-cells dr2 forces (checked in `tests/ruletest.cpp`). For INT and MAP rules
+cells dr2 forces [1]. For INT and MAP rules
 each unknown neighbour can be forced on its own.
 
 **dr2 bugs not reproduced:**
@@ -64,3 +64,7 @@ each unknown neighbour can be forced on its own.
   which makes them impossible to complete. drift checks the border (everything
   outside the space is dead). `--unchecked-border` and `--classic` keep dr2's
   behaviour.
+
+## Checks
+
+1. Checked in `tests/ruletest.cpp`.

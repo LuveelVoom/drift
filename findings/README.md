@@ -1,10 +1,7 @@
 # Findings
 
 These are complete patterns found with drift and finished with `drift/tools/finish.py`. Each file holds plain RLE in its rule, ready to paste into
-Golly. Every pattern was re-simulated after completion. Where a separate
-implementation of the rule was written (B3/S23-a5 and HighLife), it was
-checked with that too. The q4i patterns were checked with drift's rule table
-only.
+Golly [1].
 
 How each kind of file was made:
 
@@ -72,7 +69,7 @@ How each kind of file was made:
   (2 cells, (+2,+2) every 3 gens) and makes a **90-degree turn** before eating
   it. Plus 11 glider eaters. Search: `drift/examples/q4i-glider-drifter.cfg`.
 - **2c/3 signal loop** (`loop-2c3-p116.rle`): four copies of that turn joined
-  head to tail, stator from SAT; a p116 oscillator (verified). Longer legs
+  head to tail, stator from SAT; a p116 oscillator [2]. Longer legs
   give p128, p140, ...
 
 ## B36/S23 (HighLife)
@@ -90,3 +87,8 @@ How each kind of file was made:
     of the wire, but the far cap isn't a clean eater (3 cells stay changed);
   - a glider-to-signal end cap: 42 lanes × 3·10⁸ steps found nothing (to do).
 - **No signals** within 6 changed cells in 4×4, and no converters.
+
+## Checks
+
+1. Every pattern was re-simulated after completion. Where a separate implementation of the rule was written (B3/S23-a5 and HighLife), it was checked with that too. The q4i patterns were checked with drift's rule table only.
+2. Verified by re-simulation.
