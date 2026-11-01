@@ -470,6 +470,13 @@ const std::vector<Opt> &opts() {
     {"known-rotors", "FILE", "Output",
      "Known rotors list. By default dr2.c's 'knownrotors' file is used for B3/S23 only.",
      [](Ctx &c, const std::string &v) { c.o.knownRotorsFile = resolve(c, v); c.o.knownRotorsExplicit = true; }},
+    {"sort", "HOW", "Output",
+     "Order of the oscillators in the finished file: period (default), sparky (free sparks\n"
+     "first) or open (most reachable rotors first). finish.py reads this setting.",
+     [](Ctx &c, const std::string &v) {
+       if (v != "period" && v != "sparky" && v != "open")
+         fail("--sort: unknown order '" + v + "' (use period, sparky or open)");
+     }},
     {"rotor-db", "FILE", "Output",
      "Rotors already listed by earlier searches of this rule, one file per rule. Oscillators with\n"
      "these rotors aren't printed, and finish.py adds the rotors it lists, so each search shows only\n"
@@ -883,7 +890,7 @@ bool readModern(const std::vector<std::string> &args, Options &o) {
 
 std::vector<std::string> cliSettings(const std::vector<std::string> &args) {
   static const char *KEEP[] = {"rule", "pattern", "clear", "no-change", "allow-change", "no-count",
-                               "count", "no-check", "check", "must-reach"};
+                               "count", "no-check", "check", "must-reach", "sort", "rotor-db"};
   std::vector<std::string> out;
   for (size_t i = 0; i < args.size(); i++) {
     const std::string &a = args[i];

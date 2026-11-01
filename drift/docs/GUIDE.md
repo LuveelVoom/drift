@@ -216,7 +216,9 @@ depth`, how far such a rotor cell is from the stator (2+ is a free spark, 9 mean
 no stator); `touch cells`, the always-dead outside cells that see the rotor but
 not the stator. `finish.py --sort sparky` puts deep sparks first; `--sort open`
 puts the most reachable rotors first (the default is `--sort period`). The numbers
-are geometry only, so they work in any rule. `--limit` is applied using the
+are geometry only, so they work in any rule. To get this order from the
+finishing step of a search, use `sort = sparky` in the config or
+`drift my.cfg --sort sparky`. `--limit` is applied using the
 unshrunk patterns, whose stators can differ from the shrunk ones, so raise it
 if a sparky pattern might be missing.
 
@@ -361,6 +363,19 @@ breaks the limits. `finish.py` lists them under "Escapes" with what is
 outside at that generation. In HighLife, a glider hitting a pond and block
 with the two eaters unknown (20 changed cells in 8×8) finds the glider-to-pi
 reaction in about a minute.
+
+### Gutter symmetry
+
+There's no `gutter` setting, but it can be set up. Use `symmetry = hor` (or
+`vert`) and `symmetric-start`, with a pattern of odd height (odd width for `vert`)
+so that the mirror line runs through a row of cells. Then keep that row dead,
+giving the row number within the pattern:
+
+    clear = r 3 -30 3 30        # the axis row of a 7-row pattern
+    no-change = r 3 -30 3 30
+
+An even height mirrors between two rows, with no gutter. Without `no-change`, a
+rule with even births can turn the axis on.
 
 ### Symmetric billiard tables
 

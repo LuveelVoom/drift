@@ -487,6 +487,12 @@ def spark_stats(cyc):
     return len(reached) / len(rotor), depth, touch
 
 
+def config_sort(config):
+    """The config's sort setting (drift's --sort), default period."""
+    m = re.findall(r"^\s*sort\s*[= ]\s*(\w+)", "\n".join(config_lines(config)), re.M)
+    return m[-1] if m else "period"
+
+
 def rotor_db_path(config):
     """The config's rotor-db file, or None. Relative to the config file, as in drift;
     a command-line setting is relative to the current folder."""

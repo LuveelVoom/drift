@@ -374,10 +374,11 @@ def main():
     ap.add_argument("--keep-trivial", action="store_true",
                     help="list trivial oscillators (rotor parts more than 2 cells apart, so they can't "
                          "interact) as they are, instead of only their parts")
-    ap.add_argument("--sort", choices=("period", "sparky", "open"), default="period",
+    ap.add_argument("--sort", choices=("period", "sparky", "open"),
                     help="order of the oscillator sections: period (default), sparky (free sparks first: "
                          "spark depth, then touch cells) or open (largest share of the rotor reachable "
-                         "from outside first). The numbers are in each pattern's comment")
+                         "from outside first). The numbers are in each pattern's comment. "
+                         "Default: the config's sort setting")
     ap.add_argument("--limit", type=int, default=30, help="patterns listed per section (default 30)")
     ap.add_argument("--max-cells", type=int, default=0, help="leave out patterns bigger than this")
     ap.add_argument("--seconds", type=float, default=5, help="time spent shrinking each listed pattern")
@@ -387,6 +388,7 @@ def main():
                     help="time limit: the most promising results (highest periods, longest reactions) "
                          "are checked first, and patterns are listed unshrunk once time is short")
     a = ap.parse_args()
+    a.sort = a.sort or L.config_sort(a.config)
     import time
     deadline = time.time() + a.max_minutes * 60 if a.max_minutes else float("inf")
     late = lambda frac: time.time() > deadline - (1 - frac) * a.max_minutes * 60
