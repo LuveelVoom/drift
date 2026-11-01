@@ -22,11 +22,17 @@ as dead and `clear` regions stay empty), simulates it and sorts it:
                         oscillators even though the spark doesn't start them
                         cleanly. Separate oscillators are split apart, rotors
                         already listed are left out, and rotors not in the
-                        known list (B3/S23) come first.
+                        known list (B3/S23) come first. The parts of trivial
+                        oscillators (below) are listed here too.
   damaging oscillators  the spark breaks part of the still life to make it
                         (listed last; --clean-only leaves out these and the
                         section above)
   debris                oscillates without a stator (not listed)
+  trivial               the rotor falls apart into parts more than 2 cells
+                        apart, which can't affect each other even through a
+                        shared stator (e.g. a p2 and a p3 rotor making a "p6").
+                        Not listed as a whole (--keep-trivial lists them);
+                        each part goes to "oscillators found" instead.
 
 Each pattern is generation 0 (still life plus spark), shrunk as far as possible
 and re-checked, in plain RLE for your rule. Output: my-finished.txt.
@@ -213,6 +219,9 @@ class Finisher:
             if h[p] == h[0] and h[2 * p] == h[0] and not any(h[d] == h[0] for d in range(1, p)):
                 return h[0]
         info["unshrunk"] = True
+        if not info.get("alone", True):   # cyc[0] isn't a working pattern: give the whole oscillator
+            info["unseparated"] = True
+            return info["full"]
         return cyc[0]
 
 
@@ -220,18 +229,35 @@ TRANSFORMS = [lambda r, c: (r, c), lambda r, c: (r, -c), lambda r, c: (-r, c), l
               lambda r, c: (c, r), lambda r, c: (c, -r), lambda r, c: (-c, r), lambda r, c: (-c, -r)]
 
 
+def rotor_groups(cyc):
+    """The rotor cells of one cycle, split into groups more than 2 cells apart. No cell
+    sees rotor cells of two groups in its 3x3 neighbourhood, so the groups can't affect
+    each other, even through a stator they share: each runs at any phase offset."""
+    return L.components(set().union(*cyc) - frozenset.intersection(*cyc))
+
+
 def oscillator_parts(cyc, table):
-    """Split one cycle of a periodic pattern into its separate oscillators (parts more
-    than 2 cells apart can't interact). Returns (phases, period, rotor key) for each
-    part that needs a stator; the key is the same for the same rotor in any phase,
-    position or orientation."""
+    """Split one cycle of a periodic pattern into its independent oscillators (one per
+    rotor group). Returns (phases, period, rotor key, alone) for each part that needs a
+    stator; the key is the same for the same rotor in any phase, position or orientation.
+    alone: the phases are a working pattern by themselves (the part's cells are more than
+    2 cells from every other rotor). Otherwise they hold the part's rotor and the whole
+    stator around it, a valid input for L.minimize but not an oscillator as they stand."""
     out = []
-    for comp in L.components(set().union(*cyc)):
-        ph = [frozenset(s & comp) for s in cyc]
+    allc = set().union(*cyc)
+    allrotor = allc - frozenset.intersection(*cyc)
+    comps = L.components(allc)
+    for rotor in rotor_groups(cyc):
+        mine = set().union(*(c for c in comps if c & rotor))   # the cells joined to this rotor
+        others = (allrotor - rotor) & mine
+        alone = not others
+        ph = [frozenset((s & mine) - others) for s in cyc]
         per = next(d for d in range(1, len(ph) + 1) if len(ph) % d == 0 and ph[d % len(ph)] == ph[0])
         ph = ph[:per]
-        rotor = set().union(*ph) - frozenset.intersection(*ph)
-        if per < 2 or not rotor or not L.needs_stator(ph[0], per, table):
+        h = [ph[0] & rotor]   # as L.needs_stator: the rotor on its own, without any stator
+        for _ in range(2 * per):
+            h.append(frozenset(L.step(h[-1], table)))
+        if per < 2 or (h[per] == h[0] and h[2 * per] == h[0]):
             continue
         key = None
         for t in TRANSFORMS:
@@ -242,7 +268,7 @@ def oscillator_parts(cyc, table):
             for k in range(per):
                 cand = tuple(rs[(i + k) % per] for i in range(per))
                 key = cand if key is None or cand < key else key
-        out.append((ph, per, key))
+        out.append((ph, per, key, alone))
     return out
 
 
@@ -252,7 +278,7 @@ SECTIONS = [
     ("converter", "Spaceship converters (the still life recovers; spaceships leave)"),
     ("escape", "Escapes (the still life is back while something is outside it)"),
     ("signal", "Signals (still travelling with a fixed shape)"),
-    ("extracted", "Oscillators found in damaging reactions (the oscillator alone, without the spark)"),
+    ("extracted", "Oscillators found in damaging reactions and trivial oscillators (each part alone, without the spark)"),
     ("damaging", "Damaging oscillators (the spark breaks part of the still life)"),
     ("no-spark", "Oscillators that don't reach the must-reach area in their own cycle"),
 ]
@@ -293,7 +319,7 @@ def _classify(job):
 
 
 def _shrink(job):
-    """(pattern to list, whether it couldn't be shrunk)"""
+    """(pattern to list, whether it couldn't be shrunk, whether a part couldn't be separated)"""
     key, info = job
     if key == "extracted":
         g0 = FIN.extract(info)
@@ -301,7 +327,7 @@ def _shrink(job):
         if "res" in info and "still" in info:
             info["empty"] = FIN.empty_for(info["res"])
         g0 = FIN.shrink(key, info)
-    return g0, bool(info.get("unshrunk"))
+    return g0, bool(info.get("unshrunk")), bool(info.get("unseparated"))
 
 
 class Workers:
@@ -334,6 +360,9 @@ def main():
                     help="also list oscillators without a spark in their cycle, and long fizzles "
                          "(always listed when the config uses no-rechange or push)")
     ap.add_argument("--clean-only", action="store_true", help="don't list damaging oscillators, or the oscillators found in them")
+    ap.add_argument("--keep-trivial", action="store_true",
+                    help="list trivial oscillators (rotor parts more than 2 cells apart, so they can't "
+                         "interact) as they are, instead of only their parts")
     ap.add_argument("--limit", type=int, default=30, help="patterns listed per section (default 30)")
     ap.add_argument("--max-cells", type=int, default=0, help="leave out patterns bigger than this")
     ap.add_argument("--seconds", type=float, default=5, help="time spent shrinking each listed pattern")
@@ -393,31 +422,42 @@ def main():
             if not best:
                 counts["incomplete"] += 1
                 continue
-            counts[best[0]] += 1
-            if best[0] != "debris":
-                found[best[0]].append(best[1])
+            kind = best[0]
+            if kind in ("clean", "damaging", "no-spark") and not a.keep_trivial:
+                g, p = best[1]["res"]["gen"], best[1]["res"]["period"]
+                if len(rotor_groups(best[1]["hist"][g:g + p])) > 1:
+                    best[1]["was"], kind = kind, "trivial"
+            counts[kind] += 1
+            if kind != "debris":
+                found[kind].append(best[1])
 
     # The oscillators a damaging reaction ends in are real oscillators in their
-    # own right, even though the spark doesn't start them cleanly. Each separate
-    # part is checked on its own; parts that oscillate without a stator, and
-    # rotors already listed (here or as clean oscillators), are left out.
+    # own right, even though the spark doesn't start them cleanly; so are the
+    # parts of a trivial oscillator. Each part is checked on its own; parts that
+    # oscillate without a stator, and rotors already listed (here or as clean
+    # oscillators), are left out.
     seen = set()
+    for i in found.get("clean", []):
+        g, p = i["res"]["gen"], i["res"]["period"]
+        seen |= {k for _, _, k, _ in oscillator_parts(i["hist"][g:g + p], fin.table)}
+    ext, queued = [], set()
+    sources = [i for i in found.get("trivial", [])
+               if i["was"] == "clean" or (i["was"] == "damaging" and not a.clean_only) or (i["was"] == "no-spark" and a.all)]
     if not a.clean_only:
-        for i in found.get("clean", []):
-            g, p = i["res"]["gen"], i["res"]["period"]
-            seen |= {k for _, _, k in oscillator_parts(i["hist"][g:g + p], fin.table)}
-        ext, queued = [], set()
-        for i in found.get("damaging", []):
-            g, p = i["res"]["gen"], i["res"]["period"]
-            whole = i["hist"][g:g + p]
-            parts = oscillator_parts(whole, fin.table)
-            # drift's known-rotor flag describes the whole rotor, so it only applies to a part that is all of it
-            nrot = len(set().union(*whole) - frozenset.intersection(*whole))
-            for cyc, per, k in parts:
-                if k not in seen and k not in queued:
-                    queued.add(k)
-                    rotor = len(set().union(*cyc) - frozenset.intersection(*cyc))
-                    ext.append(dict(res=i["res"], cyc=cyc, period=per, rotor=rotor, whole=rotor == nrot))
+        sources += found.get("damaging", [])
+    for i in sources:
+        g, p = i["res"]["gen"], i["res"]["period"]
+        whole = i["hist"][g:g + p]
+        parts = oscillator_parts(whole, fin.table)
+        # drift's known-rotor flag describes the whole rotor, so it only applies to a part that is all of it
+        nrot = len(set().union(*whole) - frozenset.intersection(*whole))
+        for cyc, per, k, alone in parts:
+            if k not in seen and k not in queued:
+                queued.add(k)
+                rotor = len(set().union(*cyc) - frozenset.intersection(*cyc))
+                ext.append(dict(res=i["res"], cyc=cyc, period=per, rotor=rotor, whole=rotor == nrot,
+                                alone=alone, full=whole[0]))
+    if ext:
         known = lambda i: i["whole"] and str(i["res"].get("known")) == "True"
         ext.sort(key=lambda i: (known(i), -i["period"], -i["rotor"]))
         found["extracted"] = ext
@@ -441,22 +481,34 @@ def main():
                 chunk = items[i:i + max(a.jobs, a.limit - len(written))]
                 i += len(chunk)
                 if late(0.95):
-                    outs = [(info["cyc"][0] if key == "extracted" else info["hist"][0] if info.get("hist") else None, True)
+                    outs = [((info["cyc"][0] if info["alone"] else info["full"]) if key == "extracted"
+                             else info["hist"][0] if info.get("hist") else None, True,
+                             key == "extracted" and not info["alone"])
                             for info in chunk]
                 else:
                     outs = W.imap(_shrink, [(key, info) for info in chunk])
-                for info, (g0, unshrunk) in zip(chunk, outs):
+                for info, (g0, unshrunk, unseparated) in zip(chunk, outs):
                     if len(written) >= a.limit:
                         break
                     if unshrunk:
                         info["unshrunk"] = True
                     res = info["res"]
                     if key == "extracted":
+                        if unseparated:   # no stator of its own was found: list the whole oscillator once
+                            if info["full"] in shown:
+                                continue
+                            shown.add(info["full"])
+                            head = (f"p{res['period']} oscillator, {len(g0)} cells, from the reaction of result #{res['n']}: "
+                                    f"trivial, but its p{info['period']} part couldn't be given a stator of its own")
+                            written.append(f"#C {head}\n" + L.to_rle(g0, rule).rstrip())
+                            continue
                         # A smaller stator can leave separate oscillators side by side: list each new one
                         ph = [g0]
                         for _ in range(info["period"] - 1):
                             ph.append(frozenset(L.step(ph[-1], fin.table)))
-                        for cyc, p, k in oscillator_parts(ph, fin.table):
+                        for cyc, p, k, alone in oscillator_parts(ph, fin.table):
+                            if not alone:   # not expected: a stator found for one rotor joins no other
+                                continue
                             if k in shown or len(written) >= a.limit:
                                 continue
                             shown.add(k)
@@ -507,6 +559,9 @@ def main():
             lines.append("")
             lines += [w + "\n" for w in written]
     lines[2] = "# Found: " + (", ".join(summary) if summary else "nothing usable")
+    if counts["trivial"]:
+        lines[2] += (f"\n# {counts['trivial']} trivial oscillators (rotor parts more than 2 cells apart, so they "
+                     "can't interact) not listed whole; their parts are under \"Oscillators found\" (--keep-trivial lists them)")
     if counts["unchecked"]:
         lines[2] += f"\n# {counts['unchecked']} lower-priority results not checked (time limit)"
     open(out, "w").write("\n".join(lines) + "\n")
@@ -515,6 +570,7 @@ def main():
              "escape": "escapes",
              "signal": "signals", "damaging": "damaging oscillators", "no-spark": "oscillators without a spark in their cycle",
              "debris": "debris (dropped)", "incomplete": "couldn't be completed",
+             "trivial": "trivial oscillators (rotor parts more than 2 cells apart; only the parts are listed)",
              "unchecked": "not checked (--max-minutes ran out; lowest periods / shortest reactions)"}
     for k, name in names.items():
         if counts[k]:
@@ -522,7 +578,7 @@ def main():
     print(f"Saved to {out}")
     if counts["no-spark"] and not a.all:
         print("  (oscillators without a spark in their cycle aren't listed; add --all)")
-    if not (counts["clean"] + counts["catalyst"] + counts["converter"] + counts["escape"] + counts["signal"] + counts["damaging"]):
+    if not (counts["clean"] + counts["trivial"] + counts["catalyst"] + counts["converter"] + counts["escape"] + counts["signal"] + counts["damaging"]):
         skip = " ".join(l.split("=", 1)[1] for l in open(a.config) if re.match(r"\s*skip\s*=", l))
         print("Nothing usable was found. Things to try:")
         if "fizzle" in skip:

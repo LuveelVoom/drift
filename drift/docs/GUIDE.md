@@ -202,6 +202,14 @@ This section lists each one on its own, without the spark and with the
 smallest stator found, once per rotor. In B3/S23, rotors that aren't in the
 known rotors list come first and are marked.
 
+**Trivial oscillators** aren't listed whole: those whose rotor falls apart
+into parts more than 2 cells apart. Such parts can't affect each other, even
+through a stator they share (no cell sees both in its 3x3 neighbourhood), so
+a p2 and a p3 rotor side by side are not a real p6. Each part is listed on
+its own under "Oscillators found" instead; `--keep-trivial` lists them whole
+as before. Parts 2 cells apart or closer are always kept together, even
+when they happen not to interact.
+
 Last is "Damaging oscillators": the reactions themselves, with the spark that
 broke part of the still life. `finish.py --clean-only` leaves
 out both, `--max-cells N` drops big patterns, and `--all` adds long fizzles

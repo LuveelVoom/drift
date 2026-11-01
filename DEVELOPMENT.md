@@ -149,6 +149,21 @@ original arguments, plus a fingerprint of the search settings.
   to the queue (`Search::pending`, as for checkpoints) and park. Result sets are
   identical under 8→1→3→14 switching (stillater c7 4x4: 5934 osc).
 
+- **Trivial oscillators (2026-10-27).** `finish.py` splits each oscillator's
+  rotor into groups more than 2 cells apart (`rotor_groups`). Such groups can't
+  interact: no cell has rotor cells of two groups in its 3x3 neighbourhood, so
+  each runs at any phase offset. With 2+ groups the result is "trivial": left out
+  of clean/damaging/no-spark (`--keep-trivial` keeps it) and each group goes to
+  "Oscillators found", minimized on its own stator. A part that shares a stator
+  and can't be minimized is listed as the whole oscillator, marked. Conservative:
+  groups 2 cells apart that don't actually interact are kept together.
+  Checked on copies of two survey result sets (B3/S23 osc, qr4k osc) with casim: every listed
+  pattern has its stated period, none is trivial, all old rotors still listed
+  (qr4k: 30 trivial damaging oscillators dropped; "Oscillators found" 261 -> 235,
+  the difference being old entries that were two rotors on one stator); all 57
+  multi-group patterns of the old output survive a one-generation phase shift of
+  each group.
+
 ## 4. Open ideas
 
 - Further per-cell speedups in `trycell` and `listneighbors`.
