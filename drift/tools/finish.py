@@ -295,6 +295,17 @@ def _init(cfg, table, seconds, cnf):
     FIN = Finisher(cfg, table, seconds)
 
 
+def spark_key(cyc, how):
+    """Sort key for --sort (smaller first) from L.spark_stats."""
+    o, d, t = L.spark_stats(cyc)
+    return (-d, -t, -o) if how == "sparky" else (-o, -t, -d)
+
+
+def spark_note(cyc):
+    o, d, t = L.spark_stats(cyc)
+    return f"open {100 * o:.0f}%, spark depth {d}, {t} touch cells"
+
+
 RANK = {"clean": 0, "catalyst": 0, "converter": 0, "escape": 0, "signal": 0, "no-spark": 1, "damaging": 2, "debris": 3}
 
 
@@ -363,6 +374,10 @@ def main():
     ap.add_argument("--keep-trivial", action="store_true",
                     help="list trivial oscillators (rotor parts more than 2 cells apart, so they can't "
                          "interact) as they are, instead of only their parts")
+    ap.add_argument("--sort", choices=("period", "sparky", "open"), default="period",
+                    help="order of the oscillator sections: period (default), sparky (free sparks first: "
+                         "spark depth, then touch cells) or open (largest share of the rotor reachable "
+                         "from outside first). The numbers are in each pattern's comment")
     ap.add_argument("--limit", type=int, default=30, help="patterns listed per section (default 30)")
     ap.add_argument("--max-cells", type=int, default=0, help="leave out patterns bigger than this")
     ap.add_argument("--seconds", type=float, default=5, help="time spent shrinking each listed pattern")
@@ -441,6 +456,7 @@ def main():
         g, p = i["res"]["gen"], i["res"]["period"]
         seen |= {k for _, _, k, _ in oscillator_parts(i["hist"][g:g + p], fin.table)}
     ext, queued = [], set()
+    known = lambda i: i["whole"] and str(i["res"].get("known")) == "True"
     sources = [i for i in found.get("trivial", [])
                if i["was"] == "clean" or (i["was"] == "damaging" and not a.clean_only) or (i["was"] == "no-spark" and a.all)]
     if not a.clean_only:
@@ -458,7 +474,6 @@ def main():
                 ext.append(dict(res=i["res"], cyc=cyc, period=per, rotor=rotor, whole=rotor == nrot,
                                 alone=alone, full=whole[0]))
     if ext:
-        known = lambda i: i["whole"] and str(i["res"].get("known")) == "True"
         ext.sort(key=lambda i: (known(i), -i["period"], -i["rotor"]))
         found["extracted"] = ext
 
@@ -472,9 +487,16 @@ def main():
             if (key == "no-spark" and not a.all) or (key == "damaging" and a.clean_only):
                 continue
             if key in ("clean", "damaging", "no-spark"):
-                items.sort(key=lambda i: (-i["res"]["period"], i.get("damage", 0), i["size"]))
+                if a.sort == "period":
+                    items.sort(key=lambda i: (-i["res"]["period"], i.get("damage", 0), i["size"]))
+                else:   # on the unshrunk patterns: this picks what gets past --limit
+                    cycle = lambda i: i["hist"][i["res"]["gen"]:i["res"]["gen"] + i["res"]["period"]]
+                    items.sort(key=lambda i: (spark_key(cycle(i), a.sort), -i["res"]["period"], i["size"]))
             elif key == "catalyst":
                 items.sort(key=lambda i: (-i["res"]["gen"], i["size"]))
+            elif key == "extracted" and a.sort != "period":
+                items.sort(key=lambda i: (known(i), spark_key(i["cyc"], a.sort), -i["period"]))
+            final = {}   # listed pattern -> its --sort key, measured on the shrunk pattern
             written, shown = [], set(seen) if key == "extracted" else set()
             i = 0
             while i < len(items) and len(written) < a.limit:
@@ -521,8 +543,10 @@ def main():
                                 elif "known" in res and rule.upper() == "B3/S23":
                                     head += ", rotor not in the known rotors list"
                             head += ", billiard table" if not L.exposed(cyc[0], p, fin.table) else ""
+                            head += ", " + spark_note(cyc)
                             head += " (couldn't be shrunk)" if info.get("unshrunk") else ""
                             written.append(f"#C {head}\n" + L.to_rle(cyc[0], rule).rstrip())
+                            final[written[-1]] = spark_key(cyc, a.sort)
                         continue
                     if a.max_cells and g0 is not None and len(g0) > a.max_cells:
                         continue
@@ -532,6 +556,12 @@ def main():
                         head += ", billiard table" if not L.exposed(g0, p, fin.table) and key == "clean" else ""
                         if info.get("damage"):
                             head += f", {info['damage']} still-life cells changed for good"
+                        h = [g0]
+                        for _ in range(res["gen"] + p - 1):
+                            h.append(frozenset(L.step(h[-1], fin.table)))
+                        cyc = h[res["gen"]:]
+                        head += ", " + spark_note(cyc)
+                        spark = spark_key(cyc, a.sort)
                     elif key == "catalyst":
                         head = f"catalyst, {len(g0)} cells, reaction lasts {res['gen']} gens"
                     elif key == "converter":
@@ -543,8 +573,12 @@ def main():
                     if info.get("unshrunk"):
                         head += " (couldn't be shrunk)"
                     written.append(f"#C {head}\n" + (L.to_rle(g0, rule).rstrip() if g0 is not None else ""))
+                    if key in ("clean", "damaging", "no-spark"):
+                        final[written[-1]] = spark
             if not items:
                 continue
+            if a.sort != "period" and key in ("clean", "damaging", "no-spark", "extracted"):
+                written.sort(key=lambda w: final.get(w, (9,)))   # trivial-part notes have no key: last
             if key == "extracted":   # counted after shrinking and splitting, so only up to --limit
                 if not written:
                     continue

@@ -442,6 +442,51 @@ def exposed(g0, period, table):
     return False
 
 
+def spark_stats(cyc):
+    """Geometry of one full cycle of an oscillator, whatever the rule: how far an object
+    placed outside can get at the rotor. Returns (open, depth, touch):
+      free   always-dead cells reachable from outside (4-connected, through always-dead
+             cells, so a diagonal chain of cells that are ever alive is a wall)
+      touch  free cells with a rotor cell in their 3x3 and no stator cell: places where
+             the outside sees the rotor but not the stator
+      open   share of the rotor cells next to a touch cell (0 to 1)
+      depth  largest Chebyshev distance from such a rotor cell to the stator: 1 means
+             next to it, 2+ a free spark (capped at 9, the value with no stator at all)"""
+    cyc = [frozenset(s) for s in cyc]
+    cells = set().union(*cyc)
+    stator = frozenset.intersection(*cyc)
+    rotor = cells - stator
+    if not rotor:
+        return 0.0, 0, 0
+    r0 = min(r for r, c in cells) - 2
+    r1 = max(r for r, c in cells) + 2
+    c0 = min(c for r, c in cells) - 2
+    c1 = max(c for r, c in cells) + 2
+    free = {(r0, c0)}
+    todo = [(r0, c0)]
+    while todo:
+        r, c = todo.pop()
+        for q in ((r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)):
+            if r0 <= q[0] <= r1 and c0 <= q[1] <= c1 and q not in free and q not in cells:
+                free.add(q)
+                todo.append(q)
+    around = lambda r, c: [(r + i, c + j) for i in (-1, 0, 1) for j in (-1, 0, 1)]
+    touch, reached = 0, set()
+    for r, c in free:
+        near = around(r, c)
+        if any(q in stator for q in near):
+            continue
+        hit = [q for q in near if q in rotor]
+        if hit:
+            touch += 1
+            reached.update(hit)
+    depth = 0
+    for r, c in reached:
+        d = min((max(abs(r - a), abs(c - b)) for a, b in stator), default=9)
+        depth = max(depth, min(d, 9))
+    return len(reached) / len(rotor), depth, touch
+
+
 def components(cells, d=2):
     cells, out = set(cells), []
     while cells:

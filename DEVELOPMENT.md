@@ -164,6 +164,12 @@ original arguments, plus a fingerprint of the search settings.
   multi-group patterns of the old output survive a one-generation phase shift of
   each group.
 
+- **Spark metrics (2026-10-31).** `driftlib.spark_stats(cycle)` gives open / spark
+  depth / touch cells, purely geometric; `finish.py --sort sparky|open`. Sorted
+  once before `--limit` on unshrunk cycles, then again on the listed shrunk ones.
+  Known answers: `tests/sparktest.py` (includes the q4i depth-2 sparky p4 from
+  `findings/`).
+
 ## 4. Open ideas
 
 - Further per-cell speedups in `trycell` and `listneighbors`.

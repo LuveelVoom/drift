@@ -210,6 +210,16 @@ its own under "Oscillators found" instead; `--keep-trivial` lists them whole
 as before. Parts 2 cells apart or closer are always kept together, even
 when they happen not to interact.
 
+**Sparky and open oscillators.** Oscillator comments give three numbers:
+`open`, the share of rotor cells an outside object can get next to; `spark
+depth`, how far such a rotor cell is from the stator (2+ is a free spark, 9 means
+no stator); `touch cells`, the always-dead outside cells that see the rotor but
+not the stator. `finish.py --sort sparky` puts deep sparks first; `--sort open`
+puts the most reachable rotors first (the default is `--sort period`). The numbers
+are geometry only, so they work in any rule. `--limit` is applied using the
+unshrunk patterns, whose stators can differ from the shrunk ones, so raise it
+if a sparky pattern might be missing.
+
 Last is "Damaging oscillators": the reactions themselves, with the spark that
 broke part of the still life. `finish.py --clean-only` leaves
 out both, `--max-cells N` drops big patterns, and `--all` adds long fizzles
