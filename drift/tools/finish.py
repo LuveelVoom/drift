@@ -408,6 +408,8 @@ def main():
     # noise in most searches, but the point of a drifter search.
     drifters = bool(re.search(r"^\s*(no-rechange|push)\b", open(a.config).read(), re.M))
     groups = collections.defaultdict(list)
+    rotor_db = L.rotor_db_path(a.config)
+    save = set()   # rotors for the rotor-db: only ones the user has seen, or never wants to
     for line in open(jsonl):
         res = json.loads(line)
         k = res["kind"]
@@ -438,6 +440,8 @@ def main():
                 counts["incomplete"] += 1
                 continue
             kind = best[0]
+            if kind == "debris":
+                save.add(order[gi][0][1])
             if kind in ("clean", "damaging", "no-spark") and not a.keep_trivial:
                 g, p = best[1]["res"]["gen"], best[1]["res"]["period"]
                 if len(rotor_groups(best[1]["hist"][g:g + p])) > 1:
@@ -467,6 +471,7 @@ def main():
         parts = oscillator_parts(whole, fin.table)
         # drift's known-rotor flag describes the whole rotor, so it only applies to a part that is all of it
         nrot = len(set().union(*whole) - frozenset.intersection(*whole))
+        i["parts"] = [k for _, _, k, _ in parts]
         for cyc, per, k, alone in parts:
             if k not in seen and k not in queued:
                 queued.add(k)
@@ -575,6 +580,9 @@ def main():
                     written.append(f"#C {head}\n" + (L.to_rle(g0, rule).rstrip() if g0 is not None else ""))
                     if key in ("clean", "damaging", "no-spark"):
                         final[written[-1]] = spark
+                        save.add(res["rotor"])
+            if key == "extracted":   # a reaction whose oscillators have all been listed needn't come back
+                save |= {i["res"]["rotor"] for i in sources if all(k in shown for k in i["parts"])}
             if not items:
                 continue
             if a.sort != "period" and key in ("clean", "damaging", "no-spark", "extracted"):
@@ -599,6 +607,10 @@ def main():
     if counts["unchecked"]:
         lines[2] += f"\n# {counts['unchecked']} lower-priority results not checked (time limit)"
     open(out, "w").write("\n".join(lines) + "\n")
+
+    if rotor_db:   # a pattern cut by --limit isn't saved, so the next search lists it
+        n = L.rotor_db_add(rotor_db, rule, table, {r for r in save if "TOO LONG" not in r})
+        print(f"  {n:4d}  rotors added to {rotor_db}")
 
     names = {"clean": "clean oscillators", "catalyst": "catalysts", "converter": "spaceship converters",
              "escape": "escapes",

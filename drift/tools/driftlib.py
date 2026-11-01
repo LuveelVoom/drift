@@ -487,6 +487,37 @@ def spark_stats(cyc):
     return len(reached) / len(rotor), depth, touch
 
 
+def rotor_db_path(config):
+    """The config's rotor-db file, or None. Relative to the config file, as in drift;
+    a command-line setting is relative to the current folder."""
+    extra = re.findall(r"^\s*rotor-db\s*[= ]\s*(.+?)\s*$", os.environ.get("DRIFT_EXTRA_SETTINGS", ""), re.M)
+    if extra:
+        return extra[-1]
+    m = re.findall(r"^\s*rotor-db\s*[= ]\s*(.+?)\s*(?:#.*)?$", open(config).read(), re.M)
+    return os.path.join(os.path.dirname(os.path.abspath(config)), m[-1]) if m else None
+
+
+def rotor_db_add(path, rule, table, rotors):
+    """Add rotor descriptors to a rotor-db file (see drift's --rotor-db); returns how
+    many were new. Locked, because a survey finishes several searches at once."""
+    import fcntl
+    with open(path, "a+") as f:
+        fcntl.flock(f, fcntl.LOCK_EX)
+        f.seek(0)
+        old = f.read().split("\n")
+        head = "# drift rotor-db, rule "
+        if old[0].startswith(head):
+            if rule_for(old[0][len(head):]) != table:
+                sys.exit(f"finish.py: {path} is for another rule ({old[0][len(head):]})")
+        elif old[0]:
+            sys.exit(f"finish.py: {path} isn't a rotor-db file")
+        else:
+            f.write(head + rule + "\n")
+        new = sorted(set(rotors) - set(old))
+        f.write("".join(r + "\n" for r in new))
+    return len(new)
+
+
 def components(cells, d=2):
     cells, out = set(cells), []
     while cells:

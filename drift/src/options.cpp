@@ -470,6 +470,11 @@ const std::vector<Opt> &opts() {
     {"known-rotors", "FILE", "Output",
      "Known rotors list. By default dr2.c's 'knownrotors' file is used for B3/S23 only.",
      [](Ctx &c, const std::string &v) { c.o.knownRotorsFile = resolve(c, v); c.o.knownRotorsExplicit = true; }},
+    {"rotor-db", "FILE", "Output",
+     "Rotors already listed by earlier searches of this rule, one file per rule. Oscillators with\n"
+     "these rotors aren't printed, and finish.py adds the rotors it lists, so each search shows only\n"
+     "new ones. Isotropic rules only. The search itself is unchanged: nothing else is lost.",
+     [](Ctx &c, const std::string &v) { c.o.rotorDb = resolve(c, v); }},
     {"jsonl", "FILE", "Output",
      "Append each result to FILE as one JSON object per line (instead of <config>-results.jsonl).",
      [](Ctx &c, const std::string &v) { c.o.jsonl = v; }},

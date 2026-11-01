@@ -27,6 +27,7 @@ struct Options {
 
   std::string knownRotorsFile;     // empty = default lookup
   bool knownRotorsExplicit = false;
+  std::string rotorDb;             // rotors saved by earlier searches of this rule (finish.py adds to it)
   std::string jsonl;               // append one JSON object per result
   std::string textOut;             // copy of the printed results
   bool freshJsonl = false, freshText = false;   // default output files: start them afresh

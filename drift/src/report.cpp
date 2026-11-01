@@ -58,6 +58,7 @@ static std::string rle(const std::vector<std::string> &rows, char empty) {
 Reporter::Reporter(const Options &opt, const KnownRotors *k, size_t n)
     : o(opt), nknown(n) {
   (void)k;
+  if (!o.rotorDb.empty()) loadRotorDb();
   if (!o.jsonl.empty()) {
     json = fopen(o.jsonl.c_str(), o.freshJsonl ? "w" : "a");
     if (!json) throw std::runtime_error("can't open '" + o.jsonl + "' for writing");
@@ -249,6 +250,39 @@ static std::string countLines(const Search &s, int gen) {
   return out;
 }
 
+// The file: "# drift rotor-db, rule RULE", then one rotor descriptor per line.
+// The descriptor ignores reflections, so a rule that isn't isotropic would lose
+// the mirror image of a saved rotor, which is a different oscillator there.
+void Reporter::loadRotorDb() {
+  if (!o.rule.invariantUnder(FULLSYMM))
+    throw std::runtime_error("--rotor-db needs an isotropic rule: rotor descriptors ignore reflections");
+  FILE *f = fopen(o.rotorDb.c_str(), "r");
+  if (!f) return;   // first search of this rule; finish.py creates the file
+  std::string line;
+  int ch;
+  bool first = true;
+  const std::string head = "# drift rotor-db, rule ";
+  auto done = [&]() {
+    if (first && line.compare(0, head.size(), head) == 0) {
+      Rule r;
+      std::string err;
+      if (!r.parse(line.substr(head.size()), err) || r.mapString() != o.rule.mapString()) {
+        fclose(f);
+        throw std::runtime_error("--rotor-db: " + o.rotorDb + " is for another rule (" + line.substr(head.size()) + ")");
+      }
+    } else if (!line.empty() && line[0] != '#')
+      savedRotors.insert(line);
+    first = false;
+    line.clear();
+  };
+  while ((ch = fgetc(f)) != EOF) {
+    if (ch == '\n') done();
+    else line += (char)ch;
+  }
+  if (!line.empty()) done();
+  fclose(f);
+}
+
 void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
   const long *var = s.P.var;
   int gen = s.gen;
@@ -273,6 +307,7 @@ void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
       if (var[131] && per <= 6) return;
       hist = s.oscinfo(gen, 'u');
       if (o.skipKnown && main.known) return;
+      if (savedRotors.count(main.desc)) { savedHits++; return; }
       kind = "oscillator";
       title = fmt("p%d from gen %d", per, gen - per);
       break;
@@ -450,6 +485,8 @@ void Reporter::footer(double seconds, long long steps, bool finished, bool resum
            maxgen);
   if (o.params.escape) s += fmt("Escapes (still life back, something outside): %ld.\n", counts[ESCAPE]);
   if (o.mustReach) s += fmt("%ld results never reached a --must-reach region.\n", unreached);
+  if (!o.rotorDb.empty())
+    s += fmt("%ld results had a rotor already in the rotor-db (%zu rotors).\n", savedHits, savedRotors.size());
   if (capped) s += fmt("%ld more results weren't printed (--max-results %ld).\n", capped, o.maxResults);
   long found = counts[0] + counts[1] + counts[2] + counts[3] + counts[4];
   if (printed == 0) {   // explain why nothing was printed

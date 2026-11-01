@@ -170,6 +170,16 @@ original arguments, plus a fingerprint of the search settings.
   Known answers: `tests/sparktest.py` (includes the q4i depth-2 sparky p4 from
   `findings/`).
 
+- **Rotor database (2026-10-31).** `--rotor-db FILE`: `Reporter::loadRotorDb` loads
+  rotor descriptors (`main.desc`, canonical in phase and orientation), and
+  matching oscillators return before the per-rotor count. Output filter only:
+  search paths are unchanged. finish.py adds a rotor only when it was listed,
+  when all parts of its reaction were listed, or as debris; never when cut by
+  `--limit`, incomplete or unchecked. So nothing is hidden unseen. Non-isotropic
+  rules are refused (the descriptor folds reflections). Measured single-threaded,
+  seeding half the rotors: B3/S23 and B3-c/S23 result sets equal the unfiltered
+  set minus exactly those rotors (B3-c/S23: 3731 -> 1681 results, 43 rotors, 21 seeded).
+
 ## 4. Open ideas
 
 - Further per-cell speedups in `trycell` and `listneighbors`.

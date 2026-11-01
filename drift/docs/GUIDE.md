@@ -220,6 +220,18 @@ are geometry only, so they work in any rule. `--limit` is applied using the
 unshrunk patterns, whose stators can differ from the shrunk ones, so raise it
 if a sparky pattern might be missing.
 
+**Not seeing the same rotors twice.** Add `rotor-db = life-rotors.txt` to your
+configs, using one file per rule (`survey.py --rotor-db FILE` does this for a
+whole survey). Oscillators with a rotor in the file aren't printed, and finish.py
+adds what it lists. So later searches, and the finishing after them, only spend
+time on new rotors. The search still visits the same patterns, so
+it runs no faster. A rotor cut off by `--limit`, or one that couldn't be completed, is not
+saved and comes back next time; so running the same search again shows the next
+page. To see everything again, remove the option. drift refuses this
+for non-isotropic rules, where the rotor descriptor would treat an oscillator and its
+different mirror image as one. Two oscillators with one rotor but
+different stators count as the same.
+
 Last is "Damaging oscillators": the reactions themselves, with the spark that
 broke part of the still life. `finish.py --clean-only` leaves
 out both, `--max-cells N` drops big patterns, and `--all` adds long fizzles

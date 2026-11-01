@@ -439,6 +439,8 @@ class Survey:
             cmd += ["--resume", job.ckpt]
         else:
             cmd += [job.cfg, "--checkpoint", job.ckpt]
+            if self.a.rotor_db:   # kept in the checkpoint, so a resumed search has it too
+                cmd += ["--rotor-db", os.path.abspath(self.a.rotor_db)]
         cmd += ["--threads", str(self.threads), "--threads-file", job.tfile, "--max-time", str(int(seconds)),
                 "--no-finish", "--progress", "60", "--checkpoint-every", "120"]
         log = open(job.log, "a")
@@ -515,8 +517,11 @@ class Survey:
         job.fin_jobs = max(1, self.threads // max(1, busy))
         cmd = [sys.executable, FINISH, job.cfg, "--seconds", "1", "--limit", "20",
                "--max-minutes", str(self.a.finish_minutes), "--jobs", str(job.fin_jobs)]
+        env = dict(os.environ)
+        if self.a.rotor_db:
+            env["DRIFT_EXTRA_SETTINGS"] = f"rotor-db = {os.path.abspath(self.a.rotor_db)}\n"
         job.fin = subprocess.Popen(cmd, stdout=open(job.base + "-finish.log", "w"), stderr=subprocess.STDOUT,
-                                   start_new_session=True)
+                                   start_new_session=True, env=env)
         job.state = "finishing"
 
     def measure_yield(self, running):
@@ -807,6 +812,8 @@ def main():
     ap.add_argument("--no-ships", action="store_true", help="don't look for spaceships")
     ap.add_argument("--max-ships", type=int, default=2, help="spaceships to search with (most common in soups first; default 2)")
     ap.add_argument("--resume", action="store_true", help="continue the searches saved in the output folder")
+    ap.add_argument("--rotor-db", metavar="FILE",
+                    help="skip rotors in this file and add the ones found (one file per rule; see drift --rotor-db)")
     ap.add_argument("--no-finish", action="store_true", help="don't complete the results with finish.py")
     ap.add_argument("--finish-minutes", type=float, default=3,
                     help="time limit for finishing each search's results (default 3)")
