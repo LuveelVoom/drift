@@ -565,7 +565,7 @@ def main():
 
     # 3. shrink and write the ones that are listed
     lines = [f"# drift results for {a.config}, finished by finish.py (rule {rule}).",
-             "# Each pattern is gen 0 (still life + spark); paste into Golly with this rule.", None, ""]
+             "# Each pattern is gen 0 (still life + spark).", None, ""]
     summary = []
     if converters:
         title = f"Spark converters (still life back, output at least {min_dist} cells from the spark)"

@@ -1,7 +1,6 @@
 # Findings
 
-These are complete patterns found with drift and finished with `drift/tools/finish.py`. Each file holds plain RLE in its rule, ready to paste into
-Golly [1].
+Complete patterns found with drift and finished with `drift/tools/finish.py`, as plain RLE in their rule. All were re-simulated [1].
 
 How each kind of file was made:
 
@@ -16,8 +15,8 @@ How each kind of file was made:
   `must-reach` regions. These oscillators throw a spark into empty space in
   their own cycle. Spark depth 1 means the spark is born next to the object;
   2 or more means it is a free spark.
-- **`fizzles.txt`**: reactions where a spark hits a still life that then
-  recovers completely, i.e. catalysts.
+- **`fizzles.txt`**: catalysts (the spark is absorbed and the still life
+  recovers).
   - From `finish.py`.
   - Rotors longer than 8 cells are left out: those are nearly always a signal
     running along a short wire.

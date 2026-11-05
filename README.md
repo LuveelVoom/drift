@@ -7,7 +7,7 @@ this repo holds LuveelVoom's port.
 
 Main additions:
 - named options and config files instead of dr2's numbered `v` variables;
-- patterns drawn in Golly (LifeHistory RLE), with results as RLE you can paste back;
+- LifeHistory RLE input and plain RLE output;
 - multithreading, a progress line, and checkpoint/resume;
 - a single-thread speedup of 1.5–5.5× over dr2.
 

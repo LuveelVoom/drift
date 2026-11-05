@@ -55,24 +55,19 @@ You give drift two things:
 - a **still life**, usually only a small part of one;
 - a **spark**: a few cells that differ from it in generation 0.
 
-Every cell you don't specify is **unknown**. drift runs the spark forward one
-generation at a time. When the next generation depends on an unknown cell, it
-tries that cell both ways, always keeping the still life stable. A branch
-ends when the disturbance outgrows your size limits, or when it becomes one
-of:
-- an **oscillator**: the disturbance repeats;
-- a **fizzle**: it dies out and the still life is back as it was;
-- **max gen**: it is still going, so something is travelling away.
+Every cell you don't specify is **unknown**. drift runs the spark forward a
+generation at a time, branching on each unknown cell the next generation
+depends on, with the still life kept stable. A branch ends when it outgrows
+the size limits or becomes an **oscillator**, a **fizzle** (the still life
+recovers) or **max gen** (still going).
 
-drift fixes only the cells it needed, so each raw result is part of a
-pattern. After the search, `tools/finish.py` (run for you) completes every
-result, checks it by simulation and sorts it.
+Raw results fix only the cells drift needed; `tools/finish.py` (run for you)
+completes, re-simulates and sorts them.
 
 ## 2. Anatomy of an input file
 
-An input file (a *config*) is plain text: `option = value` lines, `#` starts
-a comment, and the pattern goes last, after a `pattern:` line. This one is
-`examples/beehive-spark.cfg`:
+A config is `option = value` lines (`#` comments), with the pattern last,
+after `pattern:`. This one is `examples/beehive-spark.cfg`:
 
 ```
 rule = B3/S23               # any B/S, INT (e.g. B2-a3/S12) or MAP rule
@@ -94,23 +89,19 @@ Any option can also go on the command line, where it overrides the file
 
 ## 3. Building one, step by step
 
-### Step 1: draw the starting pattern in Golly
+### Step 1: draw the starting pattern
 
-1. **File → New**, then **Control → Set Rule**: `LifeHistory`. This is only for
-   drawing; the search rule is set in the config.
-2. Draw with these states (pick one in the edit bar):
+Draw it in LifeHistory (only for drawing; the search rule is set in the config):
 
-   | state | colour | means |
-   |---|---|---|
-   | 0 | black | **unknown**: drift may build here |
-   | 1 | green | alive (in the still life) |
-   | 2 | dark blue | known dead (empty) |
-   | 3 | pale green | **the spark**: alive in gen 0 only |
-   | 4 | red | dead in gen 0 only (a spark that removes a live cell) |
-   | 5 | yellow | alive, never allowed to change |
-   | 6 | grey | dead, never allowed to change |
-
-3. Select it and use **Edit → Copy** (Golly copies RLE).
+| state | means |
+|---|---|
+| 0 | **unknown**: drift may build here |
+| 1 | alive (in the still life) |
+| 2 | known dead (empty) |
+| 3 | **the spark**: alive in gen 0 only |
+| 4 | dead in gen 0 only (a spark that removes a live cell) |
+| 5 | alive, never allowed to change |
+| 6 | dead, never allowed to change |
 
 Three rules of thumb:
 - **Undrawn cells are unknown, not dead.** Draw empty space in state 2, or add
@@ -122,8 +113,8 @@ Three rules of thumb:
 
 ### Step 2: put it in a config
 
-Paste the RLE after `pattern:`, or save it as a file and write
-`pattern = my.rle`. Then set the rule and the limits.
+Put the RLE after `pattern:`, or write `pattern = my.rle`. Then set the rule
+and the limits.
 
 **Limits** (`max-changed`, `size`) decide how big the disturbance may get.
 Start small and widen them if nothing is found. A bigger spark needs bigger
@@ -131,8 +122,8 @@ limits: the spark's own cells count too.
 
 ### Step 3: add regions
 
-A region's coordinates count from the pattern's top-left cell (row 0, col 0).
-Rows go down and columns go right; negative values are above or to the left.
+Region coordinates are (row, col) from the pattern's top-left cell; rows go
+down, negative values are above or to the left.
 
 ![beehive-spark](img/beehive-spark.svg)
 
@@ -194,7 +185,7 @@ result, in sections, best first:
 | Signals | something is still travelling with a fixed shape |
 
 Each pattern is **generation 0** (still life plus spark), shrunk to as few
-cells as possible. Paste it into Golly with your rule and run it.
+cells as possible.
 
 After those comes "Oscillators found in damaging reactions". When the spark
 breaks part of the still life, what's left can still be a real oscillator.
@@ -202,21 +193,18 @@ This section lists each one on its own, without the spark and with the
 smallest stator found, once per rotor. In B3/S23, rotors that aren't in the
 known rotors list come first and are marked.
 
-**Trivial oscillators** aren't listed whole: those whose rotor falls apart
-into parts more than 2 cells apart. Such parts can't affect each other, even
-through a stator they share (no cell sees both in its 3x3 neighbourhood), so
-a p2 and a p3 rotor side by side are not a real p6. Each part is listed on
-its own under "Oscillators found" instead; `--keep-trivial` lists them whole
-as before. Parts 2 cells apart or closer are always kept together, even
-when they happen not to interact.
+**Trivial oscillators** (rotor parts more than 2 cells apart, which can't
+interact) are split, and each part is listed on its own under "Oscillators
+found"; `--keep-trivial` lists them whole. Parts 2 or fewer cells apart stay
+together.
 
 **Sparky and open oscillators.** Oscillator comments give these numbers:
 `open`, the share of rotor cells an outside object can get next to; `spark
 depth`, how far such a rotor cell is from the stator (2+ is a free spark, 9 means
 no stator); `touch cells`, the always-dead outside cells that see the rotor but
 not the stator; `spark gap`, how far a detached spark (touching cells with no stator
-cell) is from everything else alive in its phase, with its size in brackets. So a
-gap of 2 has one empty cell around the spark. `finish.py --sort sparky` puts the
+cell) is from everything else alive in its phase, with its size in brackets.
+`finish.py --sort sparky` puts the
 largest gaps first, then the deepest sparks; `--sort open`
 puts the most reachable rotors first (the default is `--sort period`). The numbers
 are geometry only, so they work in any rule. To get this order from the
@@ -228,22 +216,18 @@ if a sparky pattern might be missing.
 **Not seeing the same rotors twice.** Add `rotor-db = life-rotors.txt` to your
 configs, using one file per rule (`survey.py --rotor-db FILE` does this for a
 whole survey). Oscillators with a rotor in the file aren't printed, and finish.py
-adds what it lists. So later searches, and the finishing after them, only spend
-time on new rotors. The search still visits the same patterns, so
-it runs no faster. A rotor cut off by `--limit`, or one that couldn't be completed, is not
-saved and comes back next time; so running the same search again shows the next
-page. To see everything again, remove the option. drift refuses this
-for non-isotropic rules, where the rotor descriptor would treat an oscillator and its
-different mirror image as one. Two oscillators with one rotor but
-different stators count as the same.
+adds what it lists, so later runs only finish new rotors (the search itself is
+no faster). Rotors cut off by `--limit` or not completed aren't saved, so a rerun
+shows the next page. One rotor with different stators counts once. Refused for
+non-isotropic rules (the rotor descriptor folds reflections).
 
 Last is "Damaging oscillators": the reactions themselves, with the spark that
 broke part of the still life. `finish.py --clean-only` leaves
 out both, `--max-cells N` drops big patterns, and `--all` adds long fizzles
 and oscillators that don't reach a `must-reach` area in their own cycle.
 
-**`my-results.txt`** holds drift's raw results. These are partial patterns,
-so pasting them into Golly won't work. Useful lines:
+**`my-results.txt`** holds drift's raw results: partial patterns, with unknown
+cells left open. Useful lines:
 
 | line | meaning |
 |---|---|
@@ -316,7 +300,7 @@ See `results/tspark-converter.cfg` and `results/glider-converter.cfg`.
 `wirebuild.py` requires the signal to repeat at least 3 times, finds an
 exactly periodic wire for it with SAT, and tests a single signal on a long
 copy. `--out` writes a finite wire (`--periods`, default 10) with stable end
-caps and a signal on it, ready for Golly.
+caps and a signal on it.
 
 `push = right c/2 3` forces a direction and speed. DIR can be `se` or a vector
 such as `1,2`; a speed of `0` keeps the disturbance within the slack.
@@ -416,7 +400,7 @@ unchecked), with `symmetry = rot180` and `pattern-no-count`.
 | "Results were found but none passed the output filters" | they were skipped | check `skip`, `min-period`, `must-reach` |
 | finished file has only "damaging oscillators" | every oscillator found breaks the still life | `skip = stable` to also keep catalysts; move the spark; loosen the limits |
 | the search takes forever | the limits are too loose | `max-steps`, smaller limits, `symmetry` |
-| results look like nonsense in Golly | you pasted a raw result | use `my-finished.txt` |
+| a result doesn't run as expected | it's a raw (partial) result | use `my-finished.txt` |
 
 ## 7. Reference
 

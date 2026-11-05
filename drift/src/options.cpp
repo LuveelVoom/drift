@@ -792,8 +792,7 @@ bool readModern(const std::vector<std::string> &args, Options &o) {
   }
   if (!twoState.empty())
     o.warnings.push_back("the pattern's RLE header says rule = " + twoState + ", but drift reads patterns "
-                         "as LifeHistory: 'b' cells are unknown, not dead. Draw the pattern in Golly with "
-                         "the LifeHistory rule (dead cells in state 2, the spark in state 3).");
+                         "as LifeHistory: 'b' cells are unknown, not dead (dead is state 2, the spark state 3).");
   int ph = (int)lines.size(), pw = 0;
   bool anyChange = false;
   for (const std::string &l : lines) {
@@ -811,7 +810,7 @@ bool readModern(const std::vector<std::string> &args, Options &o) {
          "(or start from unchecked cells: dr2.c's '2' / '3' / '4')." +
          (twoState.empty() ? std::string()
                            : "\nThis RLE is a two-state pattern (rule = " + twoState +
-                                 "): draw it in Golly with the LifeHistory rule instead."));
+                                 "): use LifeHistory states instead."));
 
   bool square = P.symm == DIAGSYMM || P.symm == ROT90SYMM || P.symm == XSYMM || P.symm == FULLSYMM;
   if (c.gridH) {

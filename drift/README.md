@@ -13,7 +13,7 @@ and can save and resume long runs. It is a port of Dean Hickerson's **dr2.c**.
 ## Install
 
     make                     # builds ./drift
-    pip install python-sat   # needed to finish results into complete patterns
+    pip install python-sat   # finish.py needs it
 
 ## Quick start
 
@@ -25,7 +25,7 @@ files next to the config:
 
 | file | what it is |
 |---|---|
-| `examples/beehive-spark-finished.txt` | **complete, checked patterns**, best first, ready to paste into Golly |
+| `examples/beehive-spark-finished.txt` | **complete, checked patterns**, best first |
 | `examples/beehive-spark-results.txt` (and `.jsonl`) | drift's raw results: partial patterns, as found |
 
 To look at a whole rule at once, run a survey: a standard set of searches
@@ -34,8 +34,7 @@ that share the cores, with the best finds collected in `SUMMARY.md`:
     ./drift survey B3/S135 --minutes 20      # results in ../surveys/B3-S135/
 
 To set up your own search, read **[docs/GUIDE.md](docs/GUIDE.md)**. It covers
-drawing the starting pattern in Golly, the options, and recipes for each kind
-of search. `./drift --help` lists every option, and `./drift my.cfg --dry-run`
+the input format, the options, and recipes for each kind of search. `./drift --help` lists every option, and `./drift my.cfg --dry-run`
 shows what a config sets up without searching.
 
 ## What's where
