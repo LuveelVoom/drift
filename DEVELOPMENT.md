@@ -193,7 +193,73 @@ original arguments, plus a fingerprint of the search settings.
   `max-box = 10x10` (twice), not finished after 60 s without. Not done: P5
   (incomplete fizzles are only counted), P6.
 
+- **Analysis tools from the 2026-11-02..04 web sessions** (`tools/`, prototypes, not
+  wired into finish.py; need python-sat, plus numpy for convanalyze/oneshot and
+  Pillow for convrender). Session configs and the original handoff are in the local
+  results folder (`../results/attempts/session-2026-11-04/`,
+  `../results/notes/web-handoff-2026-11-04/`).
+
+  | Tool | Does |
+  |---|---|
+  | `sparkconv.py CFG...` | fizzles → complete, shrink, re-simulate, require full restore; output distance, clean distance, box; dedupe over 8 orientations. Env MIND (2), MAXBOX (10), SECS, OUT |
+  | `sparkout.py RULE RLE SPARK` | output distance beyond the spark's own reach (for sparks that grow) |
+  | `convanalyze.py RULE RLE [--chain]` | tags SPLITTER, TURN, FREE-SPARK, THROUGH, LONG; chain test X→Y over 8 orientations, loop detection. Side labels are crude for corner inputs |
+  | `convrender.py RULE RLE OUT.png` | reaction strips per converter |
+  | `gliderin.py CFG...` | glider fizzles: complete, shrink, from-infinity check (glider 40 periods back must reach the same gen 0), eater/converter/escape |
+  | `glfar.py RULE RLE [MIND]` | glider reactions: output distance from the impact, FAR SIDE flag. Supersedes `glout.py` (which penalised far-side outputs on the path line) |
+  | `sparkers.py RULE MINDEPTH FINISHED...` | distinct sparky oscillators from finish.py output |
+  | `oneshot.py CFG [MIND]` | one-shot reactions from short-max-gen runs: replay on drift's known cells, then local completion, from-infinity, fate. STRICT=1, DIR=1,-1 (use 1,1 for the q4i/a5 configs), LATER=100 |
+  | `tlosc.py`, `oscparts.py` | traffic-light detection and part extraction, specific to the q4i plus configs |
+
+  Measured there: oneshot's stage-1 replay equals full completion on 60/60 results
+  (10 min → 23 s). Only sparkconv, oneshot, glfar, convanalyze and sparkers were run
+  from a clean repo copy; the rest were only syntax-checked there.
+
+- **drift behaviour found in those sessions** (verified in `search.cpp`/`report.cpp`):
+  permanent damage that settles into a still life is never reported (STABLE needs
+  `semifizzle()`); damage that grows past `max-changed`/`size` is pruned silently.
+  A short `max-gen` (~20) turns every still-active branch into a `maxgen` result,
+  which is how one-shot reactions are kept. The progress ETA can sit at ~97% for
+  10+ minutes in deep subtrees. Search order is deterministic, so a rerun from
+  scratch repeats the same first part: use `--checkpoint`/`--resume`. Symmetric
+  searches count changed cells of all copies. A `C` spark inside a `clear` region
+  survives (regions, then pattern, then clears). There's no "on at gen 0, background
+  unknown" state.
+
+- **finish.py completion fills free space with arbitrary still lifes.** In one-shot
+  runs the "catalysts" came out as 250-500-cell carpets, and 316 of 388 failed the
+  from-infinity check because junk sat on the glider's path. Fizzles are unaffected
+  because `shrink` minimises. oneshot.py completes locally instead (new live cells only
+  within R = 2, then 4, 6, of drift's known background); finish.py could do the same
+  for oscillators and max-gen results.
+
+- **Results of those sessions** (re-simulated; RLEs in the handoff): q4i 25 converters
+  within 10×10 incl. splitters and turns, no chains; a5 30 converters, #3 (14 cells,
+  free domino output) chains into 6 others; HighLife 9; q4i glider from infinity 41
+  distinct (14 far-side); q4i `3o$bo$2bo!` SE-open 11 converters; a5 `3o$bo$2bo!` none
+  at 12/7×7 (exhaustive); q4i plus: 61 symmetric catalyst sets, two oscillators
+  rebuilding the full traffic light (p9 124 cells, p14 104 cells); B36/S23-e7 glider 17
+  restoring reactions. Unchecked whether any are already known.
+
+- **B3/S135 stabilisation (unfinished).** No still life can contain
+  `4bo$5bo2$o$o2b2o$o2b2o$b4o$2bo2$2bo$b4o$o2b2o$o2b2o$o2$5bo$4bo!`: core cell (2,3)
+  is alive with 6 live neighbours and S135 has no S6 (checked per cell). So it can
+  only be an oscillator phase. The user wants drift, not SAT, for this.
+  `b3s135-stabilise-UNRUN.cfg` (session folder) dry-runs but was never run; core
+  cells can't be stator (no LifeHistory state for that).
+
 ## 4. Open ideas
+
+- oneshot.py: intact-catalyst check (at the output gen, still-life cells within 1 of
+  it must be intact). Acceptance: `a5-glider-oneshot.cfg` (60 s) rejects #1067 and
+  #1073 and keeps #1197; B36/S23-e7 keeps #212-#214.
+- Classify "still active after LATER gens" (a5: 508 of 867): explosion vs signal on
+  a drift-built wire (`wirecheck.py` logic).
+- Port convanalyze into finish.py's converter section (plan P7) and add a one-shot
+  section from maxgen results.
+- An option to report period-1 permanent-damage outcomes.
+- Long runs still to do, with `--checkpoint`: `q4i-glider-fizzle.cfg` (~3 h on 2
+  threads), `q4i-spark3o-ring1-10.cfg` (~1 h 11 min), `a5-spark3o-far-*16.cfg`.
 
 - Further per-cell speedups in `trycell` and `listneighbors`.
 - Survey ship converters and ship drifters have never kept a result (B3/S135,
