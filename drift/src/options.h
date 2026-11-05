@@ -27,6 +27,7 @@ struct Options {
 
   std::string knownRotorsFile;     // empty = default lookup
   bool knownRotorsExplicit = false;
+  int outputDist = 0;              // fizzles must have an output this far from the spark
   std::string rotorDb;             // rotors saved by earlier searches of this rule (finish.py adds to it)
   std::string jsonl;               // append one JSON object per result
   std::string textOut;             // copy of the printed results

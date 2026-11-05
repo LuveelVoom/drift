@@ -210,11 +210,14 @@ its own under "Oscillators found" instead; `--keep-trivial` lists them whole
 as before. Parts 2 cells apart or closer are always kept together, even
 when they happen not to interact.
 
-**Sparky and open oscillators.** Oscillator comments give three numbers:
+**Sparky and open oscillators.** Oscillator comments give these numbers:
 `open`, the share of rotor cells an outside object can get next to; `spark
 depth`, how far such a rotor cell is from the stator (2+ is a free spark, 9 means
 no stator); `touch cells`, the always-dead outside cells that see the rotor but
-not the stator. `finish.py --sort sparky` puts deep sparks first; `--sort open`
+not the stator; `spark gap`, how far a detached spark (touching cells with no stator
+cell) is from everything else alive in its phase, with its size in brackets. So a
+gap of 2 has one empty cell around the spark. `finish.py --sort sparky` puts the
+largest gaps first, then the deepest sparks; `--sort open`
 puts the most reachable rotors first (the default is `--sort period`). The numbers
 are geometry only, so they work in any rule. To get this order from the
 finishing step of a search, use `sort = sparky` in the config or
@@ -363,6 +366,27 @@ breaks the limits. `finish.py` lists them under "Escapes" with what is
 outside at that generation. In HighLife, a glider hitting a pond and block
 with the two eaters unknown (20 changed cells in 8×8) finds the glider-to-pi
 reaction in about a minute.
+
+### Spark converters
+
+A spark converter is a still life that takes a spark, makes one somewhere else
+and restores itself. finish.py checks every fizzle and lists these under "Spark
+converters", smallest box first, and writes them all to `my-converters.rle`,
+10 cells apart. `--min-output-dist N` (default 2) and `--max-box N` filter the
+list, and `--no-converters` skips this step. `dist` counts every cell outside
+the still life; `clean` counts only cells a receiver could use without touching
+the still life.
+
+To search for them, clear only the side the spark comes from:
+
+    clear = r -60 -60 60 -1
+    max-box = 10x10             # abandon backgrounds that can't fit 10x10
+    output-dist = 3             # drop fizzles with no output 3 cells away
+    skip = oscillator, stable
+    per-rotor = 0
+
+`max-box` changes the search and loses still lifes that don't fit that W x H box
+(it isn't tried rotated). `output-dist` only filters the output.
 
 ### Gutter symmetry
 

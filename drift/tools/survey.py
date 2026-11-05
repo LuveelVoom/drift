@@ -77,21 +77,15 @@ per-rotor = 0
 max-results = 3000
 no-rechange = 8,80
 """, SPARK),
-    # spark at (0,0); still life in rows -4..4, cols 1..9; output spark outside that box
-    "converter": ("spark converters (10 cells in 6x6, still life in a 9x9 box)", """
+    # spark at (0,0), coming from the left: the still life may wrap above and below it
+    "converter": ("spark converters (10 cells in 6x6, still life in a 10x10 box)", """
 max-changed = 10
 size = 6x6
-clear = r -60 -60 -5 80
-clear = r 5 -60 60 80
-clear = r -4 -60 4 0
-clear = r -4 10 4 80
-must-reach = r -60 4 -5 80
-must-reach = r 5 4 60 80
-must-reach = r -60 10 60 80
-must-reach = r -60 -60 -4 3
-must-reach = r 4 -60 60 3
+clear = r -60 -60 60 -1
+max-box = 10x10
+output-dist = 3
 skip = oscillator, stable
-per-rotor = 3
+per-rotor = 0
 """, SPARK),
 }
 

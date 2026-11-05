@@ -31,7 +31,7 @@ class Reporter {
   // State that survives a checkpoint
   std::unordered_set<uint64_t> hashes;
   long counts[5] = {0, 0, 0, 0, 0};   // all outcomes found, by Outcome
-  long printed = 0, unknownOsc = 0, unreached = 0, capped = 0, savedHits = 0;
+  long printed = 0, unknownOsc = 0, unreached = 0, capped = 0, savedHits = 0, outputNear = 0;
   int maxgen = 0;                  // highest generation reached so far
   std::string finishScript = "tests/finish.py";
 
@@ -43,6 +43,7 @@ class Reporter {
   std::unordered_map<std::string, int> seenRotor;
   std::unordered_set<std::string> savedRotors;   // --rotor-db
   void loadRotorDb();
+  bool reachesOutput(const Search &s) const;
 
   void classic(Search &s, Outcome o, int per, bool semifzl, uint64_t h);
   void modern(Search &s, Outcome o, int per, bool semifzl);

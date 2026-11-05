@@ -39,4 +39,15 @@ assert L.spark_stats(c) == (0.0, 0, 0), L.spark_stats(c)
 
 # No rotor at all.
 assert L.spark_stats([frozenset(ring)]) == (0.0, 0, 0)
+# The user's q4i p5: depth 3, with a lone cell one empty cell away from the rest.
+p5 = cycle("x = 10, y = 11, rule = B3/S23-q4i\n2b2ob2o$3bobobo$2b2ob3o$bo$4b4o$o3bo2bo$4b4obo$bo6b2o$2b2ob2o$3bobo$2b\n"
+           "2ob2o!", 5)
+print("q4i p5:", L.spark_stats(p5), L.spark_gap(p5))
+assert L.spark_stats(p5)[1] == 3 and L.spark_gap(p5) == (2, 1)
+
+# Lone rotor cell 3 from a stator cell; transposed; walled in; attached to the stator.
+assert L.spark_gap([frozenset({(0, 0), (0, 3)}), frozenset({(0, 0)})]) == (3, 1)
+assert L.spark_gap([frozenset({(0, 0), (3, 0)}), frozenset({(0, 0)})]) == (3, 1)
+assert L.spark_gap([frozenset(ring | {(3, 3)}), frozenset(ring)]) == (0, 0)
+assert L.spark_gap([frozenset({(0, 0), (0, 1)}), frozenset({(0, 0)})]) == (0, 0)
 print("spark_stats: all ok")

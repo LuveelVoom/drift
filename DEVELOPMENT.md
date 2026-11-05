@@ -180,6 +180,19 @@ original arguments, plus a fingerprint of the search settings.
   seeding half the rotors: B3/S23 and B3-c/S23 result sets equal the unfiltered
   set minus exactly those rotors (B3-c/S23: 3731 -> 1681 results, 43 rotors, 21 seeded).
 
+- **Spark converters (2026-11-02).** From `SPARK-CONVERTERS-PLAN.md`: P1
+  finish.py section (every fizzle, dedupe over 8 orientations, `tests/convtest.py`),
+  P2 `output-dist` (Reporter filter), P3 `max-box`, P4 survey job. `max-box`:
+  `Search::onBox[n]` is the box after n settings, so backup needs no undo; it's in
+  the fingerprint. All settings pass through `proceed`, where it's checked.
+  Measured, q4i, one thread, 8 cells 5x5: P2 equals the unfiltered set filtered
+  afterwards (96 of 124, none lost or extra). P3: comparing exact results needs
+  `--prob 100`, since pruning shifts the random choice order and with it which duplicate
+  is kept; then 0 lost by history, and shrunk converters are the same 16 with
+  and without. Speed, 10 threads, 10 cells 6x6, clear left only: 8.6 s with
+  `max-box = 10x10` (twice), not finished after 60 s without. Not done: P5
+  (incomplete fizzles are only counted), P6.
+
 ## 4. Open ideas
 
 - Further per-cell speedups in `trycell` and `listneighbors`.

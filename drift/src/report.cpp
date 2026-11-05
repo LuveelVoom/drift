@@ -1,6 +1,8 @@
 #include "report.h"
 
+#include <algorithm>
 #include <cstdarg>
+#include <cstdlib>
 #include <stdexcept>
 #include <vector>
 
@@ -283,6 +285,20 @@ void Reporter::loadRotorDb() {
   fclose(f);
 }
 
+// --output-dist: a cell on at some gen >= 1, off in the background, far from all gen-0 cells.
+bool Reporter::reachesOutput(const Search &s) const {
+  for (int g = 1; g <= s.gen; g++)
+    for (int q = s.chgd[g]; q < s.nays[g]; q++) {
+      const auto &p = s.chglist[q];
+      if (s.bkgd[s.idx(p.r, p.c)] != 0) continue;   // differs from an on cell: it died
+      bool far = true;
+      for (int k = s.chgd[0]; k < s.nays[0] && far; k++)
+        far = std::max(std::abs(p.r - s.chglist[k].r), std::abs(p.c - s.chglist[k].c)) >= o.outputDist;
+      if (far) return true;
+    }
+  return false;
+}
+
 void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
   const long *var = s.P.var;
   int gen = s.gen;
@@ -320,6 +336,7 @@ void Reporter::modern(Search &s, Outcome oc, int per, bool semifzl) {
       break;
     case FIZZLE:
       if (o.skipFizzle) return;
+      if (o.outputDist && !reachesOutput(s)) { outputNear++; return; }
       main = s.oscinfo(gen, 'f');
       if (o.skipKnown && main.known) return;
       kind = "fizzle";
@@ -485,6 +502,7 @@ void Reporter::footer(double seconds, long long steps, bool finished, bool resum
            maxgen);
   if (o.params.escape) s += fmt("Escapes (still life back, something outside): %ld.\n", counts[ESCAPE]);
   if (o.mustReach) s += fmt("%ld results never reached a --must-reach region.\n", unreached);
+  if (o.outputDist) s += fmt("%ld fizzles had no output %d or more cells from the spark.\n", outputNear, o.outputDist);
   if (!o.rotorDb.empty())
     s += fmt("%ld results had a rotor already in the rotor-db (%zu rotors).\n", savedHits, savedRotors.size());
   if (capped) s += fmt("%ld more results weren't printed (--max-results %ld).\n", capped, o.maxResults);

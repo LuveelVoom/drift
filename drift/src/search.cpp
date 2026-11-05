@@ -3,6 +3,8 @@
 // side; comments mark the places where behaviour intentionally differs.
 #include "search.h"
 
+#include <algorithm>
+
 #include <cmath>
 #include <cstdarg>
 #include <cstdio>
@@ -372,11 +374,27 @@ bool Search::consis9(int r, int c) {
 }
 
 bool Search::proceed(int r, int c, uint8_t v, bool f, bool dec) {
-  nxstng = nwstng;
+  int from = nxstng = nwstng;
   setbkgd(r, c, v, f, dec);
   while (nxstng != nwstng)
     if (consis9(st[nxstng].r, st[nxstng].c)) return ERR;
     else nxstng++;
+  return P.boxW ? boxTooBig(from) : OK;
+}
+
+// onBox is indexed by the number of settings, so backup needs no undo: lowering
+// nwstng goes back to an entry computed earlier.
+bool Search::boxTooBig(int from) {
+  if ((int)onBox.size() <= nwstng) onBox.resize(2 * nwstng + 64);
+  for (int n = from; n < nwstng; n++) {
+    Box b = onBox[n];
+    if (st[n].val == ON) {
+      b.r0 = std::min(b.r0, st[n].r); b.r1 = std::max(b.r1, st[n].r);
+      b.c0 = std::min(b.c0, st[n].c); b.c1 = std::max(b.c1, st[n].c);
+      if (b.r1 - b.r0 >= P.boxH || b.c1 - b.c0 >= P.boxW) return ERR;
+    }
+    onBox[n + 1] = b;
+  }
   return OK;
 }
 
@@ -692,6 +710,16 @@ void Search::start() {
       HT != WD)
     throw std::runtime_error("this symmetry requires height = width");
   nwstng = 0;           // make initialization un-backup-able
+  if (P.boxW) {
+    Box b = {HT, -1, WD, -1};
+    for (int r = 0; r < HT; r++)
+      for (int c = 0; c < WD; c++)
+        if (bkgd[idx(r, c)] == ON) {
+          b.r0 = std::min(b.r0, r); b.r1 = std::max(b.r1, r);
+          b.c0 = std::min(b.c0, c); b.c1 = std::max(b.c1, c);
+        }
+    onBox.assign(64, b);
+  }
   changecurr(curr, 0);  // curr <- gen 0
   found = false;
   listneighbors(0);

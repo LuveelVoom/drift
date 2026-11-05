@@ -56,6 +56,8 @@ struct Params {
   // --escape: end a branch as soon as every changed cell is in a no-count
   // region, after the reaction has touched the counted area.
   bool escape = false;
+  // --max-box: background cells known to be on must fit a W x H box. Prunes.
+  int boxW = 0, boxH = 0;
   long var[NUMVARS] = {};
   std::vector<int> reqchgcount;     // dr's "cc" command
   // Minimum-speed constraints: every newly changed cell needs
@@ -160,6 +162,9 @@ class Search {
   std::vector<uint32_t> stamp;
   uint32_t stampv = 0;
   std::vector<uint8_t> cell;    // scratch for rotor descriptors
+  struct Box { int r0, r1, c0, c1; };
+  std::vector<Box> onBox;       // onBox[n]: box of the on background cells after n settings
+  bool boxTooBig(int from);
   std::vector<uint8_t> sortkeys;
   std::vector<Pt> sorted;
 

@@ -27,6 +27,10 @@ as dead and `clear` regions stay empty), simulates it and sorts it:
   damaging oscillators  the spark breaks part of the still life to make it
                         (listed last; --clean-only leaves out these and the
                         section above)
+  spark converters      catalysts whose reaction puts a cell outside the still life
+                        at least --min-output-dist from the spark. Every fizzle is
+                        checked, not one per reaction shape as for catalysts, and
+                        they are also written to my-converters.rle, 10 cells apart
   debris                oscillates without a stator (not listed)
   trivial               the rotor falls apart into parts more than 2 cells
                         apart, which can't affect each other even through a
@@ -298,12 +302,14 @@ def _init(cfg, table, seconds, cnf):
 def spark_key(cyc, how):
     """Sort key for --sort (smaller first) from L.spark_stats."""
     o, d, t = L.spark_stats(cyc)
-    return (-d, -t, -o) if how == "sparky" else (-o, -t, -d)
+    g, n = L.spark_gap(cyc)
+    return (-g, n, -d, -t, -o) if how == "sparky" else (-o, -t, -d)
 
 
 def spark_note(cyc):
     o, d, t = L.spark_stats(cyc)
-    return f"open {100 * o:.0f}%, spark depth {d}, {t} touch cells"
+    g, n = L.spark_gap(cyc)
+    return f"open {100 * o:.0f}%, spark depth {d}, {t} touch cells, spark gap {g}" + (f" ({n} cells)" if g else "")
 
 
 RANK = {"clean": 0, "catalyst": 0, "converter": 0, "escape": 0, "signal": 0, "no-spark": 1, "damaging": 2, "debris": 3}
@@ -327,6 +333,51 @@ def _classify(job):
     if best and best[1]:
         best[1].pop("empty", None)   # a closure; rebuilt where it's needed
     return best
+
+
+def _convert(job):
+    """Check one fizzle as a spark converter: (why it was dropped, details)."""
+    res, min_dist, max_box = job
+    try:
+        got = FIN.fizzle(res)
+    except Exception as e:
+        print(f"  (result #{res['n']} skipped: {e})", file=sys.stderr, flush=True)
+        got = None
+    if not got:
+        return "incomplete", None
+    info = got[1]
+    spark = info["hist"][0] - info["still"]
+    far = lambda s, h: spark and any(min(max(abs(r - a), abs(c - b)) for a, b in spark) >= min_dist
+                                     for g in h[1:] for r, c in g - s)
+    if not far(info["still"], info["hist"]):   # also rules out the shrunk pattern: same reaction
+        return "too close", None
+    change = set(info["hist"][0]) ^ set(info["still"])
+    g0 = FIN.shrink("catalyst", info) or info["hist"][0]
+    still = frozenset(set(g0) ^ change)
+    if not still:
+        return "too close", None
+    h = [frozenset(g0)]
+    for _ in range(res["gen"] + 6):
+        h.append(frozenset(L.step(h[-1], FIN.table)))
+    if h[-1] != still or h[-2] != still:
+        return "not restored", None
+    dist, gen, clean = L.spark_outputs(still, h)
+    if dist < min_dist:
+        return "too close", None
+    rs, cs = [r for r, c in still], [c for r, c in still]
+    w, ht = max(cs) - min(cs) + 1, max(rs) - min(rs) + 1
+    if max_box and max(w, ht) > max_box:
+        return "box too big", None
+    best = None
+    for t in TRANSFORMS:   # the same converter in any orientation
+        a = [t(*q) for q in g0]
+        s = {t(*q) for q in spark}
+        r0, c0 = min(q[0] for q in a), min(q[1] for q in a)
+        k = tuple(sorted(((q[0] - r0, q[1] - c0), q in s) for q in a))
+        best = k if best is None or k < best else best
+    back = max(t for t in range(len(h)) if h[t] != still) + 1
+    return "", dict(key=best, n=res["n"], dist=dist, gen=gen, clean=clean, back=back, w=w, h=ht,
+                    cells=len(still), g0=g0, unshrunk=bool(info.get("unshrunk")))
 
 
 def _shrink(job):
@@ -375,10 +426,15 @@ def main():
                     help="list trivial oscillators (rotor parts more than 2 cells apart, so they can't "
                          "interact) as they are, instead of only their parts")
     ap.add_argument("--sort", choices=("period", "sparky", "open"),
-                    help="order of the oscillator sections: period (default), sparky (free sparks first: "
-                         "spark depth, then touch cells) or open (largest share of the rotor reachable "
+                    help="order of the oscillator sections: period (default), sparky (most detached sparks first: "
+                         "spark gap, then depth, then touch cells) or open (largest share of the rotor reachable "
                          "from outside first). The numbers are in each pattern's comment. "
                          "Default: the config's sort setting")
+    ap.add_argument("--min-output-dist", type=int,
+                    help="spark converters: smallest distance from the input spark to an output "
+                         "(default: the config's output-dist, else 2)")
+    ap.add_argument("--max-box", type=int, help="spark converters: largest still-life box side")
+    ap.add_argument("--no-converters", action="store_true", help="don't look for spark converters")
     ap.add_argument("--limit", type=int, default=30, help="patterns listed per section (default 30)")
     ap.add_argument("--max-cells", type=int, default=0, help="leave out patterns bigger than this")
     ap.add_argument("--seconds", type=float, default=5, help="time spent shrinking each listed pattern")
@@ -411,6 +467,7 @@ def main():
     drifters = bool(re.search(r"^\s*(no-rechange|push)\b", open(a.config).read(), re.M))
     groups = collections.defaultdict(list)
     rotor_db = L.rotor_db_path(a.config)
+    fizzles = []
     save = set()   # rotors for the rotor-db: only ones the user has seen, or never wants to
     for line in open(jsonl):
         res = json.loads(line)
@@ -418,6 +475,7 @@ def main():
         if k == "oscillator":
             groups[(k, res["rotor"])].append(res)
         elif k == "fizzle":
+            fizzles.append(res)
             h, w = map(int, res["history"].split()[2].split("x"))
             if max(h, w) <= 8 or a.all or drifters:
                 groups[(k, res["history"])].append(res)
@@ -484,10 +542,49 @@ def main():
         ext.sort(key=lambda i: (known(i), -i["period"], -i["rotor"]))
         found["extracted"] = ext
 
+    # Spark converters: every fizzle, since different catalysts can share a reaction shape
+    converters, drops = [], collections.Counter()
+    min_dist = a.min_output_dist or int(L.config_setting(a.config, "output-dist") or 2)
+    if fizzles and not a.no_converters:
+        best = {}
+        with Workers(min(a.jobs, len(fizzles)), init) as W:
+            jobs = [(res, min_dist, a.max_box) for res in fizzles]
+            for ji, (why, c) in enumerate(W.imap(_convert, jobs)):
+                if late(0.85):
+                    drops["not checked (time limit)"] = len(jobs) - ji
+                    break
+                if c is None:
+                    drops[why] += 1
+                elif c["key"] in best and best[c["key"]]["cells"] <= c["cells"]:
+                    drops["duplicate"] += 1
+                else:
+                    best[c["key"]] = c
+        converters = sorted(best.values(), key=lambda o: (max(o["w"], o["h"]), o["w"] * o["h"], -o["dist"], o["cells"]))
+        if a.max_cells:
+            converters = [c for c in converters if c["cells"] <= a.max_cells]
+
     # 3. shrink and write the ones that are listed
     lines = [f"# drift results for {a.config}, finished by finish.py (rule {rule}).",
              "# Each pattern is gen 0 (still life + spark); paste into Golly with this rule.", None, ""]
     summary = []
+    if converters:
+        title = f"Spark converters (still life back, output at least {min_dist} cells from the spark)"
+        summary.append(f"{len(converters)} spark converters")
+        lines += [f"## {title}: {len(converters)}", ""]
+        for c in converters:
+            note = " (couldn't be shrunk)" if c["unshrunk"] else ""
+            lines.append(f"#C spark converter, {c['w']}x{c['h']}, {c['cells']} cells, output dist {c['dist']} "
+                         f"(clean {c['clean']}) at gen {c['gen']}, back by gen {c['back']}, result #{c['n']}{note}\n"
+                         + L.to_rle(c["g0"], rule).rstrip() + "\n")
+        sheet, x, y, tall = set(), 0, 0, 0
+        for i, c in enumerate(converters):
+            if i and i % 8 == 0:
+                y, x, tall = y + tall + 10, 0, 0
+            r0, c0 = min(q[0] for q in c["g0"]), min(q[1] for q in c["g0"])
+            sheet |= {(q[0] - r0 + y, q[1] - c0 + x) for q in c["g0"]}
+            tall = max(tall, max(q[0] for q in c["g0"]) - r0 + 1)
+            x += max(q[1] for q in c["g0"]) - c0 + 11
+        open(base + "-converters.rle", "w").write(L.to_rle(sheet, rule))
     with Workers(a.jobs, init) as W:
         for key, title in SECTIONS:
             items = found.get(key, [])
@@ -623,6 +720,9 @@ def main():
     for k, name in names.items():
         if counts[k]:
             print(f"  {counts[k]:4d}  {name}")
+    if fizzles and not a.no_converters:
+        print(f"  {len(converters):4d}  spark converters ("
+              + ", ".join(f"{v} {k}" for k, v in sorted(drops.items())) + ")")
     print(f"Saved to {out}")
     if counts["no-spark"] and not a.all:
         print("  (oscillators without a spark in their cycle aren't listed; add --all)")

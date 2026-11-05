@@ -487,6 +487,78 @@ def spark_stats(cyc):
     return len(reached) / len(rotor), depth, touch
 
 
+def spark_gap(cyc):
+    """How detached the sparks of one cycle are, whatever the rule: (gap, size). In each
+    phase, a spark is a group of touching live cells with no stator cell, next to the
+    always-dead outside. gap is the Chebyshev distance from it to the nearest other
+    live cell of that phase (2 = one empty cell between; 9 at most, also if nothing else
+    is alive), size its cell count. The largest gap wins, then the smallest size;
+    (0, 0) if no phase has a spark."""
+    cyc = [frozenset(s) for s in cyc]
+    cells = frozenset(set().union(*cyc))
+    stator = frozenset.intersection(*cyc)
+    if not cells:
+        return 0, 0
+    outside = exterior(cells)
+    best = (0, 0)
+    for ph in cyc:
+        for group in components(ph, 1):
+            if group & stator or not any((r + i, c + j) in outside
+                                         for r, c in group for i, j in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                continue
+            rest = ph - group
+            gap = min((max(abs(r - a), abs(c - b)) for r, c in group for a, b in rest), default=9)
+            gap = min(gap, 9)
+            if gap > best[0] or (gap == best[0] and len(group) < best[1]):
+                best = (gap, len(group))
+    return best
+
+
+def exterior(still, pad=4):
+    """Dead cells 4-connected to the outside of the still life's box + pad."""
+    r0 = min(r for r, c in still) - pad
+    r1 = max(r for r, c in still) + pad
+    c0 = min(c for r, c in still) - pad
+    c1 = max(c for r, c in still) + pad
+    free, todo = {(r0, c0)}, [(r0, c0)]
+    while todo:
+        r, c = todo.pop()
+        for q in ((r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)):
+            if r0 <= q[0] <= r1 and c0 <= q[1] <= c1 and q not in free and q not in still:
+                free.add(q)
+                todo.append(q)
+    return free
+
+
+def spark_outputs(still, hist):
+    """Where a reaction on a still life reaches: (dist, gen, clean). An output is a cell
+    alive at gen >= 1, not in the still life, in its exterior. dist: largest Chebyshev
+    distance of an output from the nearest spark cell (gen-0 cells not in the still life);
+    gen: first generation with an output that far; clean: the same as dist, for outputs
+    some exterior cell sees in its 3x3 without seeing a still-life cell."""
+    spark = hist[0] - still
+    ext = exterior(still)
+    dist, gen, clean = 0, 0, 0
+    for t in range(1, len(hist)):
+        for r, c in hist[t] - still:
+            if (r, c) not in ext:
+                continue
+            d = min(max(abs(r - a), abs(c - b)) for a, b in spark)
+            if d > dist:
+                dist, gen = d, t
+            if d > clean and any((r + i, c + j) in ext and
+                                 not any((r + i + k, c + j + m) in still for k in (-1, 0, 1) for m in (-1, 0, 1))
+                                 for i in (-1, 0, 1) for j in (-1, 0, 1)):
+                clean = d
+    return dist, gen, clean
+
+
+def config_setting(config, name):
+    """The last value of a setting in the config (or on drift's command line), or None."""
+    m = re.findall(rf"^\s*{name}\s*[= ]\s*(\S+)", "\n".join(config_lines(config)), re.M)
+    return m[-1] if m else None
+
+
 def config_sort(config):
     """The config's sort setting (drift's --sort), default period."""
     m = re.findall(r"^\s*sort\s*[= ]\s*(\w+)", "\n".join(config_lines(config)), re.M)

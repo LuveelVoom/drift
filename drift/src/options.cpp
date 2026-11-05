@@ -203,6 +203,17 @@ const std::vector<Opt> &opts() {
      [](Ctx &c, const std::string &v) { c.o.params.maxwidth = (int)toLong("max-width", v, 1); }},
     {"max-height", "N", "Search", "Max height of the changed region (dr2: h). Default 3.",
      [](Ctx &c, const std::string &v) { c.o.params.maxheight = (int)toLong("max-height", v, 1); }},
+    {"max-box", "WxH", "Search",
+     "Give up on a branch when the background's known on cells don't fit a W x H box, wherever\n"
+     "it sits. Faster than clear regions for small still lifes; loses only what doesn't fit.",
+     [](Ctx &c, const std::string &v) {
+       int w, h;
+       std::string t = v;
+       for (char &ch : t) if (ch == 'X' || ch == '*') ch = 'x';
+       if (sscanf(t.c_str(), "%dx%d", &w, &h) != 2 || w < 1 || h < 1) fail("--max-box expects WxH, e.g. 10x10");
+       c.o.params.boxW = w;
+       c.o.params.boxH = h;
+     }},
     {"size", "WxH", "Search", "Shorthand for --max-width W --max-height H.",
      [](Ctx &c, const std::string &v) {
        int w, h;
@@ -428,6 +439,10 @@ const std::vector<Opt> &opts() {
      }},
 
     // --- Output
+    {"output-dist", "N", "Output",
+     "Keep a fizzle only if some cell born off the background is N or more cells (king moves)\n"
+     "from every gen-0 spark cell. Output filter: the search is unchanged.",
+     [](Ctx &c, const std::string &v) { c.o.outputDist = (int)toLong("output-dist", v, 1); }},
     {"only-new", nullptr, "Output", "Don't print outcomes whose rotor is in the known rotors list.",
      [](Ctx &c, const std::string &v) { c.o.skipKnown = toBool("only-new", v); }},
     {"skip", "KINDS", "Output", "Don't print these outcomes: any of oscillator, stable, fizzle, maxgen, escape.",
@@ -473,7 +488,7 @@ const std::vector<Opt> &opts() {
     {"sort", "HOW", "Output",
      "Order of the oscillators in the finished file: period (default), sparky (free sparks\n"
      "first) or open (most reachable rotors first). finish.py reads this setting.",
-     [](Ctx &c, const std::string &v) {
+     [](Ctx &, const std::string &v) {
        if (v != "period" && v != "sparky" && v != "open")
          fail("--sort: unknown order '" + v + "' (use period, sparky or open)");
      }},
@@ -890,7 +905,7 @@ bool readModern(const std::vector<std::string> &args, Options &o) {
 
 std::vector<std::string> cliSettings(const std::vector<std::string> &args) {
   static const char *KEEP[] = {"rule", "pattern", "clear", "no-change", "allow-change", "no-count",
-                               "count", "no-check", "check", "must-reach", "sort", "rotor-db"};
+                               "count", "no-check", "check", "must-reach", "sort", "rotor-db", "output-dist"};
   std::vector<std::string> out;
   for (size_t i = 0; i < args.size(); i++) {
     const std::string &a = args[i];
