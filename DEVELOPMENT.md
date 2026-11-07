@@ -43,7 +43,7 @@ exhaustively by `tests/ruletest`. That's why a single-threaded run is
 identical to dr2.
 
 **Hensel bit order.** NW=0x80 N=0x40 NE=0x20 W=0x10 E=0x08 SW=0x04 S=0x02
-SE=0x01, with r-1 = north. The class table comes from catforce-int.
+SE=0x01, with r-1 = north. The class table comes from ntCatForce+ (github.com/LuveelVoom/ntCatForce-plus).
 
 **Threads.** Every free choice is recorded as a decision. A subtree is the
 list of decision values that leads to it. A worker replays that path (with

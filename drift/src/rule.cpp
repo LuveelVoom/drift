@@ -13,7 +13,7 @@ const int DC[9] = {-1, 0, 1, -1, 0, 1, -1, 0, 1};
 // NW=0x80 N=0x40 NE=0x20 W=0x10 E=0x08 SW=0x04 S=0x02 SE=0x01
 static const int NBIT[9] = {0x80, 0x40, 0x20, 0x10, 0, 0x08, 0x04, 0x02, 0x01};
 
-// Hensel isotropic neighbourhood classes (from catforce-int/CatForce/LifeAPI.h,
+// Hensel isotropic neighbourhood classes (from ntCatForce-plus/CatForce/LifeAPI.h,
 // which takes them from the ca-rules crate, following Golly).
 static const struct { char n; char l; uint8_t masks[8]; int cnt; } HENSEL[] = {
   {'0','c',{0x00},1},
