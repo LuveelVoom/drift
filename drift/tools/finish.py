@@ -17,6 +17,8 @@ as dead and `clear` regions stay empty), simulates it and sorts it:
   escapes               (--escape) the still life is back while something is
                         outside in no-count space, e.g. a glider turned into a pi
   signals               a disturbance still travelling with a fixed shape
+  max-gen reactions     still running at max-gen: the still life is completed
+                        and the reaction checked up to max-gen only
   oscillators found     the oscillators that damaging reactions end in, each
   in damaging reactions on its own with the smallest stator found: real
                         oscillators even though the spark doesn't start them
@@ -141,23 +143,26 @@ class Finisher:
         return "catalyst", dict(res=res, hist=hist, still=still, empty=empty, size=len(hist[0]))
 
     def maxgen(self, res):
-        r = self.run(res, 320, clear_road=True)
-        if r:
-            still, hist, empty = r
-            end = hist[-1]
-            if still <= end and end - still:
-                kinds = [L.object_kind(c, self.table) for c in L.components(end - still)]
-                if all(k and k.startswith("spaceship") for k in kinds):
-                    return "converter", dict(res=res, hist=hist, size=len(hist[0]), what=", ".join(kinds))
+        # The still life is completed without a box around drift's known cells: the
+        # casing usually ends at that box's edge, so forcing everything outside it
+        # empty made almost every max-gen result impossible to complete.
+        r = self.run(res, 320)
+        if not r:
+            return None
+        still, hist, empty = r
+        end = hist[-1]
+        if still <= end and end - still:
+            kinds = [L.object_kind(c, self.table) for c in L.components(end - still)]
+            if all(k and k.startswith("spaceship") for k in kinds):
+                return "converter", dict(res=res, hist=hist, size=len(hist[0]), what=", ".join(kinds))
         import wirebuild
         m = wirebuild.measure(res, self.table)
         if m:
-            # keep the completed pattern so the signal is written out (it used to be left empty)
-            r = r or self.run(res, 1)
-            hist = r[1] if r else None
-            return "signal", dict(res=res, hist=hist, size=len(hist[0]) if hist else 0,
+            return "signal", dict(res=res, hist=hist, size=len(hist[0]),
                                   what=f"repeats every {m[0]} gens moving {m[1]}")
-        return None
+        # Anything else: the reaction as drift saw it, up to max-gen only.
+        g = res["gen"]
+        return "maxgen", dict(res=res, hist=hist[:g + 1], still=still, empty=empty, size=len(hist[0]))
 
     def escape(self, res):
         g = res["gen"]
@@ -178,11 +183,11 @@ class Finisher:
     def shrink(self, kind, info):
         """Smallest gen-0 pattern with the same reaction (checked), else the completed one."""
         hist = info.get("hist")
-        if kind not in ("clean", "catalyst", "damaging", "no-spark"):
+        if kind not in ("clean", "catalyst", "damaging", "no-spark", "maxgen"):
             return hist[0] if hist else None
         res = info["res"]
         g = res["gen"]
-        if kind == "catalyst":
+        if kind in ("catalyst", "maxgen"):
             states, loop = hist[:g + 1], False
         else:
             p = res["period"]
@@ -201,6 +206,9 @@ class Finisher:
                 h.append(frozenset(L.step(h[-1], self.table)))
             if kind == "catalyst":
                 ok = h[g] == still and h[g + 1] == still
+            elif kind == "maxgen":   # same reaction (relative to each still life) up to max-gen
+                old = info["still"]
+                ok = all(h[t] ^ still == states[t] ^ old for t in range(g + 1))
             else:
                 p = res["period"]
                 ok = h[g + p] == h[g] and h[g + 2 * p] == h[g] and not any(h[g + d] == h[g] for d in range(1, p))
@@ -282,6 +290,7 @@ SECTIONS = [
     ("converter", "Spaceship converters (the still life recovers; spaceships leave)"),
     ("escape", "Escapes (the still life is back while something is outside it)"),
     ("signal", "Signals (still travelling with a fixed shape)"),
+    ("maxgen", "Max-gen reactions (still running at max-gen; the still life is complete, the reaction checked up to max-gen)"),
     ("extracted", "Oscillators found in damaging reactions and trivial oscillators (each part alone, without the spark)"),
     ("damaging", "Damaging oscillators (the spark breaks part of the still life)"),
     ("no-spark", "Oscillators that don't reach the must-reach area in their own cycle"),
@@ -312,7 +321,8 @@ def spark_note(cyc):
     return f"open {100 * o:.0f}%, spark depth {d}, {t} touch cells, spark gap {g}" + (f" ({n} cells)" if g else "")
 
 
-RANK = {"clean": 0, "catalyst": 0, "converter": 0, "escape": 0, "signal": 0, "no-spark": 1, "damaging": 2, "debris": 3}
+RANK = {"clean": 0, "catalyst": 0, "converter": 0, "escape": 0, "signal": 0, "maxgen": 1, "no-spark": 1, "damaging": 2,
+        "debris": 3}
 
 
 def _classify(job):
@@ -425,10 +435,13 @@ def main():
     ap.add_argument("--keep-trivial", action="store_true",
                     help="list trivial oscillators (rotor parts more than 2 cells apart, so they can't "
                          "interact) as they are, instead of only their parts")
-    ap.add_argument("--sort", choices=("period", "sparky", "open"),
+    ap.add_argument("--sort", choices=("period", "sparky", "open", "settle"),
                     help="order of the oscillator sections: period (default), sparky (most detached sparks first: "
-                         "spark gap, then depth, then touch cells) or open (largest share of the rotor reachable "
-                         "from outside first). The numbers are in each pattern's comment. "
+                         "spark gap, then depth, then touch cells), open (largest share of the rotor reachable "
+                         "from outside first) or settle (longest time until the reaction settles first: the "
+                         "generation an oscillator starts cycling or a catalyst's reaction ends; max-gen "
+                         "reactions with the fewest active cells at max-gen first). The numbers are in each "
+                         "pattern's comment. "
                          "Default: the config's sort setting")
     ap.add_argument("--min-output-dist", type=int,
                     help="spark converters: smallest distance from the input spark to an output "
@@ -593,12 +606,16 @@ def main():
             if key in ("clean", "damaging", "no-spark"):
                 if a.sort == "period":
                     items.sort(key=lambda i: (-i["res"]["period"], i.get("damage", 0), i["size"]))
+                elif a.sort == "settle":
+                    items.sort(key=lambda i: (-(i["res"]["gen"] - i["res"]["period"]), i["size"]))
                 else:   # on the unshrunk patterns: this picks what gets past --limit
                     cycle = lambda i: i["hist"][i["res"]["gen"]:i["res"]["gen"] + i["res"]["period"]]
                     items.sort(key=lambda i: (spark_key(cycle(i), a.sort), -i["res"]["period"], i["size"]))
             elif key == "catalyst":
                 items.sort(key=lambda i: (-i["res"]["gen"], i["size"]))
-            elif key == "extracted" and a.sort != "period":
+            elif key == "maxgen":
+                items.sort(key=lambda i: (i["res"]["change_counts"][-1], i["size"]))
+            elif key == "extracted" and a.sort in ("sparky", "open"):
                 items.sort(key=lambda i: (known(i), spark_key(i["cyc"], a.sort), -i["period"]))
             final = {}   # listed pattern -> its --sort key, measured on the shrunk pattern
             written, shown = [], set(seen) if key == "extracted" else set()
@@ -670,6 +687,10 @@ def main():
                         head = f"catalyst, {len(g0)} cells, reaction lasts {res['gen']} gens"
                     elif key == "converter":
                         head = f"converter, {len(g0)} cells: {info['what']}"
+                    elif key == "maxgen":
+                        cc = res["change_counts"]
+                        head = (f"max-gen reaction, {len(g0)} cells, {cc[-1]} cells changed at gen {res['gen']} "
+                                f"(result #{res['n']})")
                     elif key == "escape":
                         head = f"escape, {len(g0)} cells, still life back at gen {res['gen']} with outside: {info['what']}"
                     else:
@@ -684,7 +705,7 @@ def main():
                 save |= {i["res"]["rotor"] for i in sources if all(k in shown for k in i["parts"])}
             if not items:
                 continue
-            if a.sort != "period" and key in ("clean", "damaging", "no-spark", "extracted"):
+            if a.sort in ("sparky", "open") and key in ("clean", "damaging", "no-spark", "extracted"):
                 written.sort(key=lambda w: final.get(w, (9,)))   # trivial-part notes have no key: last
             if key == "extracted":   # counted after shrinking and splitting, so only up to --limit
                 if not written:
@@ -713,7 +734,7 @@ def main():
 
     names = {"clean": "clean oscillators", "catalyst": "catalysts", "converter": "spaceship converters",
              "escape": "escapes",
-             "signal": "signals", "damaging": "damaging oscillators", "no-spark": "oscillators without a spark in their cycle",
+             "signal": "signals", "maxgen": "max-gen reactions", "damaging": "damaging oscillators", "no-spark": "oscillators without a spark in their cycle",
              "debris": "debris (dropped)", "incomplete": "couldn't be completed",
              "trivial": "trivial oscillators (rotor parts more than 2 cells apart; only the parts are listed)",
              "unchecked": "not checked (--max-minutes ran out; lowest periods / shortest reactions)"}
@@ -726,7 +747,8 @@ def main():
     print(f"Saved to {out}")
     if counts["no-spark"] and not a.all:
         print("  (oscillators without a spark in their cycle aren't listed; add --all)")
-    if not (counts["clean"] + counts["trivial"] + counts["catalyst"] + counts["converter"] + counts["escape"] + counts["signal"] + counts["damaging"]):
+    if not (counts["clean"] + counts["trivial"] + counts["catalyst"] + counts["converter"] + counts["escape"] + counts["signal"]
+            + counts["maxgen"] + counts["damaging"]):
         skip = " ".join(l.split("=", 1)[1] for l in open(a.config) if re.match(r"\s*skip\s*=", l))
         print("Nothing usable was found. Things to try:")
         if "fizzle" in skip:

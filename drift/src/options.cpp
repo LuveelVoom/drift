@@ -486,11 +486,12 @@ const std::vector<Opt> &opts() {
      "Known rotors list. By default dr2.c's 'knownrotors' file is used for B3/S23 only.",
      [](Ctx &c, const std::string &v) { c.o.knownRotorsFile = resolve(c, v); c.o.knownRotorsExplicit = true; }},
     {"sort", "HOW", "Output",
-     "Order of the oscillators in the finished file: period (default), sparky (free sparks\n"
-     "first) or open (most reachable rotors first). finish.py reads this setting.",
+     "Order of the results in the finished file: period (default), sparky (free sparks\n"
+     "first), open (most reachable rotors first) or settle (longest until the reaction settles\n"
+     "first). finish.py reads this setting.",
      [](Ctx &, const std::string &v) {
-       if (v != "period" && v != "sparky" && v != "open")
-         fail("--sort: unknown order '" + v + "' (use period, sparky or open)");
+       if (v != "period" && v != "sparky" && v != "open" && v != "settle")
+         fail("--sort: unknown order '" + v + "' (use period, sparky, open or settle)");
      }},
     {"rotor-db", "FILE", "Output",
      "Rotors already listed by earlier searches of this rule, one file per rule. Oscillators with\n"

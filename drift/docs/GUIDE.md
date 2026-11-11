@@ -185,6 +185,7 @@ result, in sections, best first:
 | Catalysts | the spark is absorbed and the still life recovers exactly |
 | Spaceship converters | the still life recovers and only spaceships leave |
 | Signals | something is still travelling with a fixed shape |
+| Max-gen reactions | still running at max-gen; the still life is complete and the reaction is checked up to max-gen only, fewest active cells first |
 
 Each pattern is **generation 0** (still life plus spark), shrunk to as few
 cells as possible.
@@ -214,6 +215,10 @@ finishing step of a search, use `sort = sparky` in the config or
 `drift my.cfg --sort sparky`. `--limit` is applied using the
 unshrunk patterns, whose stators can differ from the shrunk ones, so raise it
 if a sparky pattern might be missing.
+
+`--sort settle` (or `sort = settle`) puts the longest reactions first: oscillators
+by the generation they start cycling, catalysts by the generation the still life
+is back.
 
 **Not seeing the same rotors twice.** Add `rotor-db = life-rotors.txt` to your
 configs, using one file per rule (`survey.py --rotor-db FILE` does this for a
