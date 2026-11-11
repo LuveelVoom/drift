@@ -539,7 +539,10 @@ void Reporter::footer(double seconds, long long steps, bool finished, bool resum
       if (!o.skipMaxgen && counts[MAXGEN] == 0)
         s += "  Nothing was still travelling at max gen: try larger limits (size), more room (margin)\n"
              "  or more time (max-steps).\n";
+      if (!finished)
+        s += "  The search was stopped before it finished, so results of the kinds you keep may still exist.\n";
     }
+    for (const std::string &w : o.warnings) s += "warning: " + w + "\n";
   } else if (!o.jsonl.empty()) {
     s += "\nResults saved to " + (o.textOut.empty() ? o.jsonl : o.textOut + " and " + o.jsonl) + ".\n";
     if (o.noFinish && !o.configPath.empty()) {

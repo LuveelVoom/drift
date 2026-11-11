@@ -834,6 +834,49 @@ bool readModern(const std::vector<std::string> &args, Options &o) {
     o.warnings.push_back("the rule is not invariant under the chosen symmetry; the "
                          "background will satisfy both the rule and its mirror image");
 
+  // Regions are ROW COL. Catch the usual mistake of writing them as x y: the region
+  // misses the pattern but its transpose lies inside it. Also flag regions that miss
+  // the whole space (they are clipped to nothing).
+  for (const RegionSpec &rs : c.regions) {
+    static const char *SETN[] = {"no-change", "no-count", "no-check", "must-reach"};
+    static const char *CLRN[] = {"allow-change", "count", "check", "?"};
+    std::string name = rs.kind == PatternOp::CLEAR       ? "clear"
+                       : rs.kind == PatternOp::SETFLAG ? SETN[rs.bit & 3]
+                                                       : CLRN[rs.bit & 3];
+    Region g;
+    std::string err;
+    if (!parseRegion(rs.text, g, 'r', err)) continue;
+    auto fmt = [](const char *f, auto... a) {
+      char buf[256];
+      snprintf(buf, sizeof buf, f, a...);
+      return std::string(buf);
+    };
+    bool meetsPattern = g.maxrow >= 0 && g.minrow < ph && g.maxcol >= 0 && g.mincol < pw;
+    bool transposeInside = g.mincol >= 0 && g.maxcol < ph && g.minrow >= 0 && g.maxrow < pw;
+    if (!meetsPattern && transposeInside) {
+      std::istringstream in(rs.text);
+      std::string tok, letter, swapped;
+      std::vector<std::string> nums;
+      while (in >> tok) {
+        if (isalpha((unsigned char)tok[0])) letter = tok;
+        else nums.push_back(tok);
+      }
+      for (size_t k = 0; k + 1 < nums.size(); k += 2) swapped += " " + nums[k + 1] + " " + nums[k];
+      std::string where = g.type == 'p'
+          ? fmt("row %d, col %d (x=%d, y=%d)", g.r0, g.c0, g.c0, g.r0)
+          : fmt("rows %d..%d, cols %d..%d (x %d..%d, y %d..%d)", g.minrow, g.maxrow, g.mincol, g.maxcol,
+                g.mincol, g.maxcol, g.minrow, g.maxrow);
+      o.warnings.push_back(name + " '" + rs.text + "' is " + where + ", outside the " +
+                           fmt("%dx%d", pw, ph) + " pattern (w x h). Regions are ROW COL; if you meant x y, write '" +
+                           (letter.empty() ? "" : letter) + swapped + "'.");
+    }
+    int top = o.top, left = o.left;
+    if (g.maxrow + top < 0 || g.minrow + top >= P.HT || g.maxcol + left < 0 || g.mincol + left >= P.WD)
+      o.warnings.push_back(name + " '" + rs.text + "' lies entirely outside the search space " +
+                           fmt("(rows %d..%d, cols %d..%d from the pattern's top-left), so it has no effect.",
+                               -top, P.HT - 1 - top, -left, P.WD - 1 - left));
+  }
+
   // Region flags first (so DONTCHECK cells are flagged before the pattern is
   // read, which dr2.c requires), then the pattern, then clears.
   for (const RegionSpec &rs : c.regions) {

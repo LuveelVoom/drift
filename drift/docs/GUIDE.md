@@ -122,8 +122,10 @@ limits: the spark's own cells count too.
 
 ### Step 3: add regions
 
-Region coordinates are (row, col) from the pattern's top-left cell; rows go
-down, negative values are above or to the left.
+Region coordinates are (row, col) from the pattern's top-left cell, i.e. y
+before x (the cell at x=14, y=6 is `p 6 14`); rows go down, negative values are
+above or to the left. drift warns when a region misses the pattern but its
+row/column swap would hit it, and when a region lies outside the search space.
 
 ![beehive-spark](img/beehive-spark.svg)
 
