@@ -1,3 +1,9 @@
+<p align="center">
+  <img src="drift.png" alt="drift">
+  <br>
+  <sub>wire components by hotcrystal0</sub>
+</p>
+
 # drift
 
 A port of **dr2**, Dean Hickerson's drifter search for the Game of Life (1997,
