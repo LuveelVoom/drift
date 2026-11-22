@@ -1,0 +1,151 @@
+drift: rule B3/S23-a5, space 40x68, at most 30 changed cells in 20x22 (w x h), max gen 150
+symmetry none, seed 1, 4 threads, known rotors: 0
+results are saved to results/reaction-wire/tight2-results.txt and results/reaction-wire/tight2-results.jsonl
+legend: o on  . off  , unknown  1 on in gen 0 only  0 off in gen 0 only
+        not checked (no-check): 4 unknown  2 off  3 on
+starting position (rows/cols relative to the pattern's top-left):
+gen 0, rows 19..34, cols 28..43
+...........
+...........
+..1........
+...11......
+..1........
+............
+........oo..
+...oo...o.o..
+...o..o.o.ooo
+....ooo.o....o..
+.........oo.oo..
+......oo.o......
+......o..o......
+.......oo.......
+................
+................
+
+[~12.7%] 57.16M steps/s, 0 results (0 new osc), max gen 32, 0 queued, 10s elapsed, eta ~1m10s
+[~15.5%] 56.60M steps/s, 0 results (0 new osc), max gen 32, 0 queued, 20s elapsed, eta ~1m50s
+[~15.9%] 56.11M steps/s, 0 results (0 new osc), max gen 33, 0 queued, 30s elapsed, eta ~2m41s
+[~16.1%] 55.79M steps/s, 0 results (0 new osc), max gen 34, 0 queued, 40s elapsed, eta ~3m32s
+[~16.2%] 56.54M steps/s, 0 results (0 new osc), max gen 34, 0 queued, 50s elapsed, eta ~4m23s
+[~16.8%] 58.28M steps/s, 0 results (0 new osc), max gen 34, 0 queued, 1m01s elapsed, eta ~5m01s
+[~16.8%] 59.66M steps/s, 0 results (0 new osc), max gen 34, 0 queued, 1m11s elapsed, eta ~5m51s
+[~16.8%] 60.68M steps/s, 0 results (0 new osc), max gen 35, 0 queued, 1m21s elapsed, eta ~6m41s
+[~17.5%] 61.35M steps/s, 0 results (0 new osc), max gen 35, 0 queued, 1m31s elapsed, eta ~7m11s
+[~20.5%] 62.28M steps/s, 0 results (0 new osc), max gen 35, 0 queued, 1m41s elapsed, eta ~6m34s
+[~22.5%] 63.43M steps/s, 0 results (0 new osc), max gen 35, 0 queued, 1m51s elapsed, eta ~6m26s
+[~23%] 65.55M steps/s, 0 results (0 new osc), max gen 35, 0 queued, 2m01s elapsed, eta ~6m48s
+[~23%] 67.32M steps/s, 0 results (0 new osc), max gen 35, 0 queued, 2m12s elapsed, eta ~7m22s
+[~23%] 68.51M steps/s, 0 results (0 new osc), max gen 35, 0 queued, 2m22s elapsed, eta ~7m56s
+[~23%] 69.88M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 2m32s elapsed, eta ~8m30s
+[~23%] 71.13M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 2m42s elapsed, eta ~9m03s
+[~23%] 72.31M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 2m52s elapsed, eta ~9m36s
+[~23%] 73.17M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 3m02s elapsed, eta ~10m09s
+[~23%] 73.99M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 3m12s elapsed, eta ~10m42s
+[~23%] 74.63M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 3m22s elapsed, eta ~11m16s
+[~23%] 75.17M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 3m32s elapsed, eta ~11m49s
+[~23%] 75.72M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 3m42s elapsed, eta ~12m23s
+[~23%] 76.35M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 3m52s elapsed, eta ~12m56s
+[~23%] 76.80M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 4m02s elapsed, eta ~13m30s
+[~23%] 77.08M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 4m12s elapsed, eta ~14m03s
+[~23%] 77.30M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 4m22s elapsed, eta ~14m37s
+[~23%] 77.69M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 4m32s elapsed, eta ~15m10s
+[~23.1%] 78.01M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 4m42s elapsed, eta ~15m42s
+[~23.1%] 78.34M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 4m52s elapsed, eta ~16m16s
+[~23.1%] 78.66M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 5m02s elapsed, eta ~16m49s
+[~23.1%] 79.08M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 5m12s elapsed, eta ~17m22s
+[~23.1%] 79.37M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 5m22s elapsed, eta ~17m56s
+[~23.1%] 79.63M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 5m32s elapsed, eta ~18m29s
+[~23.1%] 79.89M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 5m43s elapsed, eta ~19m03s
+[~23.1%] 80.21M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 5m53s elapsed, eta ~19m36s
+[~23.1%] 80.47M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 6m03s elapsed, eta ~20m10s
+[~23.1%] 80.65M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 6m13s elapsed, eta ~20m43s
+[~23.1%] 80.77M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 6m23s elapsed, eta ~21m17s
+[~23.1%] 80.96M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 6m33s elapsed, eta ~21m50s
+[~23.1%] 81.09M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 6m43s elapsed, eta ~22m22s
+[~23.1%] 81.26M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 6m53s elapsed, eta ~22m54s
+[~23.1%] 81.39M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 7m03s elapsed, eta ~23m26s
+[~23.1%] 81.52M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 7m13s elapsed, eta ~23m59s
+[~23.1%] 81.69M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 7m23s elapsed, eta ~24m32s
+[~23.2%] 81.84M steps/s, 0 results (0 new osc), max gen 36, 0 queued, 7m33s elapsed, eta ~25m05s
+[~23.2%] 81.95M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 7m43s elapsed, eta ~25m38s
+[~23.2%] 82.18M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 7m53s elapsed, eta ~26m11s
+[~23.2%] 82.38M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 8m03s elapsed, eta ~26m40s
+[~23.3%] 82.53M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 8m13s elapsed, eta ~27m04s
+[~23.3%] 82.67M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 8m24s elapsed, eta ~27m35s
+[~23.3%] 82.76M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 8m34s elapsed, eta ~28m08s
+[~23.3%] 82.91M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 8m44s elapsed, eta ~28m41s
+[~23.4%] 83.01M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 8m54s elapsed, eta ~29m13s
+[~23.4%] 83.16M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 9m04s elapsed, eta ~29m45s
+[~23.4%] 83.22M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 9m14s elapsed, eta ~30m18s
+[~23.4%] 83.37M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 9m24s elapsed, eta ~30m51s
+[~23.4%] 83.46M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 9m34s elapsed, eta ~31m23s
+[~23.4%] 83.52M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 9m44s elapsed, eta ~31m56s
+[~23.4%] 83.64M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 9m54s elapsed, eta ~32m29s
+[~23.4%] 83.76M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 10m04s elapsed, eta ~33m01s
+[~23.4%] 83.83M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 10m14s elapsed, eta ~33m33s
+[~23.4%] 83.93M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 10m24s elapsed, eta ~34m05s
+[~23.5%] 84.05M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 10m34s elapsed, eta ~34m31s
+[~23.5%] 84.16M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 10m44s elapsed, eta ~35m00s
+[~23.5%] 84.26M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 10m54s elapsed, eta ~35m29s
+[~23.5%] 84.35M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 11m04s elapsed, eta ~35m58s
+[~23.6%] 84.44M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 11m14s elapsed, eta ~36m21s
+[~23.6%] 84.53M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 11m24s elapsed, eta ~36m53s
+[~23.6%] 84.64M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 11m35s elapsed, eta ~37m25s
+[~24.2%] 84.75M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 11m45s elapsed, eta ~36m49s
+[~24.2%] 84.85M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 11m55s elapsed, eta ~37m19s
+[~24.2%] 84.93M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 12m05s elapsed, eta ~37m50s
+[~24.2%] 84.98M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 12m15s elapsed, eta ~38m19s
+[~24.2%] 85.06M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 12m25s elapsed, eta ~38m48s
+[~24.3%] 85.13M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 12m35s elapsed, eta ~39m16s
+[~24.3%] 85.22M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 12m45s elapsed, eta ~39m42s
+[~24.4%] 85.28M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 12m55s elapsed, eta ~40m07s
+[~24.4%] 85.29M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 13m05s elapsed, eta ~40m35s
+[~24.4%] 85.35M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 13m15s elapsed, eta ~41m03s
+[~24.4%] 85.42M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 13m25s elapsed, eta ~41m34s
+[~24.4%] 85.48M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 13m35s elapsed, eta ~42m05s
+[~24.4%] 85.57M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 13m45s elapsed, eta ~42m36s
+[~24.4%] 85.63M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 13m55s elapsed, eta ~43m06s
+[~24.4%] 85.71M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 14m05s elapsed, eta ~43m35s
+[~24.4%] 85.79M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 14m15s elapsed, eta ~44m06s
+[~24.4%] 85.85M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 14m25s elapsed, eta ~44m37s
+[~24.4%] 85.90M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 14m36s elapsed, eta ~45m07s
+[~24.4%] 85.93M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 14m46s elapsed, eta ~45m38s
+[~24.4%] 85.98M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 14m56s elapsed, eta ~46m09s
+[~24.5%] 86.04M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 15m06s elapsed, eta ~46m29s
+[~24.6%] 86.11M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 15m16s elapsed, eta ~46m53s
+[~24.6%] 86.16M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 15m26s elapsed, eta ~47m23s
+[~24.6%] 86.19M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 15m36s elapsed, eta ~47m52s
+[~24.6%] 86.24M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 15m46s elapsed, eta ~48m22s
+[~24.6%] 86.30M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 15m56s elapsed, eta ~48m53s
+[~24.6%] 86.38M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 16m06s elapsed, eta ~49m24s
+[~24.6%] 86.44M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 16m16s elapsed, eta ~49m54s
+[~24.6%] 86.47M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 16m26s elapsed, eta ~50m25s
+[~24.6%] 86.52M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 16m36s elapsed, eta ~50m56s
+[~24.6%] 86.58M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 16m46s elapsed, eta ~51m26s
+[~24.6%] 86.62M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 16m56s elapsed, eta ~51m56s
+[~24.6%] 86.68M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 17m06s elapsed, eta ~52m27s
+[~24.6%] 86.75M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 17m16s elapsed, eta ~52m58s
+[~24.6%] 86.79M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 17m27s elapsed, eta ~53m28s
+[~24.6%] 86.83M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 17m37s elapsed, eta ~53m58s
+[~24.6%] 86.91M steps/s, 0 results (0 new osc), max gen 37, 0 queued, 17m47s elapsed, eta ~54m27s
+[~24.8%] 87.00M steps/s, 0 results (0 new osc), max gen 39, 0 queued, 17m57s elapsed, eta ~54m19s
+[~24.8%] 87.08M steps/s, 0 results (0 new osc), max gen 39, 0 queued, 18m07s elapsed, eta ~54m49s
+[~24.9%] 87.18M steps/s, 0 results (0 new osc), max gen 39, 0 queued, 18m17s elapsed, eta ~55m17s
+[~24.9%] 87.28M steps/s, 0 results (0 new osc), max gen 39, 0 queued, 18m27s elapsed, eta ~55m46s
+[~24.9%] 87.37M steps/s, 0 results (0 new osc), max gen 39, 0 queued, 18m37s elapsed, eta ~56m16s
+[~30.4%] 87.44M steps/s, 0 results (0 new osc), max gen 39, 0 queued, 18m47s elapsed, eta ~43m04s
+[~30.6%] 87.47M steps/s, 0 results (0 new osc), max gen 39, 0 queued, 18m57s elapsed, eta ~42m55s
+[~30.8%] 87.55M steps/s, 0 results (0 new osc), max gen 39, 0 queued, 19m07s elapsed, eta ~43m03s
+[~30.8%] 87.60M steps/s, 0 results (0 new osc), max gen 39, 0 queued, 19m17s elapsed, eta ~43m19s
+[~31.5%] 87.68M steps/s, 0 results (0 new osc), max gen 39, 0 queued, 19m27s elapsed, eta ~42m14s
+[~31.7%] 87.75M steps/s, 0 results (0 new osc), max gen 39, 0 queued, 19m37s elapsed, eta ~42m19s
+[~31.8%] 87.83M steps/s, 0 results (0 new osc), max gen 39, 0 queued, 19m47s elapsed, eta ~42m22s
+[~32%] 87.91M steps/s, 0 results (0 new osc), max gen 39, 0 queued, 19m58s elapsed, eta ~42m24s
+
+Stopped at the limit. Continue with: drift --resume results/reaction-wire/tight2.ckpt
+Search stopped after 1200.1s, 105515039860 steps (87.93M/s).
+Found 0 oscillators (0 with unknown rotors), 0 stable, 0 fizzles, 0 max gen; printed 0. Highest generation reached: 39.
+Escapes (still life back, something outside): 0.
+
+Nothing was printed. No branch ended in a result; the furthest any got was generation 39.
+  Give it more time (--max-steps), or loosen the limits.

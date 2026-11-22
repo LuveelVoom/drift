@@ -1,0 +1,219 @@
+drift: rule B3/S23-a5, space 50x46, at most 20 changed cells in 16x16 (w x h), max gen 80
+symmetry none, seed 1, 4 threads, known rotors: 0
+results are saved to results/reaction-wire/ctrl2b-results.txt and results/reaction-wire/ctrl2b-results.jsonl
+legend: o on  . off  , unknown  1 on in gen 0 only  0 off in gen 0 only
+        not checked (no-check): 4 unknown  2 off  3 on
+starting position (rows/cols relative to the pattern's top-left):
+gen 0, rows 1..44, cols 2..40
+.......................................
+.......................................
+.................................oo....
+................................o.o....
+................................o......
+..............................oo.o.....
+.............................o.o..o....
+........................oo...o.o.oo....
+........................o..ooo.o.o.....
+.........................o.o.o.o..o....
+........................oo.o.o.oo.o....
+..................oo.......o.o..o.ooo..
+...................o....oooo.o.o..o.o..
+..................ooo..o....oo.o.o.....
+......................o..oo.....o......
+....................oo.oo.oooooo.......
+...................o.o.........o.o.....
+..............oo...o.o.oooooooo..ooo...
+..............o..ooo.o.o....o....o.o...
+...............o.o.o.o..ooooo..........
+..............oo.o.o.oo.o..............
+........oo.......o.o..o.o.oo.o.........
+.........o....oooo.o.o..o.o.oo.........
+........ooo..o....oo.o.o...............
+............o..oo.....o................
+..........oo.oo.oooooo.................
+.........o.o.........o.o...............
+.........o.o.oooooooo..ooo.............
+.......ooo.o.o....o....o.o.............
+.......o.o.o..ooooo....................
+....oo.o.o.oo.o........................
+....o..o.o..o.o.oo.o...................
+.....ooo.o.o..o.o.oo...................
+........oo.o.o.........................
+...oooo.....o..........................
+..o...oooooo...........................
+..ooo......o.o.........................
+.,,,,,,,,,,..ooo.......................
+.,,,,,,,,,,..o.o.......................
+.,,,,,,,,,,............................
+.,,,,,,,,,,............................
+.,,,,11,,,,............................
+.,,,,,,,,,,............................
+.,,,,,,,,,,............................
+
+[~1.34%] 52.87M steps/s, 23 results (12 new osc), max gen 25, 0 queued, 10s elapsed, eta ~12m31s
+[~2.92%] 52.17M steps/s, 43 results (29 new osc), max gen 25, 0 queued, 20s elapsed, eta ~11m16s
+[~3.7%] 51.69M steps/s, 60 results (46 new osc), max gen 67, 0 queued, 30s elapsed, eta ~13m13s
+[~4.13%] 51.69M steps/s, 71 results (55 new osc), max gen 67, 0 queued, 40s elapsed, eta ~15m44s
+[~4.55%] 51.18M steps/s, 94 results (77 new osc), max gen 67, 0 queued, 50s elapsed, eta ~17m47s
+[~5.18%] 51.25M steps/s, 119 results (96 new osc), max gen 67, 0 queued, 1m01s elapsed, eta ~18m37s
+[~5.61%] 51.04M steps/s, 137 results (112 new osc), max gen 67, 0 queued, 1m11s elapsed, eta ~19m57s
+[~6.06%] 51.02M steps/s, 149 results (120 new osc), max gen 67, 0 queued, 1m21s elapsed, eta ~21m00s
+[~6.5%] 51.03M steps/s, 173 results (139 new osc), max gen 67, 0 queued, 1m31s elapsed, eta ~21m57s
+[~6.7%] 51.06M steps/s, 233 results (198 new osc), max gen 67, 0 queued, 1m41s elapsed, eta ~23m34s
+[~7.2%] 51.29M steps/s, 332 results (294 new osc), max gen 67, 0 queued, 1m51s elapsed, eta ~24m01s
+[~7.81%] 51.48M steps/s, 434 results (396 new osc), max gen 67, 0 queued, 2m01s elapsed, eta ~24m00s
+[~8.24%] 51.40M steps/s, 456 results (414 new osc), max gen 67, 0 queued, 2m12s elapsed, eta ~24m32s
+[~8.69%] 51.32M steps/s, 478 results (436 new osc), max gen 67, 0 queued, 2m22s elapsed, eta ~24m56s
+[~9.11%] 51.45M steps/s, 497 results (454 new osc), max gen 67, 0 queued, 2m32s elapsed, eta ~25m21s
+[~9.86%] 51.49M steps/s, 521 results (478 new osc), max gen 67, 0 queued, 2m42s elapsed, eta ~24m46s
+[~10.6%] 51.51M steps/s, 528 results (484 new osc), max gen 67, 0 queued, 2m52s elapsed, eta ~24m16s
+[~11.1%] 51.41M steps/s, 544 results (499 new osc), max gen 71, 0 queued, 3m02s elapsed, eta ~24m21s
+[~11.7%] 51.47M steps/s, 573 results (526 new osc), max gen 71, 0 queued, 3m13s elapsed, eta ~24m10s
+[~12.2%] 51.63M steps/s, 578 results (529 new osc), max gen 71, 0 queued, 3m23s elapsed, eta ~24m25s
+[~13.5%] 51.70M steps/s, 602 results (549 new osc), max gen 71, 0 queued, 3m33s elapsed, eta ~22m46s
+[~14.3%] 51.65M steps/s, 604 results (551 new osc), max gen 71, 0 queued, 3m43s elapsed, eta ~22m21s
+[~15.1%] 51.65M steps/s, 618 results (562 new osc), max gen 71, 0 queued, 3m53s elapsed, eta ~21m52s
+[~15.7%] 51.56M steps/s, 631 results (574 new osc), max gen 71, 0 queued, 4m03s elapsed, eta ~21m48s
+[~16.1%] 51.73M steps/s, 642 results (584 new osc), max gen 71, 0 queued, 4m14s elapsed, eta ~22m05s
+[~16.7%] 51.86M steps/s, 662 results (593 new osc), max gen 71, 0 queued, 4m24s elapsed, eta ~21m55s
+[~17.7%] 52.00M steps/s, 683 results (612 new osc), max gen 71, 0 queued, 4m34s elapsed, eta ~21m16s
+[~18%] 52.12M steps/s, 691 results (620 new osc), max gen 71, 0 queued, 4m44s elapsed, eta ~21m36s
+[~18.4%] 52.16M steps/s, 698 results (627 new osc), max gen 71, 0 queued, 4m54s elapsed, eta ~21m47s
+[~18.8%] 52.22M steps/s, 718 results (644 new osc), max gen 71, 0 queued, 5m04s elapsed, eta ~21m54s
+[~19%] 52.28M steps/s, 731 results (657 new osc), max gen 71, 0 queued, 5m15s elapsed, eta ~22m23s
+[~19.9%] 52.32M steps/s, 761 results (683 new osc), max gen 71, 0 queued, 5m25s elapsed, eta ~21m50s
+[~20.5%] 52.36M steps/s, 769 results (687 new osc), max gen 71, 0 queued, 5m35s elapsed, eta ~21m42s
+[~21%] 52.41M steps/s, 800 results (716 new osc), max gen 71, 0 queued, 5m45s elapsed, eta ~21m41s
+[~21.3%] 52.45M steps/s, 816 results (732 new osc), max gen 71, 0 queued, 5m55s elapsed, eta ~21m55s
+[~21.5%] 52.54M steps/s, 842 results (758 new osc), max gen 71, 0 queued, 6m06s elapsed, eta ~22m19s
+[~21.7%] 52.60M steps/s, 858 results (774 new osc), max gen 71, 0 queued, 6m16s elapsed, eta ~22m40s
+[~22%] 52.61M steps/s, 863 results (778 new osc), max gen 71, 0 queued, 6m26s elapsed, eta ~22m51s
+[~22.2%] 52.63M steps/s, 875 results (789 new osc), max gen 71, 0 queued, 6m36s elapsed, eta ~23m09s
+***** #1 escape at gen 20: still life back, 1 cells changed outside
+all changes: 2 1 1 2 1  3 5 6 1 1  2 4 1 2 1  1 3 3 4 1  1
+changes: 2 1 1 2 1  3 5 6 1 1  2 4 1 2 1  1 3 3 4 1  0
+sizes:   1x2 1x1 1x1 2x1 1x1  2x3 3x4 4x3 1x1 1x1  1x2 2x2 1x1 1x2 1x1  1x1 3x2 4x2 2x2 1x1  0x0
+x = 42, y = 46, rule = LifeHistory
+42B$42B$42B$35B2A5B$34BABA5B$34BA7B$32B2ABA6B$31BABA2BA5B$26B2A3BABAB
+2A5B$26BA2B3ABABA6B$27BABABABA2BA5B$26B2ABABAB2ABA5B$20B2A7BABA2BAB3A
+3B$21BA4B4ABABA2BABA3B$20B3A2BA4B2ABABA6B$24BA2B2A5BA7B$22B2AB2AB6A8B$
+21BABA9BABA6B$16B2A3BABAB8A2B3A4B$16BA2B3ABABA4BA4BABA4B$17BABABABA2B
+5A11B$16B2ABABAB2ABA15B$10B2A7BABA2BABAB2ABA10B$11BA4B4ABABA2BABAB2A
+10B$10B3A2BA4B2ABABA16B$14BA2B2A5BA17B$12B2AB2AB6A18B$11BABA9BABA16B$
+11BABAB8A2B3A14B$9B3ABABA4BA4BABA14B$9BABABA2B5A21B$6B2ABABAB2ABA25B$
+6BA2BABA2BABAB2ABA20B$7B3ABABA2BABAB2A20B$10B2ABABA26B$5B4A5BA27B$4BA
+3B6A28B$4B3A6BABA26B$7B6A2B3A24B$4B2ABA2BA4BABA24B$3BA2BA35B$3B.A6B2.
+29B$3B.3B2CBA2.29B$3B2.6B2.29B$3B2.BAB3A2.29B$3B10.29B!
+x = 42, y = 46, rule = LifeHistory
+42B$42B$42B$35B2A5B$34BABA5B$34BA7B$32B2ABA6B$31BABA2BA5B$26B2A3BABAB
+2A5B$26BA2B3ABABA6B$27BABABABA2BA5B$26B2ABABAB2ABA5B$20B2A7BABA2BAB3A
+3B$21BA4B4ABABA2BABA3B$20B3A2BA4B2ABABA6B$24BA2B2A5BA7B$22B2AB2AB6A8B$
+21BABA9BABA6B$16B2A3BABAB8A2B3A4B$16BA2B3ABABA4BA4BABA4B$17BABABABA2B
+5A11B$16B2ABABAB2ABA15B$10B2A7BABA2BABAB2ABA10B$11BA4B4ABABA2BABAB2A
+10B$10B3A2BA4B2ABABA16B$14BA2B2A5BA17B$12B2AB2AB6A18B$11BABA9BABA16B$
+11BABAB8A2B3A14B$9B3ABDBA4BA4BABA14B$9BABABA2B5A21B$6B2ABABAB2ABA25B$
+6BA2BABA2BABAB2ABA20B$7B3ABABA2BABAB2A20B$10B2ABABA26B$5B4A5BA27B$4BA
+3B6A28B$4B3A6BABA26B$7B6A2B3A24B$4B2ABA2BA4BABA24B$3BA2BA35B$3B.A6B2.
+29B$3B.6BA2.29B$3B2.6B2.29B$3B2.BAB3A2.29B$3B10.29B!
+
+[~22.4%] 52.69M steps/s, 890 results (804 new osc), max gen 71, 0 queued, 6m46s elapsed, eta ~23m25s
+[~22.9%] 52.69M steps/s, 909 results (817 new osc), max gen 71, 0 queued, 6m56s elapsed, eta ~23m27s
+[~23.1%] 52.67M steps/s, 926 results (834 new osc), max gen 71, 0 queued, 7m06s elapsed, eta ~23m41s
+[~23.4%] 52.70M steps/s, 936 results (844 new osc), max gen 71, 0 queued, 7m17s elapsed, eta ~23m47s
+[~24%] 52.73M steps/s, 965 results (873 new osc), max gen 71, 0 queued, 7m27s elapsed, eta ~23m32s
+[~24.9%] 52.79M steps/s, 1106 results (1010 new osc), max gen 71, 0 queued, 7m37s elapsed, eta ~23m02s
+[~25.1%] 52.84M steps/s, 1195 results (1099 new osc), max gen 71, 0 queued, 7m47s elapsed, eta ~23m13s
+[~25.7%] 52.91M steps/s, 1214 results (1117 new osc), max gen 71, 0 queued, 7m57s elapsed, eta ~23m01s
+[~26.4%] 53.00M steps/s, 1234 results (1137 new osc), max gen 71, 0 queued, 8m07s elapsed, eta ~22m38s
+[~27.7%] 53.05M steps/s, 1258 results (1158 new osc), max gen 71, 0 queued, 8m17s elapsed, eta ~21m36s
+[~28.2%] 53.07M steps/s, 1285 results (1179 new osc), max gen 71, 0 queued, 8m28s elapsed, eta ~21m32s
+[~28.6%] 53.09M steps/s, 1298 results (1192 new osc), max gen 71, 0 queued, 8m38s elapsed, eta ~21m35s
+[~29.1%] 53.11M steps/s, 1304 results (1196 new osc), max gen 71, 0 queued, 8m48s elapsed, eta ~21m29s
+[~29.6%] 53.16M steps/s, 1327 results (1216 new osc), max gen 71, 0 queued, 8m58s elapsed, eta ~21m23s
+[~30.3%] 53.23M steps/s, 1343 results (1230 new osc), max gen 71, 0 queued, 9m08s elapsed, eta ~21m02s
+[~30.8%] 53.31M steps/s, 1350 results (1234 new osc), max gen 71, 0 queued, 9m18s elapsed, eta ~20m55s
+[~31.4%] 53.36M steps/s, 1368 results (1247 new osc), max gen 71, 0 queued, 9m29s elapsed, eta ~20m44s
+[~32.4%] 53.36M steps/s, 1381 results (1259 new osc), max gen 71, 0 queued, 9m39s elapsed, eta ~20m05s
+[~33.4%] 53.36M steps/s, 1403 results (1281 new osc), max gen 71, 0 queued, 9m49s elapsed, eta ~19m36s
+[~34.3%] 53.40M steps/s, 1416 results (1294 new osc), max gen 71, 0 queued, 9m59s elapsed, eta ~19m07s
+[~35.9%] 53.43M steps/s, 1430 results (1306 new osc), max gen 71, 0 queued, 10m09s elapsed, eta ~18m08s
+[~37.3%] 53.46M steps/s, 1443 results (1318 new osc), max gen 71, 0 queued, 10m19s elapsed, eta ~17m20s
+[~37.8%] 53.47M steps/s, 1450 results (1323 new osc), max gen 71, 0 queued, 10m30s elapsed, eta ~17m14s
+[~38.8%] 53.45M steps/s, 1460 results (1332 new osc), max gen 71, 0 queued, 10m40s elapsed, eta ~16m50s
+[~39.5%] 53.47M steps/s, 1470 results (1340 new osc), max gen 71, 0 queued, 10m50s elapsed, eta ~16m34s
+[~41%] 53.48M steps/s, 1477 results (1343 new osc), max gen 71, 0 queued, 11m00s elapsed, eta ~15m48s
+[~41.9%] 53.49M steps/s, 1488 results (1349 new osc), max gen 71, 0 queued, 11m10s elapsed, eta ~15m31s
+[~42.5%] 53.51M steps/s, 1495 results (1356 new osc), max gen 71, 0 queued, 11m20s elapsed, eta ~15m19s
+[~43%] 53.51M steps/s, 1498 results (1359 new osc), max gen 71, 0 queued, 11m31s elapsed, eta ~15m16s
+[~43.7%] 53.57M steps/s, 1507 results (1367 new osc), max gen 71, 0 queued, 11m41s elapsed, eta ~15m04s
+[~44.9%] 53.56M steps/s, 1514 results (1372 new osc), max gen 71, 0 queued, 11m51s elapsed, eta ~14m31s
+[~46.1%] 53.56M steps/s, 1527 results (1385 new osc), max gen 71, 0 queued, 12m01s elapsed, eta ~14m04s
+[~46.9%] 53.55M steps/s, 1542 results (1400 new osc), max gen 71, 0 queued, 12m11s elapsed, eta ~13m48s
+[~47.8%] 53.57M steps/s, 1556 results (1414 new osc), max gen 71, 0 queued, 12m21s elapsed, eta ~13m30s
+[~49.7%] 53.60M steps/s, 1564 results (1420 new osc), max gen 71, 0 queued, 12m32s elapsed, eta ~12m42s
+[~50.5%] 53.63M steps/s, 1586 results (1438 new osc), max gen 71, 0 queued, 12m42s elapsed, eta ~12m26s
+[~50.8%] 53.65M steps/s, 1601 results (1452 new osc), max gen 71, 0 queued, 12m52s elapsed, eta ~12m27s
+[~51.7%] 53.66M steps/s, 1612 results (1461 new osc), max gen 71, 0 queued, 13m02s elapsed, eta ~12m10s
+[~52.7%] 53.68M steps/s, 1631 results (1472 new osc), max gen 71, 0 queued, 13m12s elapsed, eta ~11m50s
+[~53.3%] 53.68M steps/s, 1646 results (1485 new osc), max gen 71, 0 queued, 13m23s elapsed, eta ~11m42s
+[~54.6%] 53.67M steps/s, 1656 results (1494 new osc), max gen 71, 0 queued, 13m33s elapsed, eta ~11m15s
+[~55.9%] 53.65M steps/s, 1663 results (1499 new osc), max gen 71, 0 queued, 13m43s elapsed, eta ~10m49s
+[~56.9%] 53.65M steps/s, 1672 results (1508 new osc), max gen 71, 0 queued, 13m53s elapsed, eta ~10m32s
+[~57.5%] 53.61M steps/s, 1683 results (1518 new osc), max gen 71, 0 queued, 14m03s elapsed, eta ~10m24s
+[~58.3%] 53.60M steps/s, 1688 results (1523 new osc), max gen 71, 0 queued, 14m13s elapsed, eta ~10m11s
+[~59.2%] 53.60M steps/s, 1696 results (1531 new osc), max gen 71, 0 queued, 14m24s elapsed, eta ~9m55s
+[~59.6%] 53.57M steps/s, 1701 results (1536 new osc), max gen 71, 0 queued, 14m34s elapsed, eta ~9m52s
+[~60.3%] 53.55M steps/s, 1704 results (1539 new osc), max gen 71, 0 queued, 14m44s elapsed, eta ~9m43s
+[~60.9%] 53.56M steps/s, 1707 results (1541 new osc), max gen 71, 0 queued, 14m54s elapsed, eta ~9m35s
+[~61.1%] 53.56M steps/s, 1714 results (1548 new osc), max gen 71, 0 queued, 15m04s elapsed, eta ~9m35s
+[~61.4%] 53.57M steps/s, 1765 results (1596 new osc), max gen 71, 0 queued, 15m14s elapsed, eta ~9m34s
+[~61.8%] 53.59M steps/s, 1798 results (1625 new osc), max gen 71, 0 queued, 15m24s elapsed, eta ~9m31s
+[~62.3%] 53.54M steps/s, 1818 results (1643 new osc), max gen 71, 0 queued, 15m35s elapsed, eta ~9m26s
+[~63.1%] 53.53M steps/s, 1827 results (1652 new osc), max gen 71, 0 queued, 15m45s elapsed, eta ~9m12s
+[~64%] 53.50M steps/s, 1851 results (1674 new osc), max gen 71, 0 queued, 15m55s elapsed, eta ~8m58s
+[~65.3%] 53.46M steps/s, 1866 results (1687 new osc), max gen 71, 0 queued, 16m05s elapsed, eta ~8m32s
+[~66.7%] 53.43M steps/s, 1876 results (1697 new osc), max gen 71, 0 queued, 16m15s elapsed, eta ~8m06s
+[~67.6%] 53.40M steps/s, 1892 results (1712 new osc), max gen 71, 0 queued, 16m25s elapsed, eta ~7m51s
+[~68.6%] 53.38M steps/s, 1906 results (1725 new osc), max gen 71, 0 queued, 16m36s elapsed, eta ~7m34s
+[~69.8%] 53.37M steps/s, 1917 results (1736 new osc), max gen 71, 0 queued, 16m46s elapsed, eta ~7m16s
+[~70.5%] 53.32M steps/s, 1927 results (1746 new osc), max gen 71, 0 queued, 16m56s elapsed, eta ~7m04s
+[~71.2%] 53.29M steps/s, 1932 results (1751 new osc), max gen 71, 0 queued, 17m06s elapsed, eta ~6m55s
+[~71.7%] 53.28M steps/s, 1951 results (1768 new osc), max gen 71, 0 queued, 17m16s elapsed, eta ~6m48s
+[~72.7%] 53.24M steps/s, 1999 results (1808 new osc), max gen 71, 0 queued, 17m26s elapsed, eta ~6m33s
+[~73.5%] 53.21M steps/s, 2023 results (1832 new osc), max gen 71, 0 queued, 17m37s elapsed, eta ~6m21s
+[~74.1%] 53.20M steps/s, 2035 results (1842 new osc), max gen 71, 0 queued, 17m47s elapsed, eta ~6m12s
+[~74.9%] 53.17M steps/s, 2050 results (1856 new osc), max gen 71, 0 queued, 17m57s elapsed, eta ~6m01s
+[~75.9%] 53.17M steps/s, 2075 results (1879 new osc), max gen 71, 0 queued, 18m07s elapsed, eta ~5m45s
+[~76.4%] 53.16M steps/s, 2118 results (1921 new osc), max gen 71, 0 queued, 18m17s elapsed, eta ~5m38s
+[~77.2%] 53.16M steps/s, 2218 results (2017 new osc), max gen 71, 0 queued, 18m27s elapsed, eta ~5m27s
+[~78.2%] 53.18M steps/s, 2257 results (2054 new osc), max gen 71, 0 queued, 18m38s elapsed, eta ~5m12s
+[~79.3%] 53.19M steps/s, 2290 results (2083 new osc), max gen 71, 0 queued, 18m48s elapsed, eta ~4m53s
+[~80.7%] 53.20M steps/s, 2313 results (2106 new osc), max gen 71, 0 queued, 18m58s elapsed, eta ~4m31s
+[~81.3%] 53.20M steps/s, 2336 results (2129 new osc), max gen 71, 0 queued, 19m08s elapsed, eta ~4m23s
+[~82.2%] 53.20M steps/s, 2350 results (2143 new osc), max gen 71, 0 queued, 19m18s elapsed, eta ~4m10s
+[~83%] 53.20M steps/s, 2361 results (2153 new osc), max gen 71, 0 queued, 19m28s elapsed, eta ~3m59s
+[~84%] 53.21M steps/s, 2383 results (2171 new osc), max gen 71, 0 queued, 19m38s elapsed, eta ~3m44s
+[~84.7%] 53.21M steps/s, 2409 results (2195 new osc), max gen 71, 0 queued, 19m49s elapsed, eta ~3m34s
+[~85.3%] 53.21M steps/s, 2454 results (2239 new osc), max gen 71, 0 queued, 19m59s elapsed, eta ~3m25s
+[~87.2%] 53.21M steps/s, 2480 results (2259 new osc), max gen 71, 0 queued, 20m09s elapsed, eta ~2m57s
+[~88.4%] 53.18M steps/s, 2500 results (2277 new osc), max gen 71, 0 queued, 20m19s elapsed, eta ~2m39s
+[~89%] 53.14M steps/s, 2509 results (2285 new osc), max gen 71, 0 queued, 20m29s elapsed, eta ~2m32s
+[~90.3%] 53.09M steps/s, 2521 results (2294 new osc), max gen 71, 0 queued, 20m39s elapsed, eta ~2m13s
+[~91.2%] 53.01M steps/s, 2524 results (2297 new osc), max gen 71, 0 queued, 20m50s elapsed, eta ~2m01s
+[~91.7%] 52.93M steps/s, 2541 results (2314 new osc), max gen 71, 0 queued, 21m00s elapsed, eta ~1m54s
+[~92.2%] 52.84M steps/s, 2544 results (2317 new osc), max gen 71, 0 queued, 21m10s elapsed, eta ~1m46s
+[~92.7%] 52.78M steps/s, 2608 results (2381 new osc), max gen 71, 0 queued, 21m20s elapsed, eta ~1m41s
+[~92.9%] 52.74M steps/s, 2650 results (2423 new osc), max gen 71, 0 queued, 21m30s elapsed, eta ~1m38s
+[~94.3%] 52.75M steps/s, 2659 results (2432 new osc), max gen 71, 0 queued, 21m40s elapsed, eta ~1m19s
+[~96.1%] 52.75M steps/s, 2673 results (2446 new osc), max gen 71, 0 queued, 21m51s elapsed, eta ~53s
+[~96.9%] 52.76M steps/s, 2687 results (2458 new osc), max gen 71, 0 queued, 22m01s elapsed, eta ~42s
+[~97.7%] 52.76M steps/s, 2708 results (2475 new osc), max gen 71, 0 queued, 22m11s elapsed, eta ~30s
+[~99.3%] 52.79M steps/s, 2733 results (2498 new osc), max gen 71, 0 queued, 22m21s elapsed, eta ~9s
+Search complete after 1345.5s, 71030918209 steps (52.79M/s).
+Found 2502 oscillators (2502 with unknown rotors), 0 stable, 235 fizzles, 0 max gen; printed 1. Highest generation reached: 71.
+Escapes (still life back, something outside): 1.
+2735 results never reached a --must-reach region.
+
+Results saved to results/reaction-wire/ctrl2b-results.txt and results/reaction-wire/ctrl2b-results.jsonl.
+To turn them into complete, checked patterns:
+  "/Users/leo/Desktop/Life tools/Vibecoded life tools/drift/drift/drift/drift" finish "results/reaction-wire/ctrl2b.cfg"

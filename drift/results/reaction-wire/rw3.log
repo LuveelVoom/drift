@@ -1,0 +1,46 @@
+drift: rule B3/S23-a5, space 40x68, at most 24 changed cells in 20x22 (w x h), max gen 100
+symmetry none, seed 1, 10 threads, known rotors: 0
+results are saved to results/reaction-wire/rw3-results.txt and results/reaction-wire/rw3-results.jsonl
+legend: o on  . off  , unknown  1 on in gen 0 only  0 off in gen 0 only
+        not checked (no-check): 4 unknown  2 off  3 on
+starting position (rows/cols relative to the pattern's top-left):
+gen 0, rows 19..34, cols 28..43
+.............
+.............
+..1..........
+...11........
+..1..........
+..............
+........oo....
+...oo...o.o....
+...o..o.o.ooo...
+....ooo.o....o..
+.........oo.oo..
+......oo.o......
+......o..o......
+.......oo.......
+................
+................
+
+[~60%] 285.58M steps/s, 934 results (609 new osc), max gen 100, 0 queued, 1m00s elapsed, eta ~39s
+[~69.2%] 289.00M steps/s, 1336 results (1011 new osc), max gen 100, 0 queued, 2m00s elapsed, eta ~53s
+[~70.3%] 289.47M steps/s, 1482 results (1157 new osc), max gen 100, 0 queued, 3m00s elapsed, eta ~1m15s
+[~72.4%] 286.01M steps/s, 1604 results (1276 new osc), max gen 100, 0 queued, 4m00s elapsed, eta ~1m31s
+[~77.8%] 284.19M steps/s, 1821 results (1491 new osc), max gen 100, 0 queued, 5m00s elapsed, eta ~1m25s
+[~78.1%] 283.69M steps/s, 2150 results (1805 new osc), max gen 100, 0 queued, 6m00s elapsed, eta ~1m40s
+[~78.2%] 283.34M steps/s, 3251 results (2904 new osc), max gen 100, 0 queued, 7m00s elapsed, eta ~1m57s
+[~79.2%] 282.76M steps/s, 3546 results (3198 new osc), max gen 100, 0 queued, 8m00s elapsed, eta ~2m06s
+[~79.8%] 281.99M steps/s, 3850 results (3502 new osc), max gen 100, 0 queued, 9m00s elapsed, eta ~2m17s
+[~80.8%] 281.18M steps/s, 4047 results (3699 new osc), max gen 100, 0 queued, 10m00s elapsed, eta ~2m22s
+[~80.8%] 280.54M steps/s, 4214 results (3865 new osc), max gen 100, 0 queued, 11m00s elapsed, eta ~2m36s
+[~80.8%] 280.24M steps/s, 4484 results (4134 new osc), max gen 100, 0 queued, 12m01s elapsed, eta ~2m51s
+[~80.8%] 280.16M steps/s, 4900 results (4547 new osc), max gen 100, 0 queued, 13m01s elapsed, eta ~3m05s
+
+Interrupted. Resume with: drift --resume results/reaction-wire/rw3.ckpt
+Search stopped after 823.9s, 230685991377 steps (279.99M/s).
+Found 4780 oscillators (4780 with unknown rotors), 0 stable, 0 fizzles, 353 max gen; printed 0. Highest generation reached: 100.
+Escapes (still life back, something outside): 0.
+
+Nothing was printed. The kinds you keep didn't turn up: fizzles (0), escapes (0).
+  Found instead (skipped by your config): 4780 oscillators, 353 max gen.
+  The search was stopped before it finished, so results of the kinds you keep may still exist.

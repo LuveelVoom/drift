@@ -1,0 +1,49 @@
+drift: rule B3/S23-a5, space 73x95, at most 24 changed cells in 20x22 (w x h), max gen 160
+symmetry none, seed 1, 4 threads, known rotors: 0
+results are saved to results/reaction-wire/newwire-results.txt and results/reaction-wire/newwire-results.jsonl
+legend: o on  . off  , unknown  1 on in gen 0 only  0 off in gen 0 only
+        not checked (no-check): 4 unknown  2 off  3 on
+starting position (rows/cols relative to the pattern's top-left):
+gen 0, rows 50..65, cols 28..43
+.............
+.............
+..1..........
+...11........
+..1..........
+.............
+........oo...
+...oo...o.o..
+...o..o.o.ooo
+....ooo.o....o
+.........oo.oo
+......oo.o...
+......o..o...
+.......oo....
+.............
+.............
+
+[~10.4%] 90.07M steps/s, 4198 results (4198 new osc), max gen 93, 0 queued, 2m00s elapsed, eta ~17m17s
+[~29.2%] 88.96M steps/s, 11830 results (11830 new osc), max gen 102, 0 queued, 4m00s elapsed, eta ~9m42s
+[~31.7%] 88.91M steps/s, 16921 results (16921 new osc), max gen 104, 0 queued, 6m00s elapsed, eta ~12m54s
+[~31.7%] 89.06M steps/s, 17731 results (17731 new osc), max gen 104, 0 queued, 8m00s elapsed, eta ~17m12s
+[~31.7%] 90.09M steps/s, 24208 results (24208 new osc), max gen 104, 0 queued, 10m00s elapsed, eta ~21m30s
+[~31.7%] 90.40M steps/s, 32637 results (32637 new osc), max gen 105, 0 queued, 12m00s elapsed, eta ~25m49s
+[~31.8%] 90.65M steps/s, 36819 results (36819 new osc), max gen 105, 0 queued, 14m00s elapsed, eta ~30m05s
+[~31.8%] 90.65M steps/s, 36819 results (36819 new osc), max gen 105, 0 queued, 16m00s elapsed, eta ~34m22s
+[~32%] 90.35M steps/s, 36819 results (36819 new osc), max gen 105, 0 queued, 18m00s elapsed, eta ~38m17s
+[~32%] 90.01M steps/s, 36819 results (36819 new osc), max gen 105, 0 queued, 20m00s elapsed, eta ~42m33s
+[~32%] 91.15M steps/s, 36819 results (36819 new osc), max gen 105, 0 queued, 22m00s elapsed, eta ~46m48s
+[~32%] 89.50M steps/s, 36819 results (36819 new osc), max gen 105, 0 queued, 24m00s elapsed, eta ~51m03s
+[~32%] 88.15M steps/s, 36940 results (36940 new osc), max gen 105, 0 queued, 26m00s elapsed, eta ~55m18s
+[~32%] 87.05M steps/s, 37045 results (37045 new osc), max gen 105, 0 queued, 28m01s elapsed, eta ~59m34s
+
+Stopped at the limit. Continue with: drift --resume results/reaction-wire/newwire.ckpt
+Search stopped after 1800.1s, 155095527830 steps (86.16M/s).
+Found 37046 oscillators (37046 with unknown rotors), 0 stable, 0 fizzles, 0 max gen; printed 0. Highest generation reached: 105.
+Escapes (still life back, something outside): 0.
+
+Nothing was printed. The kinds you keep didn't turn up: fizzles (0), max gen (0), escapes (0).
+  Found instead (skipped by your config): 37046 oscillators.
+  Nothing was still travelling at max gen: try larger limits (size), more room (margin)
+  or more time (max-steps).
+  The search was stopped before it finished, so results of the kinds you keep may still exist.

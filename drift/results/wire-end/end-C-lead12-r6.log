@@ -1,0 +1,132 @@
+drift: rule B3/S23-a5, space 56x55, at most 12 changed cells in 8x8 (w x h), max gen 80
+symmetry none, seed 1, 2 threads, known rotors: 0
+results are saved to results/wire-end/end-C-lead12-r6-results.txt and results/wire-end/end-C-lead12-r6-results.jsonl
+warning: every cell within 2 of the spark is known, so drift can't build anything until the spark's own evolution reaches unknown cells (it may outgrow the limits first). Leave unknown cells next to the spark where things may be built (ignore this if the spark is meant to fly through empty space first).
+legend: o on  . off  , unknown  1 on in gen 0 only  0 off in gen 0 only
+        not checked (no-check): 4 unknown  2 off  3 on
+starting position (rows/cols relative to the pattern's top-left):
+gen 0, rows 11..50, cols 1..42
+............................
+............................
+............................,,,,oo
+............................,,,o.o
+............................,,,o,o
+............................oo,o,,oooooo
+.............................o,o,,,..
+.............................o,,oooooo
+..........................oo.o.,,.,,,o
+.........................o.o..ooooo.
+.........................o.o......o.
+......................oo.o..oooooo........
+.......................o.o.1..............
+.......................o..o0oooo..........
+....................oo.o.......o..........
+...................o.o..ooooo.............
+...................o.o......o.............
+................oo.o..oooooo..............
+.................o.o......................
+.................o..oooooo................
+..............oo.o.......o................
+.............o.o..ooooo...................
+.............o.o......o...................
+..........oo.o..oooooo....................
+...........o.o............................
+...........o..oooooo......................
+........oo.o.......o......................
+.......o.o..ooooo.........................
+.......o.o......o.........................
+....oo.o..oooooo..........................
+.....o.o..................................
+.....o..oooooo............................
+..oo.o.......o............................
+...o..ooooo...............................
+...o......o...............................
+....oooooo................................
+......o...................................
+......oo..................................
+..........................................
+..........................................
+
+***** #1 fizzle at gen 10
+history: f10 r12 6x7 ......B ....A11 ....A.. ..A11.. ..A.... 2B1....
+changes: 2 2 3 4 3  2 2 2 3 2  0
+sizes:   2x1 2x1 2x2 2x3 3x1  1x2 2x1 2x1 2x2 1x2  0x0
+x = 51, y = 52, rule = LifeHistory
+51B$51B$51B$33B14.4B$29B18.4B$29B18.4B$29B18.4B$29B18.4B$29B19.3B$29B
+19.3B$29B19.3B$29B19.3B$29B19.3B$29B4.2A13.3B$29B3.ABA13.3B$29B3.A.A
+13.3B$29B2ABA2B6A7.3B$30BABA2BA3B9.3B$30BA2B6A9.3B$27B2ABA7BA9.3B$26BA
+BA2B5AB11.3B$26BABA6BAB11.3B$23B2ABA2B6A16B$24BABABC22B$24BA2BAD4A18B$
+21B2ABA7BA18B$20BABA2B5A21B$20BABA6BA21B$17B2ABA2B6A22B$18BABA30B$18BA
+2B6A24B$15B2ABA7BA24B$14BABA2B5A27B$14BABA6BA27B$11B2ABA2B6A28B$12BABA
+36B$12BA2B6A30B$9B2ABA7BA30B$8BABA2B5A33B$8BABA6BA33B$5B2ABA2B6A34B$6B
+ABA42B$6BA2B6A36B$3B2ABA7BA36B$4BA2B5A39B$4BA6BA39B$5B6A40B$7BA43B$7B
+2A42B$51B$51B$51B!
+
+***** #2 fizzle at gen 12
+history: f12 r16 8x9 ........B ......A11 ......A.. ....A11.. ....A.... ..A11.... ..A...... 2B1......
+changes: 2 2 3 4 3  2 2 2 3 4  3 2 0
+sizes:   2x1 2x1 2x2 2x3 3x1  1x2 2x1 2x1 2x2 2x3  3x1 1x2 0x0
+x = 51, y = 52, rule = LifeHistory
+51B$51B$51B$33B14.4B$29B18.4B$29B18.4B$29B18.4B$29B18.4B$29B19.3B$29B
+19.3B$29B19.3B$29B19.3B$29B19.3B$29B4.2AB12.3B$29B3.ABABA11.3B$29B3.AB
+A2BA10.3B$29B2ABA2B6A7.3B$30BABA5B10.3B$30BA2B6A9.3B$27B2ABA5B2.A9.3B$
+26BABA2B5AB11.3B$26BABA6BAB11.3B$23B2ABA2B6A16B$24BABABC22B$24BA2BAD4A
+18B$21B2ABA7BA18B$20BABA2B5A21B$20BABA6BA21B$17B2ABA2B6A22B$18BABA30B$
+18BA2B6A24B$15B2ABA7BA24B$14BABA2B5A27B$14BABA6BA27B$11B2ABA2B6A28B$
+12BABA36B$12BA2B6A30B$9B2ABA7BA30B$8BABA2B5A33B$8BABA6BA33B$5B2ABA2B6A
+34B$6BABA42B$6BA2B6A36B$3B2ABA7BA36B$4BA2B5A39B$4BA6BA39B$5B6A40B$7BA
+43B$7B2A42B$51B$51B$51B!
+
+***** #3 fizzle at gen 14
+history: f14 r18 9x10 ........A2 ........A. ......A11. ......A... ....A11... ....A..... ..A11..... ..A....... 2B1.......
+changes: 2 2 3 4 3  2 2 2 3 4  3 2 2 1 0
+sizes:   2x1 2x1 2x2 2x3 3x1  1x2 2x1 2x1 2x2 2x3  3x1 1x2 2x1 1x1 0x0
+x = 51, y = 52, rule = LifeHistory
+51B$51B$51B$33B14.4B$29B18.4B$29B18.4B$29B18.4B$29B18.4B$29B19.3B$29B
+19.3B$29B19.3B$29B19.3B$29B19.3B$29B4.2AB2A10.3B$29B3.ABABAB10.3B$29B
+3.ABA4B9.3B$29B2ABA2B6A7.3B$30BABA6B9.3B$30BA2B6A9.3B$27B2ABA5B2.A9.3B
+$26BABA2B5AB11.3B$26BABA6BAB11.3B$23B2ABA2B6A16B$24BABABC22B$24BA2BAD
+4A18B$21B2ABA7BA18B$20BABA2B5A21B$20BABA6BA21B$17B2ABA2B6A22B$18BABA
+30B$18BA2B6A24B$15B2ABA7BA24B$14BABA2B5A27B$14BABA6BA27B$11B2ABA2B6A
+28B$12BABA36B$12BA2B6A30B$9B2ABA7BA30B$8BABA2B5A33B$8BABA6BA33B$5B2ABA
+2B6A34B$6BABA42B$6BA2B6A36B$3B2ABA7BA36B$4BA2B5A39B$4BA6BA39B$5B6A40B$
+7BA43B$7B2A42B$51B$51B$51B!
+
+[~100%] 42.97M steps/s, 5025 results (5021 new osc), max gen 47, 0 queued, 2m00s elapsed, eta ~0s
+[~100%] 42.70M steps/s, 8361 results (8357 new osc), max gen 47, 0 queued, 4m00s elapsed, eta ~0s
+[~100%] 42.70M steps/s, 11346 results (11342 new osc), max gen 52, 0 queued, 6m00s elapsed, eta ~0s
+[~100%] 42.57M steps/s, 13507 results (13503 new osc), max gen 52, 0 queued, 8m00s elapsed, eta ~0s
+[~100%] 41.06M steps/s, 17769 results (17765 new osc), max gen 52, 0 queued, 10m00s elapsed, eta ~0s
+[~100%] 39.66M steps/s, 20839 results (20835 new osc), max gen 52, 0 queued, 12m00s elapsed, eta ~0s
+[~100%] 38.82M steps/s, 26788 results (26784 new osc), max gen 65, 0 queued, 14m00s elapsed, eta ~0s
+[~100%] 37.99M steps/s, 30498 results (30494 new osc), max gen 65, 0 queued, 16m00s elapsed, eta ~0s
+[~100%] 37.48M steps/s, 32559 results (32555 new osc), max gen 65, 0 queued, 18m00s elapsed, eta ~0s
+[~100%] 37.00M steps/s, 36837 results (36831 new osc), max gen 80, 0 queued, 20m00s elapsed, eta ~0s
+[~100%] 36.56M steps/s, 41650 results (41644 new osc), max gen 80, 0 queued, 22m01s elapsed, eta ~0s
+[~100%] 36.15M steps/s, 45366 results (45360 new osc), max gen 80, 0 queued, 24m01s elapsed, eta ~0s
+***** #4 fizzle at gen 21
+history: f21 r33 13x16 .............1B2 .............A.. ...........11A.. ...........A.... .........11A.... .........A...... .......11A...... .......A........ .....11A........ CC.3.A.......... 1B.1@0.......... ..B.A1C......... .....2..........
+changes: 2 2 3 4 3  2 2 2 3 4  3 2 2 2 3  4 5 6 6 8  4 0
+sizes:   2x1 2x1 2x2 2x3 3x1  1x2 2x1 2x1 2x2 2x3  3x1 1x2 2x1 2x1 2x2  2x3 4x3 5x3 6x3 7x3  4x2 0x0
+x = 51, y = 52, rule = LifeHistory
+51B$51B$51B$33B14.4B$29B18.4B$29B18.4B$29B18.4B$29B6.2B3A7.4B$29B6.BA
+3BA7.3B$29B6.B2AB2A7.3B$29B6.4A3B6.3B$29B6.A2B4A6.3B$29B6.BA4BA6.3B$
+29B4.2ABAB3A2B5.3B$29B3.ABA2BA3B2A5.3B$29B3.ABA4BA3B5.3B$29B2ABA2B7A6.
+3B$30BABA9B6.3B$30BA2B6A9.3B$27B2ABA5B2.A9.3B$26BABA2B5AB11.3B$26BABA
+6BAB11.3B$23B2ABA2B6A16B$24BABABC22B$24BA2BAD4A18B$21B2ABA7BA18B$20BAB
+A2B5A21B$20BABA6BA21B$17B2ABA2B6A22B$18BABA30B$18BA2B6A24B$15B2ABA7BA
+24B$14BABA2B5A27B$14BABA6BA27B$11B2ABA2B6A28B$12BABA36B$12BA2B6A30B$9B
+2ABA7BA30B$8BABA2B5A33B$8BABA6BA33B$5B2ABA2B6A34B$6BABA42B$6BA2B6A36B$
+3B2ABA7BA36B$4BA2B5A39B$4BA6BA39B$5B6A40B$7BA43B$7B2A42B$51B$51B$51B!
+
+[~100%] 35.76M steps/s, 46390 results (46383 new osc), max gen 80, 0 queued, 26m01s elapsed, eta ~0s
+[~100%] 35.44M steps/s, 46818 results (46811 new osc), max gen 80, 0 queued, 28m01s elapsed, eta ~0s
+
+Stopped at the limit. Continue with: drift --resume results/wire-end/end-C-lead12-r6.ckpt
+Search stopped after 1800.1s, 63026054021 steps (35.01M/s).
+Found 47720 oscillators (47720 with unknown rotors), 0 stable, 5 fizzles, 2 max gen; printed 4. Highest generation reached: 80.
+1 fizzles had no output 5 or more cells from the spark.
+
+Results saved to results/wire-end/end-C-lead12-r6-results.txt and results/wire-end/end-C-lead12-r6-results.jsonl.
+To turn them into complete, checked patterns:
+  "/Users/leo/Desktop/Life tools/Vibecoded life tools/drift/drift/drift/drift" finish "results/wire-end/end-C-lead12-r6.cfg"

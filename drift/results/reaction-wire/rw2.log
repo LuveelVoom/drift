@@ -1,0 +1,74 @@
+drift: rule B3/S23-a5, space 40x68, at most 24 changed cells in 20x22 (w x h), max gen 100
+symmetry none, seed 1, 10 threads, known rotors: 0
+results are saved to results/reaction-wire/rw2-results.txt and results/reaction-wire/rw2-results.jsonl
+legend: o on  . off  , unknown  1 on in gen 0 only  0 off in gen 0 only
+        not checked (no-check): 4 unknown  2 off  3 on
+starting position (rows/cols relative to the pattern's top-left):
+gen 0, rows 19..34, cols 28..43
+.............
+.............
+..1..........
+...11........
+..1..........
+................
+........oo......
+...oo...o.o.....
+...o..o.o.ooo...
+....ooo.o....o..
+.........oo.oo..
+......oo.o......
+......o..o......
+.......oo.......
+................
+................
+
+***** #1 escape at gen 68: still life back, 4 cells changed outside
+all changes: 4 4 7 5 4  4 7 5 4 4  7 5 4 4 7  5 5 9 10 11  12 12 13 12 15  16 12 13 12 9  10 8 8 6 11  10 8 6 11 11  9 7 8 5 4  4 7 5 4 4  7 5 4 4 7  5 4 4 7 5  4 4 7 5 4  4 7 5 4
+changes: 4 4 7 5 4  4 7 5 4 4  7 5 4 4 7  5 5 9 10 11  12 12 13 12 15  16 12 13 12 9  10 8 8 6 11  10 8 6 11 11  9 7 8 5 4  4 7 5 4 4  7 5 4 4 7  5 4 4 7 5  3 4 6 2 2  1 3 2 0
+sizes:   3x3 3x2 3x3 3x4 3x3  3x2 3x3 3x4 3x3 3x2  3x3 3x4 3x3 3x2 3x3  3x4 4x3 5x4 5x4 5x5  5x4 5x6 5x6 5x6 6x7  6x7 6x6 7x5 7x4 8x4  7x3 7x4 7x4 7x3 8x4  8x4 8x5 9x3 10x4 10x4  10x5 10x4 10x4 3x4 3x3  3x2 3x3 3x4 3x3 3x2  3x3 3x4 3x3 3x2 3x3  3x4 3x3 3x2 3x3 3x4  3x2 3x2 3x2 1x2 3x1  1x1 3x1 1x2 0x0
+x = 64, y = 36, rule = LifeHistory
+64B$64B$64B$64B$64B$41B18.5B$41B18.5B$41B18.5B$41B18.5B$41B18.5B$41B
+18.5B$41B18.5B$41B18.5B$41B18.5B$41B18.5B$41B18.5B$41B18.5B$41B18.5B$
+41B18.5B$41B18.5B$43B16.5B$30BC12B16.5B$31B2C9B17.5B$30BC12B16.5B$46B
+13.5B$36B2A8B13.5B$31B2A3BABA7B13.5B$31BA2BABAB3A5B13.5B$32B3ABA4BA4B
+13.5B$37B2AB2A4B13.5B$34B2ABA26B$34BA2BA26B$35B2A27B$64B$64B$64B!
+x = 64, y = 36, rule = LifeHistory
+64B$64B$64B$64B$64B$41B18.5B$41B18.5B$41B18.5B$41B18.5B$41B18.5B$41B
+18.5B$41B18.5B$41B18.5B$41B18.5B$41B18.5B$41B18.5B$41B18.5B$41B18.5B$
+41B18.5B$27BC13B18.5B$25B2C16B16.5B$27BC15B16.5B$42B17.5B$43B16.5B$46B
+13.5B$36B2A8B13.5B$31B2A3BABA7B13.5B$31BA2BABAB3A5B13.5B$32B3ABA4BA4B
+13.5B$37B2AB2A4B13.5B$34B2ABA26B$34BA2BA26B$35B2A27B$64B$64B$64B!
+
+[~86.1%] 298.61M steps/s, 176 results (12 new osc), max gen 100, 0 queued, 1m00s elapsed, eta ~9s
+[~86.3%] 295.61M steps/s, 222 results (12 new osc), max gen 100, 0 queued, 2m00s elapsed, eta ~18s
+[~86.4%] 292.88M steps/s, 10427 results (8804 new osc), max gen 100, 0 queued, 3m00s elapsed, eta ~28s
+[~86.4%] 290.83M steps/s, 12278 results (8812 new osc), max gen 100, 0 queued, 4m00s elapsed, eta ~37s
+[~86.4%] 289.57M steps/s, 12630 results (8816 new osc), max gen 100, 0 queued, 5m00s elapsed, eta ~47s
+[~86.4%] 289.07M steps/s, 16987 results (11512 new osc), max gen 100, 0 queued, 6m00s elapsed, eta ~56s
+[~86.4%] 288.99M steps/s, 19082 results (13497 new osc), max gen 100, 0 queued, 7m00s elapsed, eta ~1m06s
+[~86.4%] 288.64M steps/s, 19954 results (14288 new osc), max gen 100, 0 queued, 8m00s elapsed, eta ~1m15s
+[~86.4%] 287.44M steps/s, 20766 results (14323 new osc), max gen 100, 0 queued, 9m01s elapsed, eta ~1m25s
+[~86.5%] 286.06M steps/s, 20923 results (14347 new osc), max gen 100, 0 queued, 10m01s elapsed, eta ~1m34s
+[~86.5%] 284.84M steps/s, 23973 results (17276 new osc), max gen 100, 0 queued, 11m01s elapsed, eta ~1m43s
+[~86.5%] 283.90M steps/s, 31423 results (24667 new osc), max gen 100, 0 queued, 12m01s elapsed, eta ~1m52s
+[~86.5%] 282.76M steps/s, 36441 results (29685 new osc), max gen 100, 0 queued, 13m01s elapsed, eta ~2m02s
+[~86.5%] 282.00M steps/s, 41323 results (34562 new osc), max gen 100, 0 queued, 14m01s elapsed, eta ~2m11s
+[~86.5%] 280.91M steps/s, 53962 results (47200 new osc), max gen 100, 0 queued, 15m01s elapsed, eta ~2m21s
+[~86.5%] 280.24M steps/s, 58511 results (51743 new osc), max gen 100, 0 queued, 16m01s elapsed, eta ~2m30s
+[~86.5%] 279.86M steps/s, 63610 results (56841 new osc), max gen 100, 0 queued, 17m02s elapsed, eta ~2m39s
+[~86.5%] 279.62M steps/s, 78929 results (72122 new osc), max gen 100, 0 queued, 18m02s elapsed, eta ~2m49s
+[~86.5%] 279.55M steps/s, 82259 results (75439 new osc), max gen 100, 0 queued, 19m02s elapsed, eta ~2m58s
+[~86.5%] 279.60M steps/s, 85999 results (79026 new osc), max gen 100, 0 queued, 20m02s elapsed, eta ~3m08s
+[~87.7%] 279.75M steps/s, 96206 results (88851 new osc), max gen 100, 0 queued, 21m02s elapsed, eta ~2m57s
+[~87.7%] 279.76M steps/s, 106832 results (99176 new osc), max gen 100, 0 queued, 22m02s elapsed, eta ~3m04s
+[~87.7%] 279.50M steps/s, 117114 results (109452 new osc), max gen 100, 0 queued, 23m02s elapsed, eta ~3m13s
+[~87.7%] 279.20M steps/s, 128576 results (120914 new osc), max gen 100, 0 queued, 24m02s elapsed, eta ~3m21s
+
+Stopped at the limit. Continue with: drift --resume results/reaction-wire/rw2.ckpt
+Search stopped after 1500.0s, 418578794471 steps (279.05M/s).
+Found 125613 oscillators (125613 with unknown rotors), 0 stable, 0 fizzles, 7699 max gen; printed 1. Highest generation reached: 100.
+Escapes (still life back, something outside): 1.
+
+Results saved to results/reaction-wire/rw2-results.txt and results/reaction-wire/rw2-results.jsonl.
+To turn them into complete, checked patterns:
+  "/Users/leo/Desktop/Life tools/Vibecoded life tools/drift/drift/drift/drift" finish "results/reaction-wire/rw2.cfg"

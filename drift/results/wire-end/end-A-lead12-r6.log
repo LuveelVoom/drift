@@ -1,0 +1,105 @@
+drift: rule B3/S23-a5, space 56x53, at most 12 changed cells in 8x8 (w x h), max gen 80
+symmetry none, seed 1, 2 threads, known rotors: 0
+results are saved to results/wire-end/end-A-lead12-r6-results.txt and results/wire-end/end-A-lead12-r6-results.jsonl
+warning: every cell within 2 of the spark is known, so drift can't build anything until the spark's own evolution reaches unknown cells (it may outgrow the limits first). Leave unknown cells next to the spark where things may be built (ignore this if the spark is meant to fly through empty space first).
+legend: o on  . off  , unknown  1 on in gen 0 only  0 off in gen 0 only
+        not checked (no-check): 4 unknown  2 off  3 on
+starting position (rows/cols relative to the pattern's top-left):
+gen 0, rows 12..50, cols 1..40
+.........................
+.........................
+.........................,oo
+.........................,o,,ooo
+.........................,,o,o.o
+.........................,oo.o.o
+....................oo...,,,.o.o
+.....................o....oooo.o,o
+....................ooo..o,,,,oo,o,o
+........................o..oo..,,,o
+......................oo.oo.oooooo
+.....................o.o.1.......o,o..
+................oo...o.o.oo00oooo,,ooo
+................o..ooo.o.o....o..,,o.o
+.................o.o.o.o..ooooo.........
+................oo.o.o.oo.o.............
+..........oo.......o.o..o.o.oo.o........
+...........o....oooo.o.o..o.o.oo........
+..........ooo..o....oo.o.o..............
+..............o..oo.....o...............
+............oo.oo.oooooo................
+...........o.o.........o.o..............
+......oo...o.o.oooooooo..ooo............
+......o..ooo.o.o....o....o.o............
+.......o.o.o.o..ooooo...................
+......oo.o.o.oo.o.......................
+.........o.o..o.o.oo.o..................
+......oooo.o.o..o.o.oo..................
+.....o....oo.o.o........................
+....o..oo.....o.........................
+...o.oo.oooooo..........................
+...o.........o.o........................
+..oo.oooooooo..ooo......................
+...o.o....o....o.o......................
+...o..oooo.oo...........................
+....o.o..o.o.o..........................
+.....o......o...........................
+........................................
+........................................
+
+***** #1 fizzle at gen 14: split rotor, gap 1
+history: f14 r18 9x9 ........C ......A2. ......@2. ......A.. ......A2. .....12.. ....B@A.. D.32..... ..11.....
+changes: 3 4 1 1 2  4 1 2 1 1  3 3 4 1 0
+sizes:   2x4 2x2 1x1 1x1 1x2  2x2 1x1 1x2 1x1 1x1  3x2 4x2 2x2 1x1 0x0
+x = 49, y = 52, rule = LifeHistory
+49B$49B$49B$30B14.5B$29B15.5B$29B15.5B$27B17.5B$26B18.5B$26B18.5B$26B
+18.5B$26B18.5B$26B18.5B$26B20.3B$26B20.3B$26B.2A4.AB2A9.3B$26B.A2.3ABA
+BA9.3B$26B2.A.ABABA2B9.3B$26B.2ABABAB2AB9.3B$21B2A3B2.2BABA2BAB9.3B$
+22BA4B4ABABA2B9.3B$21B3A2BA4B2ABABA9.3B$25BA2B2A5BA10.3B$23B2AB2AB6A
+11.3B$22BABABC7BA.A2B7.3B$17B2A3BABAB2A2D4A2.3A7.3B$17BA2B3ABABA4BA2B
+2.ABA7.3B$18BABABABA2B5A17B$17B2ABABAB2ABA21B$11B2A7BABA2BABAB2ABA16B$
+12BA4B4ABABA2BABAB2A16B$11B3A2BA4B2ABABA22B$15BA2B2A5BA23B$13B2AB2AB6A
+24B$12BABA9BABA22B$7B2A3BABAB8A2B3A20B$7BA2B3ABABA4BA4BABA20B$8BABABAB
+A2B5A27B$7B2ABABAB2ABA31B$10BABA2BABAB2ABA26B$7B4ABABA2BABAB2A26B$6BA
+4B2ABABA32B$5BA2B2A5BA33B$4BAB2AB6A34B$4BA9BABA32B$3B2AB8A2B3A30B$4BAB
+A4BA4BABA30B$4BA2B4AB2A35B$5BABA2BABABA34B$6BA6BA35B$49B$49B$49B!
+
+[~100%] 43.35M steps/s, 9507 results (9506 new osc), max gen 78, 0 queued, 2m00s elapsed, eta ~0s
+***** #2 fizzle at gen 13: split rotor, gap 1
+history: f13 r17 8x8 ......A3 ......@2 ......A. ......A2 .....12. ....B@A. D.32.... ..11....
+changes: 3 4 1 1 2  4 1 2 1 1  3 3 4 0
+sizes:   2x4 2x2 1x1 1x1 1x2  2x2 1x1 1x2 1x1 1x1  3x2 4x2 2x2 0x0
+x = 49, y = 52, rule = LifeHistory
+49B$49B$49B$30B14.5B$29B15.5B$29B15.5B$27B17.5B$26B18.5B$26B18.5B$26B
+18.5B$26B18.5B$26B18.5B$26B20.3B$26B20.3B$26B.2A17.3B$26B.A2.3A3B10.3B
+$26B2.A.ABABAB10.3B$26B.2ABABAB2A10.3B$21B2A3B2.2BABA2BA10.3B$22BA4B4A
+BABAB10.3B$21B3A2BA4B2ABABA9.3B$25BA2B2A5BA10.3B$23B2AB2AB6A11.3B$22BA
+BABC7BA.A2B7.3B$17B2A3BABAB2A2D4A2.3A7.3B$17BA2B3ABABA4BA2B2.ABA7.3B$
+18BABABABA2B5A17B$17B2ABABAB2ABA21B$11B2A7BABA2BABAB2ABA16B$12BA4B4ABA
+BA2BABAB2A16B$11B3A2BA4B2ABABA22B$15BA2B2A5BA23B$13B2AB2AB6A24B$12BABA
+9BABA22B$7B2A3BABAB8A2B3A20B$7BA2B3ABABA4BA4BABA20B$8BABABABA2B5A27B$
+7B2ABABAB2ABA31B$10BABA2BABAB2ABA26B$7B4ABABA2BABAB2A26B$6BA4B2ABABA
+32B$5BA2B2A5BA33B$4BAB2AB6A34B$4BA9BABA32B$3B2AB8A2B3A30B$4BABA4BA4BAB
+A30B$4BA2B4AB2A35B$5BABA2BABABA34B$6BA6BA35B$49B$49B$49B!
+
+[~100%] 43.36M steps/s, 19190 results (19188 new osc), max gen 78, 0 queued, 4m00s elapsed, eta ~0s
+[~100%] 43.68M steps/s, 26514 results (26512 new osc), max gen 78, 0 queued, 6m00s elapsed, eta ~0s
+[~100%] 43.67M steps/s, 33145 results (33143 new osc), max gen 78, 0 queued, 8m00s elapsed, eta ~0s
+[~100%] 42.22M steps/s, 45856 results (45854 new osc), max gen 78, 0 queued, 10m00s elapsed, eta ~0s
+[~100%] 40.73M steps/s, 50161 results (50159 new osc), max gen 78, 0 queued, 12m00s elapsed, eta ~0s
+[~100%] 39.71M steps/s, 55014 results (55012 new osc), max gen 78, 0 queued, 14m00s elapsed, eta ~0s
+[~100%] 38.96M steps/s, 61767 results (61765 new osc), max gen 78, 0 queued, 16m00s elapsed, eta ~0s
+[~100%] 38.43M steps/s, 75724 results (75722 new osc), max gen 78, 0 queued, 18m00s elapsed, eta ~0s
+[~100%] 37.92M steps/s, 83180 results (83178 new osc), max gen 78, 0 queued, 20m01s elapsed, eta ~0s
+[~100%] 37.51M steps/s, 87970 results (87968 new osc), max gen 78, 0 queued, 22m01s elapsed, eta ~0s
+[~100%] 37.13M steps/s, 96216 results (96214 new osc), max gen 78, 0 queued, 24m01s elapsed, eta ~0s
+[~100%] 36.82M steps/s, 103902 results (103900 new osc), max gen 78, 0 queued, 26m01s elapsed, eta ~0s
+[~100%] 36.56M steps/s, 112041 results (112039 new osc), max gen 78, 0 queued, 28m01s elapsed, eta ~0s
+
+Stopped at the limit. Continue with: drift --resume results/wire-end/end-A-lead12-r6.ckpt
+Search stopped after 1800.2s, 65090799443 steps (36.16M/s).
+Found 118983 oscillators (118983 with unknown rotors), 0 stable, 2 fizzles, 0 max gen; printed 2. Highest generation reached: 78.
+0 fizzles had no output 5 or more cells from the spark.
+
+Results saved to results/wire-end/end-A-lead12-r6-results.txt and results/wire-end/end-A-lead12-r6-results.jsonl.
+To turn them into complete, checked patterns:
+  "/Users/leo/Desktop/Life tools/Vibecoded life tools/drift/drift/drift/drift" finish "results/wire-end/end-A-lead12-r6.cfg"
