@@ -29,10 +29,6 @@ as dead and `clear` regions stay empty), simulates it and sorts it:
   damaging oscillators  the spark breaks part of the still life to make it
                         (listed last; --clean-only leaves out these and the
                         section above)
-  spark converters      catalysts whose reaction puts a cell outside the still life
-                        at least --min-output-dist from the spark. Every fizzle is
-                        checked, not one per reaction shape as for catalysts, and
-                        they are also written to my-converters.rle, 10 cells apart
   debris                oscillates without a stator (not listed)
   trivial               the rotor falls apart into parts more than 2 cells
                         apart, which can't affect each other even through a
@@ -42,6 +38,15 @@ as dead and `clear` regions stay empty), simulates it and sorts it:
 
 Each pattern is generation 0 (still life plus spark), shrunk as far as possible
 and re-checked, in plain RLE for your rule. Output: my-finished.txt.
+
+With output-dist in the config, catalysts of any size are listed (spark
+converters among them), each with how far its output reaches.
+
+--sheet also writes the patterns of the chosen sections into one RLE
+(my-sheet.rle), in rows, with a #C line per pattern giving its position. It
+takes every result of those sections, not just the first --limit; the ones
+past --limit aren't shrunk. --sheet-min-period, --sheet-min-dist and the other
+--sheet-* filters (see --help) narrow it down.
 """
 import argparse
 import collections
@@ -345,51 +350,6 @@ def _classify(job):
     return best
 
 
-def _convert(job):
-    """Check one fizzle as a spark converter: (why it was dropped, details)."""
-    res, min_dist, max_box = job
-    try:
-        got = FIN.fizzle(res)
-    except Exception as e:
-        print(f"  (result #{res['n']} skipped: {e})", file=sys.stderr, flush=True)
-        got = None
-    if not got:
-        return "incomplete", None
-    info = got[1]
-    spark = info["hist"][0] - info["still"]
-    far = lambda s, h: spark and any(min(max(abs(r - a), abs(c - b)) for a, b in spark) >= min_dist
-                                     for g in h[1:] for r, c in g - s)
-    if not far(info["still"], info["hist"]):   # also rules out the shrunk pattern: same reaction
-        return "too close", None
-    change = set(info["hist"][0]) ^ set(info["still"])
-    g0 = FIN.shrink("catalyst", info) or info["hist"][0]
-    still = frozenset(set(g0) ^ change)
-    if not still:
-        return "too close", None
-    h = [frozenset(g0)]
-    for _ in range(res["gen"] + 6):
-        h.append(frozenset(L.step(h[-1], FIN.table)))
-    if h[-1] != still or h[-2] != still:
-        return "not restored", None
-    dist, gen, clean = L.spark_outputs(still, h)
-    if dist < min_dist:
-        return "too close", None
-    rs, cs = [r for r, c in still], [c for r, c in still]
-    w, ht = max(cs) - min(cs) + 1, max(rs) - min(rs) + 1
-    if max_box and max(w, ht) > max_box:
-        return "box too big", None
-    best = None
-    for t in TRANSFORMS:   # the same converter in any orientation
-        a = [t(*q) for q in g0]
-        s = {t(*q) for q in spark}
-        r0, c0 = min(q[0] for q in a), min(q[1] for q in a)
-        k = tuple(sorted(((q[0] - r0, q[1] - c0), q in s) for q in a))
-        best = k if best is None or k < best else best
-    back = max(t for t in range(len(h)) if h[t] != still) + 1
-    return "", dict(key=best, n=res["n"], dist=dist, gen=gen, clean=clean, back=back, w=w, h=ht,
-                    cells=len(still), g0=g0, unshrunk=bool(info.get("unshrunk")))
-
-
 def _shrink(job):
     """(pattern to list, whether it couldn't be shrunk, whether a part couldn't be separated)"""
     key, info = job
@@ -423,6 +383,60 @@ class Workers:
             self.pool.terminate()
 
 
+OSC_KINDS = ("clean", "damaging", "no-spark", "extracted")
+# --sheet filters: option name -> (sections it applies to, property, minimum or maximum)
+SHEET_FILTERS = {
+    "sheet-min-period": (OSC_KINDS, "period", "min"),
+    "sheet-max-period": (OSC_KINDS, "period", "max"),
+    "sheet-min-spark-gap": (OSC_KINDS, "gap", "min"),
+    "sheet-min-dist": (("catalyst",), "dist", "min"),
+    "sheet-min-clean-dist": (("catalyst",), "clean", "min"),
+    "sheet-min-gens": (("catalyst", "clean", "damaging", "no-spark"), "gens", "min"),
+    "sheet-max-gens": (("catalyst", "clean", "damaging", "no-spark"), "gens", "max"),
+    "sheet-max-cells": (tuple(k for k, _ in SECTIONS), "cells", "max"),
+}
+
+
+def sheet_meta(key, g0, res, info, table, cyc=None):
+    """What the --sheet filters look at: period, spark gap, output dist (clean), gens, cells.
+    gens = how long a catalyst's reaction lasts, or when an oscillator starts cycling."""
+    m = {"cells": len(g0)}
+    if key in OSC_KINDS:
+        p = info["period"] if key == "extracted" else res["period"]
+        if cyc is None:
+            h = [frozenset(g0)]
+            start = 0 if key == "extracted" else res["gen"]
+            for _ in range(start + p - 1):
+                h.append(frozenset(L.step(h[-1], table)))
+            cyc = h[start:start + p]
+        m["period"] = p
+        m["gap"] = L.spark_gap(cyc)[0]
+        if key != "extracted":
+            m["gens"] = res["gen"] - p
+    elif key == "catalyst":
+        m["gens"] = res["gen"]
+        m["dist"] = m["clean"] = 0
+        if info.get("still") is not None and info.get("hist"):
+            still = frozenset(set(g0) ^ (set(info["hist"][0]) ^ set(info["still"])))
+            h = [frozenset(g0)]
+            for _ in range(res["gen"] + 2):
+                h.append(frozenset(L.step(h[-1], table)))
+            if still and h[0] - still:
+                m["dist"], m["gen"], m["clean"] = L.spark_outputs(still, h)
+    return m
+
+
+def sheet_keep(key, meta, filters):
+    """True if no --sheet filter that applies to this section rejects it."""
+    for name, value in filters.items():
+        kinds, prop, how = SHEET_FILTERS[name]
+        if key not in kinds or prop not in meta:
+            continue
+        if (how == "min" and meta[prop] < value) or (how == "max" and meta[prop] > value):
+            return False
+    return True
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("config")
@@ -443,11 +457,21 @@ def main():
                          "reactions with the fewest active cells at max-gen first). The numbers are in each "
                          "pattern's comment. "
                          "Default: the config's sort setting")
-    ap.add_argument("--min-output-dist", type=int,
-                    help="spark converters: smallest distance from the input spark to an output "
-                         "(default: the config's output-dist, else 2)")
-    ap.add_argument("--max-box", type=int, help="spark converters: largest still-life box side")
-    ap.add_argument("--no-converters", action="store_true", help="don't look for spark converters")
+    ap.add_argument("--sheet", nargs="?", const="", default=None, metavar="FILE",
+                    help="also write the patterns of the --sheet-kinds sections into one RLE, in rows "
+                         "(default file: <config>-sheet.rle; default: the config's sheet setting)")
+    ap.add_argument("--sheet-kinds", metavar="KINDS",
+                    help="sections for --sheet, comma-separated: " + ", ".join(k for k, _ in SECTIONS)
+                         + " (default: every listed section, or with sheet filters the sections they "
+                           "apply to; or the config's sheet-kinds setting)")
+    for name, (kinds, prop, how) in SHEET_FILTERS.items():
+        what = {"period": "period", "gap": "spark gap (see --sort sparky)", "dist": "output distance from the spark",
+                "clean": "clean output distance", "gens": "reaction length / generations before cycling",
+                "cells": "cells"}[prop]
+        ap.add_argument("--" + name, type=int, metavar="N",
+                        help=f"--sheet: {'at least' if how == 'min' else 'at most'} this {what}; applies to "
+                             + (", ".join(kinds) if len(kinds) < len(SECTIONS) else "every section")
+                             + f" (or the config's {name} setting)")
     ap.add_argument("--limit", type=int, default=30, help="patterns listed per section (default 30)")
     ap.add_argument("--max-cells", type=int, default=0, help="leave out patterns bigger than this")
     ap.add_argument("--seconds", type=float, default=5, help="time spent shrinking each listed pattern")
@@ -458,6 +482,30 @@ def main():
                          "are checked first, and patterns are listed unshrunk once time is short")
     a = ap.parse_args()
     a.sort = a.sort or L.config_sort(a.config)
+    if a.sheet is None:
+        v = L.config_setting(a.config, "sheet")
+        if v and v.lower() not in ("no", "false", "0", "off"):
+            a.sheet = "" if v.lower() in ("yes", "true", "1", "on") else v
+    a.sheet_kinds = a.sheet_kinds or L.config_setting(a.config, "sheet-kinds")
+    sheet_filters = {}
+    for name in SHEET_FILTERS:
+        v = getattr(a, name.replace("-", "_"))
+        if v is None and L.config_setting(a.config, name) is not None:
+            try:
+                v = int(L.config_setting(a.config, name))
+            except ValueError:
+                sys.exit(f"finish.py: {name} needs a whole number")
+        if v is not None:
+            sheet_filters[name] = v
+    sheet_kinds = None
+    if sheet_filters and not a.sheet_kinds:   # the sections the filters are about
+        sheet_kinds = set().union(*(SHEET_FILTERS[n][0] for n in sheet_filters))
+    if a.sheet_kinds:
+        sheet_kinds = {k.strip() for k in a.sheet_kinds.split(",") if k.strip()}
+        bad = sheet_kinds - {k for k, _ in SECTIONS}
+        if bad:
+            sys.exit("finish.py: --sheet-kinds: unknown " + ", ".join(sorted(bad))
+                     + " (use " + ", ".join(k for k, _ in SECTIONS) + ")")
     import time
     deadline = time.time() + a.max_minutes * 60 if a.max_minutes else float("inf")
     late = lambda frac: time.time() > deadline - (1 - frac) * a.max_minutes * 60
@@ -478,6 +526,9 @@ def main():
     # Long thin fizzles are usually a signal running along a short wire. That's
     # noise in most searches, but the point of a drifter search.
     drifters = bool(re.search(r"^\s*(no-rechange|push)\b", open(a.config).read(), re.M))
+    # With output-dist, every fizzle was printed for an output that reaches away from
+    # the spark (a spark converter): list them whatever their size.
+    out_dist = int(L.config_setting(a.config, "output-dist") or 0)
     groups = collections.defaultdict(list)
     rotor_db = L.rotor_db_path(a.config)
     fizzles = []
@@ -490,7 +541,7 @@ def main():
         elif k == "fizzle":
             fizzles.append(res)
             h, w = map(int, res["history"].split()[2].split("x"))
-            if max(h, w) <= 8 or a.all or drifters:
+            if max(h, w) <= 8 or a.all or drifters or out_dist:
                 groups[(k, res["history"])].append(res)
         elif k == "maxgen":
             groups[(k, tuple(res["change_counts"][-12:]))].append(res)
@@ -555,49 +606,11 @@ def main():
         ext.sort(key=lambda i: (known(i), -i["period"], -i["rotor"]))
         found["extracted"] = ext
 
-    # Spark converters: every fizzle, since different catalysts can share a reaction shape
-    converters, drops = [], collections.Counter()
-    min_dist = a.min_output_dist or int(L.config_setting(a.config, "output-dist") or 2)
-    if fizzles and not a.no_converters:
-        best = {}
-        with Workers(min(a.jobs, len(fizzles)), init) as W:
-            jobs = [(res, min_dist, a.max_box) for res in fizzles]
-            for ji, (why, c) in enumerate(W.imap(_convert, jobs)):
-                if late(0.85):
-                    drops["not checked (time limit)"] = len(jobs) - ji
-                    break
-                if c is None:
-                    drops[why] += 1
-                elif c["key"] in best and best[c["key"]]["cells"] <= c["cells"]:
-                    drops["duplicate"] += 1
-                else:
-                    best[c["key"]] = c
-        converters = sorted(best.values(), key=lambda o: (max(o["w"], o["h"]), o["w"] * o["h"], -o["dist"], o["cells"]))
-        if a.max_cells:
-            converters = [c for c in converters if c["cells"] <= a.max_cells]
-
     # 3. shrink and write the ones that are listed
     lines = [f"# drift results for {a.config}, finished by finish.py (rule {rule}).",
              "# Each pattern is gen 0 (still life + spark).", None, ""]
     summary = []
-    if converters:
-        title = f"Spark converters (still life back, output at least {min_dist} cells from the spark)"
-        summary.append(f"{len(converters)} spark converters")
-        lines += [f"## {title}: {len(converters)}", ""]
-        for c in converters:
-            note = " (couldn't be shrunk)" if c["unshrunk"] else ""
-            lines.append(f"#C spark converter, {c['w']}x{c['h']}, {c['cells']} cells, output dist {c['dist']} "
-                         f"(clean {c['clean']}) at gen {c['gen']}, back by gen {c['back']}, result #{c['n']}{note}\n"
-                         + L.to_rle(c["g0"], rule).rstrip() + "\n")
-        sheet, x, y, tall = set(), 0, 0, 0
-        for i, c in enumerate(converters):
-            if i and i % 8 == 0:
-                y, x, tall = y + tall + 10, 0, 0
-            r0, c0 = min(q[0] for q in c["g0"]), min(q[1] for q in c["g0"])
-            sheet |= {(q[0] - r0 + y, q[1] - c0 + x) for q in c["g0"]}
-            tall = max(tall, max(q[0] for q in c["g0"]) - r0 + 1)
-            x += max(q[1] for q in c["g0"]) - c0 + 11
-        open(base + "-converters.rle", "w").write(L.to_rle(sheet, rule))
+    sheet = []   # (section, comment, pattern) for --sheet
     with Workers(a.jobs, init) as W:
         for key, title in SECTIONS:
             items = found.get(key, [])
@@ -619,6 +632,8 @@ def main():
                 items.sort(key=lambda i: (known(i), spark_key(i["cyc"], a.sort), -i["period"]))
             final = {}   # listed pattern -> its --sort key, measured on the shrunk pattern
             written, shown = [], set(seen) if key == "extracted" else set()
+            to_sheet = a.sheet is not None and (sheet_kinds is None or key in sheet_kinds)
+            listed = set()   # ids of the items handled below (the rest only go to the sheet)
             i = 0
             while i < len(items) and len(written) < a.limit:
                 chunk = items[i:i + max(a.jobs, a.limit - len(written))]
@@ -633,6 +648,7 @@ def main():
                 for info, (g0, unshrunk, unseparated) in zip(chunk, outs):
                     if len(written) >= a.limit:
                         break
+                    listed.add(id(info))
                     if unshrunk:
                         info["unshrunk"] = True
                     res = info["res"]
@@ -644,6 +660,8 @@ def main():
                             head = (f"p{res['period']} oscillator, {len(g0)} cells, from the reaction of result #{res['n']}: "
                                     f"trivial, but its p{info['period']} part couldn't be given a stator of its own")
                             written.append(f"#C {head}\n" + L.to_rle(g0, rule).rstrip())
+                            if to_sheet:
+                                sheet.append((key, head, g0, sheet_meta(key, g0, res, info, fin.table)))
                             continue
                         # A smaller stator can leave separate oscillators side by side: list each new one
                         ph = [g0]
@@ -667,6 +685,9 @@ def main():
                             head += ", " + spark_note(cyc)
                             head += " (couldn't be shrunk)" if info.get("unshrunk") else ""
                             written.append(f"#C {head}\n" + L.to_rle(cyc[0], rule).rstrip())
+                            if to_sheet:
+                                sheet.append((key, head, cyc[0], sheet_meta(key, cyc[0], res, dict(info, period=p),
+                                                                            fin.table, cyc)))
                             final[written[-1]] = spark_key(cyc, a.sort)
                         continue
                     if a.max_cells and g0 is not None and len(g0) > a.max_cells:
@@ -685,6 +706,16 @@ def main():
                         spark = spark_key(cyc, a.sort)
                     elif key == "catalyst":
                         head = f"catalyst, {len(g0)} cells, reaction lasts {res['gen']} gens"
+                        if out_dist and g0 is not None and info.get("still") is not None and info.get("hist"):
+                            # as the old spark-converter check: the still life under the shrunk pattern
+                            still = frozenset(set(g0) ^ (set(info["hist"][0]) ^ set(info["still"])))
+                            h = [frozenset(g0)]
+                            for _ in range(res["gen"] + 2):
+                                h.append(frozenset(L.step(h[-1], fin.table)))
+                            if still and h[0] - still:
+                                d, dg, dc = L.spark_outputs(still, h)
+                                if d:
+                                    head += f", output dist {d} (clean {dc}) at gen {dg}"
                     elif key == "converter":
                         head = f"converter, {len(g0)} cells: {info['what']}"
                     elif key == "maxgen":
@@ -698,9 +729,27 @@ def main():
                     if info.get("unshrunk"):
                         head += " (couldn't be shrunk)"
                     written.append(f"#C {head}\n" + (L.to_rle(g0, rule).rstrip() if g0 is not None else ""))
+                    if to_sheet and g0 is not None:
+                        sheet.append((key, head, g0, sheet_meta(key, g0, res, info, fin.table,
+                                                                cyc if key in OSC_KINDS else None)))
                     if key in ("clean", "damaging", "no-spark"):
                         final[written[-1]] = spark
                         save.add(res["rotor"])
+            if to_sheet and key != "extracted":   # the rest of the section, past --limit: unshrunk
+                for info in items:
+                    if id(info) in listed or not info.get("hist"):
+                        continue
+                    g0 = info["hist"][0]
+                    if a.max_cells and len(g0) > a.max_cells:
+                        continue
+                    res = info["res"]
+                    what = {"clean": f"p{res.get('period')} oscillator", "damaging": f"p{res.get('period')} damaging oscillator",
+                            "no-spark": f"p{res.get('period')} oscillator"}.get(key, key)
+                    meta = sheet_meta(key, g0, res, info, fin.table)
+                    note = (f", spark gap {meta['gap']}" if "gap" in meta else "") + \
+                           (f", output dist {meta['dist']} (clean {meta['clean']})" if meta.get("dist") else "")
+                    sheet.append((key, f"{what}, {len(g0)} cells{note}, result #{res['n']} (not shrunk: past --limit)",
+                                  g0, meta))
             if key == "extracted":   # a reaction whose oscillators have all been listed needn't come back
                 save |= {i["res"]["rotor"] for i in sources if all(k in shown for k in i["parts"])}
             if not items:
@@ -727,6 +776,27 @@ def main():
     if counts["unchecked"]:
         lines[2] += f"\n# {counts['unchecked']} lower-priority results not checked (time limit)"
     open(out, "w").write("\n".join(lines) + "\n")
+    if a.sheet is not None:
+        sheet_file = a.sheet or base + "-sheet.rle"
+        dropped = len(sheet)
+        sheet = [e for e in sheet if sheet_keep(e[0], e[3], sheet_filters)]
+        dropped -= len(sheet)
+        cells, x, y, tall, notes = set(), 0, 0, 0, []
+        for n, (key, head, g0, meta) in enumerate(sheet):
+            if n and n % 10 == 0:
+                y, x, tall = y + tall + 10, 0, 0
+            r0, c0 = min(q[0] for q in g0), min(q[1] for q in g0)
+            cells |= {(q[0] - r0 + y, q[1] - c0 + x) for q in g0}
+            notes.append(f"#C {n + 1} at x={x} y={y} ({key}): {head}")
+            tall = max(tall, max(q[0] for q in g0) - r0 + 1)
+            x += max(q[1] for q in g0) - c0 + 11
+        with open(sheet_file, "w") as f:
+            filt = "".join(f", {k} {v}" for k, v in sheet_filters.items())
+            f.write(f"#C drift results for {a.config}: {len(sheet)} patterns, gen 0, 10 per row, "
+                    f"positions are top-left corners{filt}\n" + "\n".join(notes) + "\n")
+            f.write(L.to_rle(cells, rule) if cells else "x = 0, y = 0, rule = " + rule + "\n!\n")
+        print(f"  {len(sheet):4d}  patterns in one sheet: {sheet_file}"
+              + (f" ({dropped} left out by the sheet filters)" if dropped else ""))
 
     if rotor_db:   # a pattern cut by --limit isn't saved, so the next search lists it
         n = L.rotor_db_add(rotor_db, rule, table, {r for r in save if "TOO LONG" not in r})
@@ -741,9 +811,6 @@ def main():
     for k, name in names.items():
         if counts[k]:
             print(f"  {counts[k]:4d}  {name}")
-    if fizzles and not a.no_converters:
-        print(f"  {len(converters):4d}  spark converters ("
-              + ", ".join(f"{v} {k}" for k, v in sorted(drops.items())) + ")")
     print(f"Saved to {out}")
     if counts["no-spark"] and not a.all:
         print("  (oscillators without a spark in their cycle aren't listed; add --all)")

@@ -361,12 +361,11 @@ reaction in about a minute.
 ### Spark converters
 
 A spark converter is a still life that takes a spark, makes one somewhere else
-and restores itself. finish.py checks every fizzle and lists these under "Spark
-converters", smallest box first, and writes them all to `my-converters.rle`,
-10 cells apart. `--min-output-dist N` (default 2) and `--max-box N` filter the
-list, and `--no-converters` skips this step. `dist` counts every cell outside
-the still life; `clean` counts only cells a receiver could use without touching
-the still life.
+and restores itself. drift prints such a fizzle when `output-dist` is set, and
+finish.py lists it with the other catalysts (of any size, when the config has
+`output-dist`), with `output dist N (clean M) at gen G` in its comment. `dist`
+counts every cell outside the still life; `clean` counts only cells a receiver
+could use without touching the still life.
 
 To search for them, clear only the side the spark comes from:
 
@@ -378,6 +377,30 @@ To search for them, clear only the side the spark comes from:
 
 `max-box` changes the search and loses still lifes that don't fit that W x H box
 (it isn't tried rotated). `output-dist` only filters the output.
+
+### All results in one pattern
+
+`--sheet` (or `sheet = yes` in the config) makes finish.py also write
+`my-sheet.rle`: the patterns of every listed section in one RLE, 10 per row,
+11 cells apart, with a `#C` line per pattern giving its top-left corner and its
+comment. It takes all results of a section, not just the first `--limit`; those
+past the limit aren't shrunk. `--sheet-kinds catalyst,clean` (or `sheet-kinds =`)
+picks the sections. Run on its own, `finish.py --sheet FILE` names the file.
+
+Filters (drift options or config settings of the same name):
+
+| setting | keeps | applies to |
+|---|---|---|
+| `sheet-min-period N`, `sheet-max-period N` | period N or more / at most N | oscillator sections |
+| `sheet-min-spark-gap N` | spark gap N or more (as in `--sort sparky`) | oscillator sections |
+| `sheet-min-dist N`, `sheet-min-clean-dist N` | output N or more cells from the spark (any / clean) | catalysts |
+| `sheet-min-gens N`, `sheet-max-gens N` | reaction length (catalysts) or first cycling gen (oscillators) | catalysts, oscillators |
+| `sheet-max-cells N` | at most N cells | everything |
+
+A filter only applies to the sections listed for it. Without `sheet-kinds`, the sheet holds just
+the sections the given filters apply to, so `--sheet --sheet-min-period 10` gives the oscillators
+of period 10 or more, and adding `--sheet-min-dist 6` adds the catalysts reaching 6 cells. The
+values are measured on the pattern in the sheet (shrunk, or unshrunk past `--limit`).
 
 ### Gutter symmetry
 

@@ -493,6 +493,31 @@ const std::vector<Opt> &opts() {
        if (v != "period" && v != "sparky" && v != "open" && v != "settle")
          fail("--sort: unknown order '" + v + "' (use period, sparky, open or settle)");
      }},
+    {"sheet", nullptr, "Output",
+     "finish.py also writes the finished patterns into one RLE, <config>-sheet.rle, in rows of 10\n"
+     "with a #C line per pattern (all of each section, not just the first --limit).",
+     [](Ctx &, const std::string &v) { toBool("sheet", v); }},
+    {"sheet-kinds", "KINDS", "Output",
+     "Sections for --sheet, comma-separated: clean, catalyst, converter, escape, signal, maxgen,\n"
+     "extracted, damaging, no-spark (default: every listed section).",
+     [](Ctx &, const std::string &) {}},
+    {"sheet-min-period", "N", "Output", "--sheet: only oscillators of period N or more (see finish.py --help for all sheet filters).",
+     [](Ctx &, const std::string &v) { toLong("sheet-min-period", v, 1); }},
+    {"sheet-max-period", "N", "Output", "--sheet: only oscillators of period N or less.",
+     [](Ctx &, const std::string &v) { toLong("sheet-max-period", v, 1); }},
+    {"sheet-min-spark-gap", "N", "Output", "--sheet: only oscillators with a spark gap of N or more (as in --sort sparky).",
+     [](Ctx &, const std::string &v) { toLong("sheet-min-spark-gap", v, 0); }},
+    {"sheet-min-dist", "N", "Output", "--sheet: only catalysts whose output reaches N or more cells from the spark.",
+     [](Ctx &, const std::string &v) { toLong("sheet-min-dist", v, 0); }},
+    {"sheet-min-clean-dist", "N", "Output", "--sheet: the same for the clean output distance.",
+     [](Ctx &, const std::string &v) { toLong("sheet-min-clean-dist", v, 0); }},
+    {"sheet-min-gens", "N", "Output",
+     "--sheet: catalyst reactions lasting N or more gens, oscillators starting to cycle at gen N or later.",
+     [](Ctx &, const std::string &v) { toLong("sheet-min-gens", v, 0); }},
+    {"sheet-max-gens", "N", "Output", "--sheet: the same, at most N.",
+     [](Ctx &, const std::string &v) { toLong("sheet-max-gens", v, 0); }},
+    {"sheet-max-cells", "N", "Output", "--sheet: patterns of at most N cells.",
+     [](Ctx &, const std::string &v) { toLong("sheet-max-cells", v, 1); }},
     {"rotor-db", "FILE", "Output",
      "Rotors already listed by earlier searches of this rule, one file per rule. Oscillators with\n"
      "these rotors aren't printed, and finish.py adds the rotors it lists, so each search shows only\n"
@@ -948,7 +973,10 @@ bool readModern(const std::vector<std::string> &args, Options &o) {
 
 std::vector<std::string> cliSettings(const std::vector<std::string> &args) {
   static const char *KEEP[] = {"rule", "pattern", "clear", "no-change", "allow-change", "no-count",
-                               "count", "no-check", "check", "must-reach", "sort", "rotor-db", "output-dist"};
+                               "count", "no-check", "check", "must-reach", "sort", "rotor-db", "output-dist",
+                               "sheet", "sheet-kinds", "sheet-min-period", "sheet-max-period", "sheet-min-spark-gap",
+                               "sheet-min-dist", "sheet-min-clean-dist", "sheet-min-gens", "sheet-max-gens",
+                               "sheet-max-cells"};
   std::vector<std::string> out;
   for (size_t i = 0; i < args.size(); i++) {
     const std::string &a = args[i];
@@ -972,6 +1000,7 @@ std::vector<std::string> cliSettings(const std::vector<std::string> &args) {
           if (realpath(value.c_str(), real)) value = real;
         }
         std::replace(value.begin(), value.end(), '\n', ' ');
+        if (value.empty()) value = "yes";   // a bare switch such as --sheet
         out.push_back(name + " = " + value);
       }
   }

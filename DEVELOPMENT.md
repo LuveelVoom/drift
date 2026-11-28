@@ -272,3 +272,23 @@ original arguments, plus a fingerprint of the search settings.
 ```
 cd drift && make test      # rule tables, then builds ref/dr2fixed and compares; expect "all identical"
 ```
+
+## 2026-11-27: spark converters back in place; --sheet
+- finish.py no longer has a "Spark converters" section at the top or writes `-converters.rle`
+  (`--min-output-dist`, `--max-box`, `--no-converters` removed). With `output-dist` in the config,
+  catalysts of any box size are listed (before: only <= 8 unless --all), each with
+  `output dist N (clean M) at gen G`, measured as the old converter check did. On
+  results/wire-end/end-A-lead12-r4 the old section's 5 converters (dist 14, 13, 12, 10, 10) are now
+  among its 9 catalysts with the same distances.
+- `--sheet` / `sheet = yes` and `--sheet-kinds` / `sheet-kinds =` (drift accepts and forwards them):
+  `<config>-sheet.rle`, every result of the chosen sections, 10 per row, a #C line per pattern; past
+  --limit unshrunk. Checked through drift on examples/glider-eater (14 catalysts, sheet parses in casim).
+- `make test`: all identical.
+- Seen, not changed: README/GUIDE call examples/beehive-spark.cfg a ~1 s tutorial in Life, but its
+  committed rule is B2ein3cijr4jy6i/S23-ky4citwyz and it ran > 2 min.
+- Sheet filters (later the same day): `sheet-min-period`, `sheet-max-period`, `sheet-min-spark-gap`,
+  `sheet-min-dist`, `sheet-min-clean-dist`, `sheet-min-gens`, `sheet-max-gens`, `sheet-max-cells`
+  (finish.py flags, drift options, config settings). Each applies only to the sections that have the
+  property; without sheet-kinds the sheet is limited to those sections. Checked: min-dist 12 on
+  end-A-lead12-r4 keeps exactly the dist 14/13/12 catalysts; min-period 4 on a 30 s a5 spark-oscillator
+  run keeps 197 oscillators, all p4+, no other kinds; adding min-spark-gap 2 keeps 11, all gap 2.
